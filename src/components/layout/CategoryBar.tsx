@@ -1,0 +1,378 @@
+"use client";
+
+import { useContext, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { TiThSmallOutline } from "react-icons/ti";
+import { RiArrowRightSLine } from "react-icons/ri";
+import { IoIosArrowUp } from "react-icons/io";
+import { PiShoppingCartLight } from "react-icons/pi";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import categoryLogo from "@/assets/categoryLogo.webp";
+import category from "@/data/categoryBarItems";
+import topCategoriesData12 from "@/data/topCategoriesData12";
+import topCategoriesData34 from "@/data/topCategoriesData34";
+import topCategoriesData56 from "@/data/topCategoriesData56";
+import { useCart } from "@/context/CartContext";
+import type { TopCategory } from "@/types/category";
+
+gsap.registerPlugin(ScrollTrigger);
+
+function HoverLine() {
+  const enter = (e: React.MouseEvent<HTMLElement>) => {
+    const line = e.currentTarget.querySelector(".line");
+    if (!line) return;
+    gsap.fromTo(
+      line,
+      { scaleX: 0, transformOrigin: "left", backgroundColor: "black" },
+      { scaleX: 1, duration: 0.4, ease: "power2.out", backgroundColor: "black" }
+    );
+  };
+  const leave = (e: React.MouseEvent<HTMLElement>) => {
+    const line = e.currentTarget.querySelector(".line");
+    if (!line) return;
+    gsap.to(line, {
+      scaleX: 0,
+      transformOrigin: "right",
+      duration: 0.4,
+      ease: "power2.out",
+      backgroundColor: "black",
+    });
+  };
+  return { enter, leave };
+}
+
+/** Simple dropdown used for topCategoriesData12 & topCategoriesData56 (same shape) */
+function SimpleDropdownItem({
+  cate,
+  offsetLeft,
+  topOffset,
+  onEnter,
+  onLeave,
+}: {
+  cate: TopCategory;
+  offsetLeft?: string;
+  topOffset: string;
+  onEnter: (e: React.MouseEvent<HTMLElement>) => void;
+  onLeave: (e: React.MouseEvent<HTMLElement>) => void;
+}) {
+  const [hover, setHover] = useState(false);
+  return (
+    <div
+      className="relative h-full flex items-center group cursor-pointer"
+      onMouseEnter={(e) => {
+        onEnter(e);
+        setHover(true);
+      }}
+      onMouseLeave={(e) => {
+        onLeave(e);
+        setHover(false);
+      }}
+    >
+      <span>{cate.title}</span>
+      <span className="line absolute left-0 top-[34px] h-[2px] w-full"></span>
+      <div
+        className={`w-[260px] z-50 h-fit pointer-events-none opacity-0 ${
+          hover ? "group-hover:opacity-100" : ""
+        } -translate-y-3 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 bg-white border border-gray-200 shadow-md absolute ${
+          offsetLeft ?? "left-[-10px]"
+        } ${topOffset} px-5 py-2`}
+      >
+        {cate.submenus.map((subCate, index) => (
+          <div key={subCate.id} className="mt-2 group/subItem">
+            <span
+              className="cursor-pointer text-sm relative inline-block text-gray-600 group-hover/subItem:text-gray-900"
+              onMouseEnter={onEnter}
+              onMouseLeave={onLeave}
+            >
+              {subCate.name}
+              <span className="line absolute left-0 top-[19px] h-[1.7px] w-full"></span>
+            </span>
+            {index !== cate.submenus.length - 1 && (
+              <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Nested dropdown used for topCategoriesData34 (has second-level submenu) */
+function NestedDropdownItem({
+  cate,
+  topOffset,
+  onEnter,
+  onLeave,
+}: {
+  cate: TopCategory;
+  topOffset: string;
+  onEnter: (e: React.MouseEvent<HTMLElement>) => void;
+  onLeave: (e: React.MouseEvent<HTMLElement>) => void;
+}) {
+  const [hover, setHover] = useState(false);
+  return (
+    <div
+      className="relative h-full flex items-center group cursor-pointer"
+      onMouseEnter={(e) => {
+        onEnter(e);
+        setHover(true);
+      }}
+      onMouseLeave={(e) => {
+        onLeave(e);
+        setHover(false);
+      }}
+    >
+      <span>{cate.title}</span>
+      <span className="line absolute left-0 top-[34px] h-[2px] w-full"></span>
+      <div
+        className={`w-[260px] z-50 flex flex-col gap-3 h-fit pointer-events-none opacity-0 ${
+          hover ? "group-hover:opacity-100" : ""
+        } -translate-y-3 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 bg-white border border-gray-200 shadow-md absolute left-[-10px] ${topOffset} px-5 py-2`}
+      >
+        {cate.submenus.map((subCate, index) => (
+          <div key={subCate.id}>
+            <div
+              className={`relative ${
+                index !== cate.submenus.length - 1 ? "mb-3" : "mb-1"
+              } mt-1 group/item w-[235px]`}
+            >
+              <div className="flex items-center justify-between group font-medium cursor-pointer">
+                <span
+                  className="relative text-gray-700 group-hover:text-gray-950"
+                  onMouseEnter={onEnter}
+                  onMouseLeave={onLeave}
+                >
+                  {subCate.name}
+                  <span className="line absolute left-0 bottom-[1px] h-[1.6px] w-full"></span>
+                </span>
+                {subCate.item && (
+                  <RiArrowRightSLine className="absolute left-[213px] top-[4px] text-lg text-gray-500" />
+                )}
+              </div>
+              {subCate.item && (
+                <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white border shadow-md absolute left-[235px] -top-[8px] px-5 py-2">
+                  {subCate.item.map((subItem, i2) => (
+                    <div
+                      key={i2}
+                      className={`cursor-pointer mt-2 group/subItem ${
+                        i2 !== subCate.item!.length - 1 ? "mb-0" : "mb-1"
+                      }`}
+                    >
+                      <span
+                        className="text-sm relative text-gray-600 group-hover/subItem:text-gray-900"
+                        onMouseEnter={onEnter}
+                        onMouseLeave={onLeave}
+                      >
+                        {subItem}
+                        <span className="line absolute left-0 -bottom-[1px] h-[1.6px] w-full"></span>
+                      </span>
+                      {i2 !== subCate.item!.length - 1 && (
+                        <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {index !== cate.submenus.length - 1 && (
+              <div className="w-full h-[2px] bg-gray-100"></div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CategoryMegaMenu({ onEnter, onLeave }: { onEnter: (e: React.MouseEvent<HTMLElement>) => void; onLeave: (e: React.MouseEvent<HTMLElement>) => void }) {
+  return (
+    <div className="relative group/main">
+      <div className="h-[39px] mt-2 flex gap-1 cursor-pointer">
+        <TiThSmallOutline className="text-[22px] mt-[2px]" />
+        <div className="flex items-center mb-3">
+          <span className="text-[16px] font-medium mr-[2px]">Category</span>
+          <IoIosArrowUp className="mt-[5px]" />
+        </div>
+      </div>
+      <div className="bg-white absolute z-50 opacity-0 group-hover/main:opacity-100 pointer-events-none group-hover/main:pointer-events-auto translate-y-4 group-hover/main:translate-y-0 transition-all duration-200 top-[46px] w-[260px] h-fit border-gray-200 border shadow-md p-5">
+        <div className="flex flex-col gap-4">
+          {category.map((item) => (
+            <div key={item.id} className="relative group/item w-[225px]">
+              <Link href={`/category/${encodeURIComponent(item.name)}`}>
+                <div className="flex items-center justify-between group font-medium cursor-pointer">
+                  <span
+                    className="relative text-gray-700 group-hover:text-gray-950"
+                    onMouseEnter={onEnter}
+                    onMouseLeave={onLeave}
+                  >
+                    {item.name}
+                    <span className="line absolute left-0 bottom-[1px] h-[1.6px] w-full"></span>
+                  </span>
+                  <RiArrowRightSLine className="absolute left-[201px] top-[5px] text-lg text-gray-500" />
+                </div>
+              </Link>
+              <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white rounded-md border border-gray-200 shadow-md absolute left-[225px] -top-[4px] px-5 py-2">
+                {item.title.map((title, index) => (
+                  <div key={index} className="cursor-pointer mt-2">
+                    <span className="text-sm">{title}</span>
+                    <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CategoryBar() {
+  const { enter, leave } = HoverLine();
+  const [cateShow, setCateShow] = useState(false);
+  const lastScrollY = useRef(0);
+  const { cart } = useCart();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const hideBefore = 650;
+
+      if (currentScrollY < hideBefore) {
+        setCateShow(false);
+        lastScrollY.current = currentScrollY;
+        return;
+      }
+
+      setCateShow(currentScrollY < lastScrollY.current);
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <div>
+      {/* Static bar */}
+      <div className="w-full categoryBackground hidden xl:flex bg-yellow-400">
+        <div className="w-[92%] h-[47px] mx-auto flex justify-between items-center category">
+          <CategoryMegaMenu onEnter={enter} onLeave={leave} />
+
+          <div className="flex h-full items-center gap-5 font-semibold text-[15px] mr-2">
+            <div
+              className="relative h-full flex items-center cursor-pointer"
+              onMouseEnter={enter}
+              onMouseLeave={leave}
+            >
+              <span>Home</span>
+              <span className="line absolute left-0 top-[34px] h-[2px] w-full"></span>
+            </div>
+
+            {topCategoriesData12.map((cate) => (
+              <SimpleDropdownItem key={cate.id} cate={cate} topOffset="top-[45px]" onEnter={enter} onLeave={leave} />
+            ))}
+
+            {topCategoriesData34.map((cate) => (
+              <NestedDropdownItem key={cate.id} cate={cate} topOffset="top-[45px]" onEnter={enter} onLeave={leave} />
+            ))}
+
+            <div>
+              <span className="text-red-600">Bespoke</span>
+            </div>
+            <div>
+              <Image className="w-[40px] h-auto" src={categoryLogo} alt="Xteamwear" />
+            </div>
+            <div className="relative cursor-pointer" onMouseEnter={enter} onMouseLeave={leave}>
+              <span>DTF Design</span>
+              <span className="line absolute left-0 -bottom-1 h-[2px] w-full"></span>
+            </div>
+
+            {topCategoriesData56.map((cate) => (
+              <SimpleDropdownItem
+                key={cate.id}
+                cate={cate}
+                offsetLeft={cate.id === 2 ? "-left-[60px]" : "left-[-10px]"}
+                topOffset="top-[45px]"
+                onEnter={enter}
+                onLeave={leave}
+              />
+            ))}
+
+            <div className="relative cursor-pointer" onMouseEnter={enter} onMouseLeave={leave}>
+              <span>All Reviews</span>
+              <span className="line absolute left-0 -bottom-1 h-[2px] w-full"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky bar that slides in on scroll-up */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 bg-yellow-400 hidden xl:flex justify-between h-[80px] px-4 items-center transition-all duration-150 ${
+          cateShow ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
+        <h2 className="text-xl font-medium">XTEAMWEAR</h2>
+
+        <CategoryMegaMenu onEnter={enter} onLeave={leave} />
+
+        <div className="flex flex-wrap items-center gap-5 font-semibold text-[15px] mr-2">
+          <div
+            className="relative h-full flex items-center cursor-pointer"
+            onMouseEnter={enter}
+            onMouseLeave={leave}
+          >
+            <span>Home</span>
+            <span className="line absolute left-0 top-[23px] h-[2px] w-full"></span>
+          </div>
+
+          {topCategoriesData12.map((cate) => (
+            <SimpleDropdownItem key={cate.id} cate={cate} topOffset="top-[28px]" onEnter={enter} onLeave={leave} />
+          ))}
+
+          {topCategoriesData34.map((cate) => (
+            <NestedDropdownItem key={cate.id} cate={cate} topOffset="top-[28px]" onEnter={enter} onLeave={leave} />
+          ))}
+
+          <div>
+            <span className="text-red-600">Bespoke</span>
+          </div>
+          <div>
+            <Image className="w-[40px] h-auto" src={categoryLogo} alt="Xteamwear" />
+          </div>
+          <div className="relative cursor-pointer" onMouseEnter={enter} onMouseLeave={leave}>
+            <span>DTF Design</span>
+            <span className="line absolute left-0 -bottom-1 h-[2px] w-full"></span>
+          </div>
+
+          {topCategoriesData56.map((cate) => (
+            <SimpleDropdownItem
+              key={cate.id}
+              cate={cate}
+              offsetLeft={cate.id === 2 ? "-left-[60px]" : "left-[-10px]"}
+              topOffset="top-[28px]"
+              onEnter={enter}
+              onLeave={leave}
+            />
+          ))}
+
+          <div className="relative cursor-pointer" onMouseEnter={enter} onMouseLeave={leave}>
+            <span>All Reviews</span>
+            <span className="line absolute left-0 -bottom-1 h-[2px] w-full"></span>
+          </div>
+        </div>
+
+        <Link href="/cart" className="relative">
+          <PiShoppingCartLight className="text-[32px] group-hover:scale-110 transition-all duration-200" />
+          <span className="absolute -top-[9px] -right-[6px] flex items-center justify-center bg-red-500 rounded-full font-semibold text-white text-[14.5px] w-[25px] h-[25px]">
+            {cart.length}
+          </span>
+        </Link>
+      </div>
+    </div>
+  );
+}
