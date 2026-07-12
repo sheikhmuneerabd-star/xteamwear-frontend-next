@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/context/CartContext";
+import Link from "next/link";
 
 export default function OrderSummary() {
   const { cart } = useCart();
@@ -108,12 +109,12 @@ export default function OrderSummary() {
 
         <div className="space-y-4 mt-4 xl:w-full md:w-[48%] w-full">
           <div className="md:flex justify-center hidden">
-            <button
-              type="button"
-              className="rounded text-sm w-full cursor-pointer md:h-[45px] h-[42px] hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1"
+            <Link
+              href="/checkout"
+              className="rounded text-sm w-full md:h-[45px] h-[42px] hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1 flex items-center justify-center"
             >
               PROCEED TO CHECKOUT
-            </button>
+            </Link>
           </div>
           <div className="md:flex justify-center hidden">
             <button
@@ -141,12 +142,12 @@ export default function OrderSummary() {
               <p className="font-semibold">Rs.{total.toLocaleString("en-PK")} PKR</p>
             </div>
             <div className="md:flex justify-center px-3 py-1">
-              <button
-                type="button"
-                className="rounded cursor-pointer text-sm w-full md:h-[45px] h-[42px] hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1"
+              <Link
+                href="/checkout"
+                className="rounded text-sm w-full md:h-[45px] h-[42px] hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1 flex items-center justify-center"
               >
                 PROCEED TO CHECKOUT
-              </button>
+              </Link>
             </div>
             <div className="md:flex justify-center px-3 py-1">
               <button

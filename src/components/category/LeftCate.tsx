@@ -54,7 +54,7 @@ export default function LeftCate({
                   }}
                   aria-expanded={isOpen}
                   aria-controls={`section-${index}`}
-                  className="w-full flex justify-between items-center pl-0 p-2 group"
+                  className="w-full flex cursor-pointer justify-between items-center pl-0 p-2 group"
                 >
                   <div className="flex w-full items-center relative">
                     <IoIosArrowForward className="text-[15px] mt-[3.3px]" />

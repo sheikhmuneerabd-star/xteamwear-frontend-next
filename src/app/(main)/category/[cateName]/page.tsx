@@ -13,8 +13,18 @@ import RightViewPage from "@/components/category/RightViewPage";
 import CardCateSec from "@/components/category/CardCateSec";
 import LastCateCard from "@/components/category/LastCateCard";
 
-import categoryCardImg from "@/data/categoryCardImg";
 import lastCateCard from "@/data/lastCateCard";
+import type { Product } from "@/types/product";
+
+interface DbProductResponse {
+  _id: string;
+  name: string;
+  oldPrice: number;
+  newPrice: number;
+  category: string;
+  available: boolean;
+  variants: { color: string; icon: string; images: string[]; sku: string; stock: number }[];
+}
 
 export default function CategorySection() {
   const params = useParams<{ cateName: string }>();
@@ -24,14 +34,32 @@ export default function CategorySection() {
   const [itemPerPageCard, setItemPerPageCard] = useState(10);
   const options = [10, 20, 25, 30, 50];
 
-  const [activeCategory, setActiveCategory] = useState("");
-  const [subActiveCategory, setSubActiveCategory] = useState("");
-  const [stockOpen, setStockOpen] = useState(false);
-  const [outStockOpen, setOutStockOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (cateName) setActiveCategory(cateName);
-  }, [cateName]);
+    async function fetchProducts() {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        const mapped: Product[] = (data.products || []).map((p: DbProductResponse) => ({
+          id: p._id,
+          name: p.name,
+          oldPrice: p.oldPrice,
+          newPrice: p.newPrice,
+          category: p.category,
+          available: p.available,
+          variants: p.variants,
+        }));
+        setProducts(mapped);
+      } catch (err) {
+        console.error("Failed to load products", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProducts();
+  }, []);
 
   const handleShowMore = () => {
     const currentIndex = options.indexOf(itemPerPageCard);
@@ -42,6 +70,15 @@ export default function CategorySection() {
       window.scrollBy({ top: 200, behavior: "smooth" });
     }, 100);
   };
+
+  const [activeCategory, setActiveCategory] = useState("");
+  const [subActiveCategory, setSubActiveCategory] = useState("");
+  const [stockOpen, setStockOpen] = useState(false);
+  const [outStockOpen, setOutStockOpen] = useState(false);
+
+  useEffect(() => {
+    if (cateName) setActiveCategory(cateName);
+  }, [cateName]);
 
   return (
     <div>
@@ -56,7 +93,7 @@ export default function CategorySection() {
           />
           <ClearStockBox setStockOpen={setStockOpen} stockOpen={stockOpen} outStockOpen={outStockOpen} setOutStockOpen={setOutStockOpen} />
           <Available
-            categoryCardImg={categoryCardImg}
+            categoryCardImg={products}
             setStockOpen={setStockOpen}
             stockOpen={stockOpen}
             outStockOpen={outStockOpen}
@@ -75,25 +112,33 @@ export default function CategorySection() {
             itemPerPageCard={itemPerPageCard}
             setItemPerPageCard={setItemPerPageCard}
           />
-          <CardCateSec
-            categoryCardImg={categoryCardImg}
-            stockOpen={stockOpen}
-            outStockOpen={outStockOpen}
-            grid={grid}
-            itemPerPageCard={itemPerPageCard}
-            activeCategory={activeCategory}
-          />
-          <div className="flex justify-center mt-3">
-            {itemPerPageCard < categoryCardImg.length && (
-              <button
-                type="button"
-                className="rounded cursor-pointer text-sm md:w-[310px] w-[280px] md:h-[45px] h-[42px] mt-2 hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1"
-                onClick={handleShowMore}
-              >
-                Show More
-              </button>
-            )}
-          </div>
+
+          {loading ? (
+            <p className="text-center py-16 text-gray-500">Loading products...</p>
+          ) : (
+            <>
+              <CardCateSec
+                categoryCardImg={products}
+                stockOpen={stockOpen}
+                outStockOpen={outStockOpen}
+                grid={grid}
+                itemPerPageCard={itemPerPageCard}
+                activeCategory={activeCategory}
+                subActiveCategory={subActiveCategory}
+              />
+              <div className="flex justify-center mt-3">
+                {itemPerPageCard < products.length && (
+                  <button
+                    type="button"
+                    className="rounded text-sm md:w-[310px] w-[280px] md:h-[45px] h-[42px] mt-2 hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1"
+                    onClick={handleShowMore}
+                  >
+                    Show More
+                  </button>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
 

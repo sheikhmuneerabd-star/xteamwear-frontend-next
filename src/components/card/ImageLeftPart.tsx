@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -18,7 +18,7 @@ export default function ImageLeftPart({ product, selectedColor }: ImageLeftPartP
   const selectedVariant =
     product.variants.find((v) => v.color === selectedColor) || product.variants[0];
 
-  const [activeImage, setActiveImage] = useState<StaticImageData>(selectedVariant.images[0]);
+  const [activeImage, setActiveImage] = useState(selectedVariant.images[0]);
 
   useEffect(() => {
     setActiveImage(selectedVariant.images[0]);
@@ -30,9 +30,16 @@ export default function ImageLeftPart({ product, selectedColor }: ImageLeftPartP
 
   return (
     <div className="xl:w-[55%] md:w-[45%] w-[90%] md:mx-0 mx-auto sticky top-8">
-      <div className="relative">
-        <Image className="w-full h-auto" src={activeImage} alt={product.name} priority />
-        <span className="bg-red-500 text-[14px] absolute top-0 right-0 text-white px-2 py-[1px]">
+      <div className="relative aspect-[4/5] w-full">
+        <Image
+          className="object-cover"
+          src={activeImage}
+          alt={product.name}
+          fill
+          sizes="(max-width: 768px) 90vw, 55vw"
+          priority
+        />
+        <span className="bg-red-500 text-[14px] absolute top-0 right-0 text-white px-2 py-[1px] z-10">
           Sale {discount}%
         </span>
       </div>
@@ -48,12 +55,9 @@ export default function ImageLeftPart({ product, selectedColor }: ImageLeftPartP
         >
           {selectedVariant.images.map((img, i) => (
             <SwiperSlide key={i}>
-              <Image
-                src={img}
-                onClick={() => setActiveImage(img)}
-                className="cursor-pointer w-full h-auto"
-                alt={`${product.name} view ${i + 1}`}
-              />
+              <div className="relative aspect-square w-full cursor-pointer" onClick={() => setActiveImage(img)}>
+                <Image src={img} alt={`${product.name} view ${i + 1}`} fill sizes="150px" className="object-cover" />
+              </div>
             </SwiperSlide>
           ))}
         </Swiper>

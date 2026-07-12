@@ -87,7 +87,7 @@ const baseSPProducts: Product[] = [
 // Same note as shirtData.ts: real backend won't need this duplication.
 const sPShirtData: Product[] = [
   ...baseSPProducts,
-  ...baseSPProducts.map((p) => ({ ...p, id: p.id + 4 })), // 9-12
+  ...baseSPProducts.map((p) => ({ ...p, id: (p.id as number) + 4 })),
 ];
 
 export default sPShirtData;

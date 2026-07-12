@@ -120,8 +120,8 @@ const baseProducts: Product[] = [
  */
 const shirtData: Product[] = [
   ...baseProducts,
-  ...baseProducts.map((p) => ({ ...p, id: p.id + 99 })), // 100-103
-  ...baseProducts.map((p) => ({ ...p, id: p.id + 103 })), // 104-107
+  ...baseProducts.map((p) => ({ ...p, id: (p.id as number) + 99 })),
+  ...baseProducts.map((p) => ({ ...p, id: (p.id as number) + 103 })),
 ];
 
 export default shirtData;

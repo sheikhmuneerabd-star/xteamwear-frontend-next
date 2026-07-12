@@ -1,5 +1,5 @@
 "use client";
-
+import { useSession, signOut } from "next-auth/react";
 import { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -139,7 +139,11 @@ export default function Navbar() {
   const languageBoxRef = useRef<HTMLDivElement>(null);
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
 
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountBoxRef = useRef<HTMLDivElement>(null);
+
   const { cart } = useCart();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -174,6 +178,16 @@ export default function Navbar() {
     function handleClickOutside(event: MouseEvent) {
       if (languageBoxRef.current && !languageBoxRef.current.contains(event.target as Node)) {
         setLanguageCountry(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (accountBoxRef.current && !accountBoxRef.current.contains(event.target as Node)) {
+        setAccountOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -298,13 +312,43 @@ export default function Navbar() {
                 </div>
               </div>
             </div>
-            <Link href="/sign-in" className="flex items-center gap-1 group cursor-pointer">
-              <PiUserLight className="text-[40px] group-hover:scale-110 transition-all duration-200" />
-              <div className="flex flex-col text-[13px]">
-                <span>Sign In or Register</span>
-                <span className="font-semibold">My account</span>
+            {status === "authenticated" ? (
+              <div className="flex items-center gap-1 group cursor-pointer relative" ref={accountBoxRef}>
+                <PiUserLight
+                  className="text-[40px] group-hover:scale-110 transition-all duration-200"
+                  onClick={() => setAccountOpen(!accountOpen)}
+                />
+                <div className="flex flex-col text-[13px]" onClick={() => setAccountOpen(!accountOpen)}>
+                  <span>Hi, {session.user?.name?.split(" ")[0]}</span>
+                  <span className="font-semibold">My account</span>
+                </div>
+                <div
+                  className="bg-white z-50 w-[160px] py-3 flex flex-col gap-2 rounded-md absolute top-12 right-0 shadowNavCon transition-all duration-300"
+                  style={{
+                    opacity: accountOpen ? 1 : 0,
+                    pointerEvents: accountOpen ? "auto" : "none",
+                    transform: accountOpen ? "translateY(0)" : "translateY(-10px)",
+                  }}
+                >
+                  <p className="px-4 text-xs text-gray-500 truncate">{session.user?.email}</p>
+                  <button
+                    type="button"
+                    className="px-4 py-2 text-left text-sm hover:bg-gray-100"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                  >
+                    Sign Out
+                  </button>
+                </div>
               </div>
-            </Link>
+            ) : (
+              <Link href="/sign-in" className="flex items-center gap-1 group cursor-pointer">
+                <PiUserLight className="text-[40px] group-hover:scale-110 transition-all duration-200" />
+                <div className="flex flex-col text-[13px]">
+                  <span>Sign In or Register</span>
+                  <span className="font-semibold">My account</span>
+                </div>
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -424,14 +468,33 @@ export default function Navbar() {
                   </div>
 
                   <div>
-                    <Link href="/sign-in" className="flex gap-1 items-center p-3 border-b border-gray-300">
-                      <HiOutlineUserCircle className="text-[24px]" />
-                      <span className="text-[16px]">Sign In</span>
-                    </Link>
-                    <Link href="/sign-in" className="flex gap-1 items-center p-3 border-b border-gray-300">
-                      <RiUserAddLine className="text-[24px]" />
-                      <span className="text-[16px]">Create an account</span>
-                    </Link>
+                    {status === "authenticated" ? (
+                      <>
+                        <div className="flex gap-1 items-center p-3 border-b border-gray-300">
+                          <HiOutlineUserCircle className="text-[24px]" />
+                          <span className="text-[16px]">Hi, {session.user?.name?.split(" ")[0]}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="w-full flex gap-1 items-center p-3 border-b border-gray-300 text-left"
+                          onClick={() => signOut({ callbackUrl: "/" })}
+                        >
+                          <RiUserAddLine className="text-[24px]" />
+                          <span className="text-[16px]">Sign Out</span>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/sign-in" className="flex gap-1 items-center p-3 border-b border-gray-300">
+                          <HiOutlineUserCircle className="text-[24px]" />
+                          <span className="text-[16px]">Sign In</span>
+                        </Link>
+                        <Link href="/sign-in" className="flex gap-1 items-center p-3 border-b border-gray-300">
+                          <RiUserAddLine className="text-[24px]" />
+                          <span className="text-[16px]">Create an account</span>
+                        </Link>
+                      </>
+                    )}
                   </div>
 
                   <div>

@@ -1,0 +1,34 @@
+import Link from "next/link";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    redirect("/");
+  }
+
+  return (
+    <div className="flex min-h-screen">
+      <aside className="w-[220px] bg-gray-900 text-white p-5 space-y-4">
+        <h2 className="text-xl font-bold mb-6">Xteamwear Admin</h2>
+        <nav className="flex flex-col gap-2">
+          <Link href="/admin" className="hover:bg-gray-800 rounded px-3 py-2">
+            Dashboard
+          </Link>
+          <Link href="/admin/products" className="hover:bg-gray-800 rounded px-3 py-2">
+            Products
+          </Link>
+          <Link href="/admin/orders" className="hover:bg-gray-800 rounded px-3 py-2">
+            Orders
+          </Link>
+          <Link href="/" className="hover:bg-gray-800 rounded px-3 py-2 text-gray-400 mt-8">
+            ← Back to Store
+          </Link>
+        </nav>
+      </aside>
+      <main className="flex-1 bg-gray-50 p-8">{children}</main>
+    </div>
+  );
+}

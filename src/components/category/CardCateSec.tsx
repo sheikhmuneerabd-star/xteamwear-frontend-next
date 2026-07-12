@@ -15,9 +15,10 @@ interface CardCateSecProps {
   grid: number;
   itemPerPageCard: number;
   activeCategory: string;
+  subActiveCategory?: string;
 }
 
-export default function CardCateSec({ categoryCardImg, stockOpen, outStockOpen, grid, itemPerPageCard, activeCategory }: CardCateSecProps) {
+export default function CardCateSec({ categoryCardImg, stockOpen, outStockOpen, grid, itemPerPageCard, activeCategory, subActiveCategory }: CardCateSecProps) {
   useGSAP(() => {
     const ctx = gsap.context(() => {
       ScrollTrigger.batch(".shirt2", {
@@ -47,6 +48,7 @@ export default function CardCateSec({ categoryCardImg, stockOpen, outStockOpen, 
 
   const filteredData = categoryCardImg
     .filter((item) => item.category === activeCategory)
+    .filter((item) => !subActiveCategory || item.subCategory === subActiveCategory)
     .filter((item) => {
       if (stockOpen && outStockOpen) return true;
       if (stockOpen) return item.available;

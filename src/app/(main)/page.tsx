@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
@@ -10,10 +10,44 @@ import ShirtCard from "@/components/home/ShirtCard";
 import TestimonialSlider from "@/components/home/TestimonialSlider";
 import LatestPostSec from "@/components/home/LatestPostSec";
 import LatestCards from "@/components/home/LatestCards";
-import shirtData from "@/data/shirtData";
+import type { Product } from "@/types/product";
 
 export default function HomePage() {
   const [showMore, setShowMore] = useState(4);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        const mapped: Product[] = (data.products || []).map((p: {
+          _id: string;
+          name: string;
+          oldPrice: number;
+          newPrice: number;
+          category: string;
+          available: boolean;
+          variants: { color: string; icon: string; images: string[]; sku: string; stock: number }[];
+        }) => ({
+          id: p._id,
+          name: p.name,
+          oldPrice: p.oldPrice,
+          newPrice: p.newPrice,
+          category: p.category,
+          available: p.available,
+          variants: p.variants,
+        }));
+        setProducts(mapped);
+      } catch (err) {
+        console.error("Failed to load products", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProducts();
+  }, []);
 
   useGSAP(() => {
     const tl = gsap.timeline();
@@ -39,7 +73,7 @@ export default function HomePage() {
     <div>
       <TeamImage />
 
-      <h3 className="text-center text-2xl font-medium xl:mt-9 mt-5 xteamwearA">
+      <h3 className="text-center text-2xl font-medium xl:mt-0 mt-5 xteamwearA">
         XTEAMWEAR ADVANTAGES
       </h3>
       <FactoryCard />
@@ -47,14 +81,20 @@ export default function HomePage() {
       <div className="bg-gray-100">
         <h3 className="ml-[40px] text-2xl font-medium pt-10 pb-8">LATEST HOT PRODUCTS</h3>
         <div className="w-[93.8%] mx-auto">
-          <ShirtCard showMore={showMore} />
+          {loading ? (
+            <p className="text-center py-10 text-gray-500">Loading products...</p>
+          ) : products.length === 0 ? (
+            <p className="text-center py-10 text-gray-500">No products available yet.</p>
+          ) : (
+            <ShirtCard showMore={showMore} products={products} />
+          )}
         </div>
         <div className="flex justify-center pb-10 showMore">
-          {showMore < shirtData.length && (
+          {showMore < products.length && (
             <button
               type="button"
               onClick={() => setShowMore(showMore + 4)}
-              className="bg-white text-center text-[14px] font-medium w-[300px] h-[42px] rounded-md shadow-md mt-10 transition-all duration-200 cursor-pointer hover:border-black border-[1.3px] hover:-translate-y-2"
+              className="bg-white text-center text-[14px] font-medium w-[300px] h-[42px] rounded-md shadow-md mt-10 transition-all duration-200 hover:border-black border-[1.3px] hover:-translate-y-2"
             >
               SHOW MORE
             </button>
