@@ -134,7 +134,7 @@ export default function CheckoutPage() {
             {summaryOpen ? "Hide" : "Show"} order summary
             {summaryOpen ? <IoChevronUp /> : <IoChevronDown />}
           </span>
-          <span className="font-semibold">Rs.{subtotal.toLocaleString("en-PK")}</span>
+          <span className="font-semibold">${subtotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
         </button>
 
         {summaryOpen && (
@@ -311,7 +311,7 @@ export default function CheckoutPage() {
                     <p className="text-xs text-gray-500">{item.color}</p>
                   </div>
                   <p className="text-sm font-medium shrink-0">
-                    Rs.{(item.newPrice * item.qty).toLocaleString("en-PK")}
+                    ${(item.newPrice * item.qty).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                   </p>
                 </div>
               );
@@ -332,7 +332,7 @@ export default function CheckoutPage() {
           <div className="mt-6 pt-4 border-t border-gray-300 space-y-2 text-sm">
             <div className="flex justify-between">
               <p className="text-gray-600">Subtotal · {totalQty} item{totalQty > 1 ? "s" : ""}</p>
-              <p className="font-medium">Rs.{subtotal.toLocaleString("en-PK")}</p>
+              <p className="font-medium">${subtotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
             </div>
             <div className="flex justify-between">
               <p className="text-gray-600">Shipping</p>
@@ -343,8 +343,8 @@ export default function CheckoutPage() {
           <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-300">
             <p className="font-semibold text-lg">Total</p>
             <p className="font-semibold text-lg">
-              <span className="text-xs text-gray-500 font-normal mr-1">PKR</span>
-              Rs.{subtotal.toLocaleString("en-PK")}
+              <span className="text-xs text-gray-500 font-normal mr-1">USD</span>
+              ${subtotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
