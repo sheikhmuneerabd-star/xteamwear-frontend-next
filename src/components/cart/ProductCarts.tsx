@@ -1,8 +1,5 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -11,31 +8,10 @@ import { MdOutlineArrowBackIos, MdOutlineArrowForwardIos } from "react-icons/md"
 
 import cartsProduct from "@/data/cartsProduct";
 import Carts from "./Carts";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useSafeScrollFade } from "@/lib/useSafeScrollFade";
 
 export default function ProductCarts() {
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      ScrollTrigger.batch(".swiper-slide", {
-        start: "top 90%",
-        once: true,
-        onEnter: (elements) => {
-          gsap.from(elements, { y: 80, opacity: 0, duration: 0.8, stagger: 0.15 });
-        },
-      });
-      ScrollTrigger.refresh();
-    });
-
-    const fallback = setTimeout(() => {
-      gsap.set(".swiper-slide", { opacity: 1, y: 0, clearProps: "opacity,transform" });
-    }, 1000);
-
-    return () => {
-      ctx.revert();
-      clearTimeout(fallback);
-    };
-  }, []);
+  useSafeScrollFade(".bestseller-slide", []);
 
   return (
     <div className="mt-16">
@@ -66,7 +42,7 @@ export default function ProductCarts() {
           speed={700}
         >
           {cartsProduct.map((shirt) => (
-            <SwiperSlide key={shirt.id}>
+            <SwiperSlide key={shirt.id} className="bestseller-slide">
               <Carts shirt={shirt} />
             </SwiperSlide>
           ))}

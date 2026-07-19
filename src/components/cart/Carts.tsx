@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Product, ProductVariant } from "@/types/product";
+import { formatPrice } from "@/lib/formatPrice";
 
 export default function Carts({ shirt }: { shirt: Product }) {
   const [active, setActive] = useState<ProductVariant>(shirt.variants[0]);
@@ -43,10 +44,10 @@ export default function Carts({ shirt }: { shirt: Product }) {
               {shirt.name}
             </p>
             <p className="text-gray-600 text-sm md:text-base lg:text-lg mt-2 line-through cursor-pointer">
-              Rs.{shirt.oldPrice.toLocaleString("en-PK")} PKR
+              {formatPrice(shirt.oldPrice)}
             </p>
             <div className="text-red-600 flex items-center gap-2 cursor-pointer text-sm md:text-base lg:text-lg font-medium">
-              Rs.{shirt.newPrice.toLocaleString("en-PK")} PKR
+              {formatPrice(shirt.newPrice)}
               <p className="bg-red-600 text-white xl:px-3 lg:px-3 px-2 xl:text-[15px] lg:text-[15px] text-[10px] xl:pt-1 lg:pt-1 pt-[2px] xl:pb-[5px] lg:pb-[5px] pb-[2px] rounded cursor-text hidden md:flex">
                 (-{discount}%)
               </p>

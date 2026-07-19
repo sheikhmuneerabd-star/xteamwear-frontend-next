@@ -5,8 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { Product } from "@/types/product";
 import CateShirtCard from "./CateShirtCard";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useSafeScrollFade } from "@/lib/useSafeScrollFade";
 
 interface CardCateSecProps {
   categoryCardImg: Product[];
@@ -19,37 +18,14 @@ interface CardCateSecProps {
 }
 
 export default function CardCateSec({ categoryCardImg, stockOpen, outStockOpen, grid, itemPerPageCard, activeCategory, subActiveCategory }: CardCateSecProps) {
-  useGSAP(() => {
-    const ctx = gsap.context(() => {
-      ScrollTrigger.batch(".shirt2", {
-        start: "top 90%",
-        once: true,
-        onEnter: (elements) => {
-          gsap.from(elements, { y: 80, opacity: 0, duration: 0.8, stagger: 0.15 });
-        },
-      });
+  useSafeScrollFade(".shirt2", [activeCategory, grid, itemPerPageCard]);
 
-      // Elements jo already viewport mein hain unke liye ScrollTrigger
-      // ka onEnter fire nahi hota — is liye ek forced refresh + fallback
-      ScrollTrigger.refresh();
-    });
+  const normalize = (str?: string) => (str || "").trim().toLowerCase();
 
-    // Safety net: agar kisi wajah se animation trigger na ho,
-    // 1 second baad sab kuch visible force kar do
-    const fallback = setTimeout(() => {
-      gsap.set(".shirt2", { opacity: 1, y: 0, clearProps: "opacity,transform" });
-    }, 1000);
-
-    return () => {
-      ctx.revert();
-      clearTimeout(fallback);
-    };
-  }, [activeCategory, grid, itemPerPageCard]);
-
-  const filteredData = categoryCardImg
-    .filter((item) => item.category === activeCategory)
-    .filter((item) => !subActiveCategory || item.subCategory === subActiveCategory)
-    .filter((item) => {
+    const filteredData = categoryCardImg
+      .filter((item) => normalize(item.category) === normalize(activeCategory))
+      .filter((item) => !subActiveCategory || normalize(item.subCategory) === normalize(subActiveCategory))
+      .filter((item) => {
       if (stockOpen && outStockOpen) return true;
       if (stockOpen) return item.available;
       if (outStockOpen) return !item.available;

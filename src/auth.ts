@@ -39,14 +39,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig.callbacks,
     async signIn({ user, account }) {
       if (account?.provider === "google") {
+        if (!user.email) return false;
+
         await connectDB();
-        const existing = await User.findOne({ email: user.email?.toLowerCase() });
+        const existing = await User.findOne({ email: user.email.toLowerCase() });
 
         if (!existing) {
           const userCount = await User.countDocuments();
           await User.create({
-            name: user.name,
-            email: user.email?.toLowerCase(),
+            name: user.name || user.email.split("@")[0],
+            email: user.email.toLowerCase(),
             password: await hashPassword(crypto.randomUUID()),
             role: userCount === 0 ? "admin" : "user",
           });

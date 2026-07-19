@@ -16,7 +16,8 @@ interface ImageLeftPartProps {
 
 export default function ImageLeftPart({ product, selectedColor }: ImageLeftPartProps) {
   const selectedVariant =
-    product.variants.find((v) => v.color === selectedColor) || product.variants[0];
+  product.variants.find((v) => v.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()) ||
+  product.variants[0];
 
   const [activeImage, setActiveImage] = useState(selectedVariant.images[0]);
 
@@ -54,7 +55,7 @@ export default function ImageLeftPart({ product, selectedColor }: ImageLeftPartP
           onSlideChange={(swiper) => setActiveImage(selectedVariant.images[swiper.realIndex])}
         >
           {selectedVariant.images.map((img, i) => (
-            <SwiperSlide key={i}>
+            <SwiperSlide key={i} className="thumb-slide">
               <div className="relative aspect-square w-full cursor-pointer" onClick={() => setActiveImage(img)}>
                 <Image src={img} alt={`${product.name} view ${i + 1}`} fill sizes="150px" className="object-cover" />
               </div>

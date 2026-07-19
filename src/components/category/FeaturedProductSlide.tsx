@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { formatPrice } from "@/lib/formatPrice";
 import type { Product, ProductVariant } from "@/types/product";
 
 export default function FeaturedProductSlide({ item }: { item: Product }) {
@@ -40,10 +41,10 @@ export default function FeaturedProductSlide({ item }: { item: Product }) {
               {item.name}
             </p>
             <p className="text-gray-600 text-sm md:text-base lg:text-[14px] mt-2 line-through cursor-pointer">
-              Rs.{item.oldPrice.toLocaleString("en-PK")} PKR
+              {formatPrice(item.oldPrice)}
             </p>
             <div className="text-red-600 flex items-center cursor-pointer text-sm md:text-base lg:text-[14px] font-medium gap-1">
-              Rs.{item.newPrice.toLocaleString("en-PK")} PKR
+              {formatPrice(item.newPrice)}
               <p className="bg-red-600 text-white xl:px-2 lg:px-3 px-2 xl:text-[13px] lg:text-[15px] text-[10px] py-[2px] rounded cursor-text hidden md:flex">
                 (-{discount}%)
               </p>

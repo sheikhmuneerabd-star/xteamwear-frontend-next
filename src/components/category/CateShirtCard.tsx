@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { formatPrice } from "@/lib/formatPrice";
 import type { Product, ProductVariant } from "@/types/product";
 
 interface CateShirtCardProps {
@@ -55,10 +56,10 @@ export default function CateShirtCard({ shirt, grid }: CateShirtCardProps) {
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam at ut culpa a obcaecati aspernatur commodi deleniti esse quo consequatur.
             </p>
             <p className="text-gray-600 text-sm md:text-base lg:text-lg mt-2 line-through cursor-pointer">
-              Rs.{shirt.oldPrice.toLocaleString("en-PK")} PKR
+              {formatPrice(shirt.oldPrice)}
             </p>
             <div className="text-red-600 flex items-center gap-2 cursor-pointer text-sm md:text-base lg:text-lg font-medium">
-              Rs.{shirt.newPrice.toLocaleString("en-PK")} PKR
+              {formatPrice(shirt.newPrice)}
               <p className="bg-red-600 text-white xl:px-3 lg:px-3 px-2 xl:text-[15px] lg:text-[15px] text-[10px] xl:pt-1 lg:pt-1 pt-[2px] xl:pb-[5px] lg:pb-[5px] pb-[2px] rounded cursor-text hidden md:flex">
                 (-{discount}%)
               </p>

@@ -71,7 +71,7 @@ function SimpleDropdownItem({
         setHover(false);
       }}
     >
-      <span>{cate.title}</span>
+      <Link href={`/category/${encodeURIComponent(cate.title)}`}>{cate.title}</Link>
       <span className="line absolute left-0 top-[34px] h-[2px] w-full"></span>
       <div
         className={`w-[260px] z-50 h-fit pointer-events-none opacity-0 ${
@@ -81,19 +81,22 @@ function SimpleDropdownItem({
         } ${topOffset} px-5 py-2`}
       >
         {cate.submenus.map((subCate, index) => (
-          <div key={subCate.id} className="mt-2 group/subItem">
-            <span
-              className="cursor-pointer text-sm relative inline-block text-gray-600 group-hover/subItem:text-gray-900"
-              onMouseEnter={onEnter}
-              onMouseLeave={onLeave}
-            >
-              {subCate.name}
-              <span className="line absolute left-0 top-[19px] h-[1.7px] w-full"></span>
-            </span>
-            {index !== cate.submenus.length - 1 && (
-              <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
-            )}
-          </div>
+          <Link href={`/category/${encodeURIComponent(cate.title)}?sub=${encodeURIComponent(subCate.name)}`} key={subCate.id}>
+            <div className="mt-2 group/subItem">
+              <Link
+                href={`/category/${encodeURIComponent(cate.title)}?sub=${encodeURIComponent(subCate.name)}`}
+                className="cursor-pointer text-sm relative inline-block text-gray-600 group-hover/subItem:text-gray-900"
+                onMouseEnter={onEnter}
+                onMouseLeave={onLeave}
+              >
+                {subCate.name}
+                <span className="line absolute left-0 top-[19px] h-[1.7px] w-full"></span>
+              </Link>
+              {index !== cate.submenus.length - 1 && (
+                <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
+              )}
+            </div>
+          </Link>
         ))}
       </div>
     </div>
@@ -113,6 +116,8 @@ function NestedDropdownItem({
   onLeave: (e: React.MouseEvent<HTMLElement>) => void;
 }) {
   const [hover, setHover] = useState(false);
+  const isGroupHeading = cate.id === 2;
+
   return (
     <div
       className="relative h-full flex items-center group cursor-pointer"
@@ -125,63 +130,91 @@ function NestedDropdownItem({
         setHover(false);
       }}
     >
-      <span>{cate.title}</span>
+      {isGroupHeading ? (
+        <span>{cate.title}</span>
+      ) : (
+        <Link href={`/category/${encodeURIComponent(cate.title)}`}>{cate.title}</Link>
+      )}
       <span className="line absolute left-0 top-[34px] h-[2px] w-full"></span>
       <div
         className={`w-[260px] z-50 flex flex-col gap-3 h-fit pointer-events-none opacity-0 ${
           hover ? "group-hover:opacity-100" : ""
         } -translate-y-3 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 bg-white border border-gray-200 shadow-md absolute left-[-10px] ${topOffset} px-5 py-2`}
       >
-        {cate.submenus.map((subCate, index) => (
-          <div key={subCate.id}>
-            <div
-              className={`relative ${
-                index !== cate.submenus.length - 1 ? "mb-3" : "mb-1"
-              } mt-1 group/item w-[235px]`}
-            >
-              <div className="flex items-center justify-between group font-medium cursor-pointer">
-                <span
-                  className="relative text-gray-700 group-hover:text-gray-950"
-                  onMouseEnter={onEnter}
-                  onMouseLeave={onLeave}
-                >
-                  {subCate.name}
-                  <span className="line absolute left-0 bottom-[1px] h-[1.6px] w-full"></span>
-                </span>
-                {subCate.item && (
-                  <RiArrowRightSLine className="absolute left-[213px] top-[4px] text-lg text-gray-500" />
-                )}
-              </div>
-              {subCate.item && (
-                <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white border shadow-md absolute left-[235px] -top-[8px] px-5 py-2">
-                  {subCate.item.map((subItem, i2) => (
-                    <div
-                      key={i2}
-                      className={`cursor-pointer mt-2 group/subItem ${
-                        i2 !== subCate.item!.length - 1 ? "mb-0" : "mb-1"
-                      }`}
-                    >
-                      <span
-                        className="text-sm relative text-gray-600 group-hover/subItem:text-gray-900"
-                        onMouseEnter={onEnter}
-                        onMouseLeave={onLeave}
-                      >
-                        {subItem}
-                        <span className="line absolute left-0 -bottom-[1px] h-[1.6px] w-full"></span>
-                      </span>
-                      {i2 !== subCate.item!.length - 1 && (
-                        <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
-                      )}
-                    </div>
-                  ))}
+        {cate.submenus.map((subCate, index) => {
+          const categoryName = isGroupHeading ? subCate.name : cate.title;
+          const subParam = isGroupHeading ? undefined : subCate.name;
+
+          return (
+            <div key={subCate.id}>
+              <div
+                className={`relative ${
+                  index !== cate.submenus.length - 1 ? "mb-3" : "mb-1"
+                } mt-1 group/item w-[235px]`}
+              >
+                <Link
+                  href={`/category/${encodeURIComponent(categoryName)}${
+                    subParam ? `?sub=${encodeURIComponent(subParam)}` : ""
+                  }`}
+              >
+                <div className="flex items-center justify-between group font-medium cursor-pointer">
+                  <Link
+                    href={`/category/${encodeURIComponent(categoryName)}${
+                      subParam ? `?sub=${encodeURIComponent(subParam)}` : ""
+                    }`}
+                    className="relative text-gray-700 group-hover:text-gray-950"
+                    onMouseEnter={onEnter}
+                    onMouseLeave={onLeave}
+                  >
+                    {subCate.name}
+                    <span className="line absolute left-0 bottom-[1px] h-[1.6px] w-full"></span>
+                  </Link>
+                  {subCate.item && (
+                    <RiArrowRightSLine className="absolute left-[213px] top-[4px] text-lg text-gray-500" />
+                  )}
                 </div>
+                {subCate.item && (
+                  <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white border shadow-md absolute left-[235px] -top-[8px] px-5 py-2">
+                    {subCate.item.map((subItem, i2) => {
+                      const itemCategoryName = isGroupHeading ? subCate.name : cate.title;
+                      return (
+                        <Link
+                        href={`/category/${encodeURIComponent(categoryName)}${
+                          subParam ? `?sub=${encodeURIComponent(subParam)}` : ""
+                        }`}
+                        >
+                        <div
+                          key={i2}
+                          className={`cursor-pointer mt-2 group/subItem ${
+                            i2 !== subCate.item!.length - 1 ? "mb-0" : "mb-1"
+                          }`}
+                        >
+                          <Link
+                            href={`/category/${encodeURIComponent(itemCategoryName)}?sub=${encodeURIComponent(subItem)}`}
+                            className="text-sm relative text-gray-600 group-hover/subItem:text-gray-900"
+                            onMouseEnter={onEnter}
+                            onMouseLeave={onLeave}
+                          >
+                            {subItem}
+                            <span className="line absolute left-0 -bottom-[1px] h-[1.6px] w-full"></span>
+                          </Link>
+                          {i2 !== subCate.item!.length - 1 && (
+                            <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
+                          )}
+                        </div>
+                      </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </Link>
+              </div>
+              {index !== cate.submenus.length - 1 && (
+                <div className="w-full h-[2px] bg-gray-100"></div>
               )}
             </div>
-            {index !== cate.submenus.length - 1 && (
-              <div className="w-full h-[2px] bg-gray-100"></div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -216,10 +249,20 @@ function CategoryMegaMenu({ onEnter, onLeave }: { onEnter: (e: React.MouseEvent<
               </Link>
               <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white rounded-md border border-gray-200 shadow-md absolute left-[225px] -top-[4px] px-5 py-2">
                 {item.title.map((title, index) => (
-                  <div key={index} className="cursor-pointer mt-2">
-                    <span className="text-sm">{title}</span>
-                    <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
-                  </div>
+                  <Link
+                      href={`/category/${encodeURIComponent(item.name)}?sub=${encodeURIComponent(title)}`}
+                      key={index}
+                    >
+                    <div className="cursor-pointer mt-2">
+                      <Link
+                        href={`/category/${encodeURIComponent(item.name)}?sub=${encodeURIComponent(title)}`}
+                        className="text-sm"
+                      >
+                        {title}
+                      </Link>
+                      <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -268,7 +311,7 @@ export default function CategoryBar() {
               onMouseEnter={enter}
               onMouseLeave={leave}
             >
-              <span>Home</span>
+              <Link href="/">Home</Link>
               <span className="line absolute left-0 top-[34px] h-[2px] w-full"></span>
             </div>
 
@@ -281,7 +324,9 @@ export default function CategoryBar() {
             ))}
 
             <div>
-              <span className="text-red-600">Bespoke</span>
+              <Link href="/bespoke" className="text-red-600">
+                Bespoke
+              </Link>
             </div>
             <div>
               <Image className="w-[40px] h-auto" src={categoryLogo} alt="Xteamwear" />
@@ -316,7 +361,9 @@ export default function CategoryBar() {
           cateShow ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <h2 className="text-xl font-medium">XTEAMWEAR</h2>
+        <Link href="/">
+          <h2 className="text-xl font-medium">XTEAMWEAR</h2>
+        </Link>
 
         <CategoryMegaMenu onEnter={enter} onLeave={leave} />
 
@@ -326,7 +373,7 @@ export default function CategoryBar() {
             onMouseEnter={enter}
             onMouseLeave={leave}
           >
-            <span>Home</span>
+            <Link href="/">Home</Link>
             <span className="line absolute left-0 top-[23px] h-[2px] w-full"></span>
           </div>
 

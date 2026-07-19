@@ -9,6 +9,7 @@ import { BsQuestionCircleFill } from "react-icons/bs";
 import sponserPosition from "@/assets/sponserPosition/sponserPosition.webp";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types/product";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface PlayerRow {
   size: string;
@@ -108,9 +109,9 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
           / 8% spandex wicking pinhole mesh High-tech
         </p>
         <div className="flex flex-wrap gap-2 text-2xl">
-          <p className="line-through">Rs.{product.oldPrice.toLocaleString("en-PK")} PKR</p>
+          <p className="line-through">{formatPrice(product.oldPrice)}</p>
           <span className="text-red-500 font-semibold">
-            Rs.{product.newPrice.toLocaleString("en-PK")} PKR
+            {formatPrice(product.newPrice)}
           </span>
         </div>
         <p className="underline hover:text-gray-600 w-fit cursor-pointer text-sm">Size Chart</p>

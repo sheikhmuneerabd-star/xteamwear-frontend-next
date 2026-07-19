@@ -78,7 +78,21 @@ export default function CardPage() {
   };
 
   if (loading) {
-    return <div className="text-center py-20 text-lg">Loading...</div>;
+    return (
+      <div className="xl:w-[92%] w-[97%] mx-auto xl:mt-[0px] mt-[55px] animate-pulse">
+        <div className="h-6 bg-gray-200 rounded w-1/3 my-5" />
+        <div className="flex items-start md:flex-row flex-col gap-8">
+          <div className="xl:w-[55%] md:w-[45%] w-[90%] mx-auto md:mx-0 aspect-[4/5] bg-gray-200 rounded-md" />
+          <div className="xl:w-[45%] md:w-[55%] w-full space-y-4">
+            <div className="h-6 bg-gray-200 rounded w-3/4" />
+            <div className="h-4 bg-gray-200 rounded w-1/2" />
+            <div className="h-8 bg-gray-200 rounded w-1/3" />
+            <div className="h-10 bg-gray-200 rounded w-full" />
+            <div className="h-10 bg-gray-200 rounded w-full" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!product) {
@@ -97,7 +111,7 @@ export default function CardPage() {
         />
       </div>
       <Description />
-      <ProductSec handleClick={handleClick} />
+      <ProductSec handleClick={handleClick} category={product.category} currentProductId={product.id} />
     </div>
   );
 }

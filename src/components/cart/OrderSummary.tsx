@@ -35,7 +35,7 @@ export default function OrderSummary() {
           </div>
           <div className="flex justify-between border-b border-gray-400 pb-3">
             <p className="text-[14px]">Subtotal</p>
-            <p className="font-semibold">Rs.{total.toLocaleString("en-PK")} PKR</p>
+            <p className="font-semibold">${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
           </div>
 
           <div>
@@ -102,7 +102,7 @@ export default function OrderSummary() {
 
           <div className="md:flex justify-between border-b border-gray-400 pb-5 hidden">
             <p className="text-sm font-medium">TOTAL:</p>
-            <p className="font-semibold">Rs.{total.toLocaleString("en-PK")} PKR</p>
+            <p className="font-semibold">${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
           </div>
           <p className="text-[14px] text-gray-500">Tax included and shipping calculated at checkout</p>
         </div>
@@ -139,7 +139,7 @@ export default function OrderSummary() {
           <div className="fixed left-0 bottom-0 w-full h-[160px] bg-white shadow-md shadow-gray-600">
             <div className="flex justify-between p-3">
               <p className="text-sm font-medium">TOTAL:</p>
-              <p className="font-semibold">Rs.{total.toLocaleString("en-PK")} PKR</p>
+              <p className="font-semibold">${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
             </div>
             <div className="md:flex justify-center px-3 py-1">
               <Link

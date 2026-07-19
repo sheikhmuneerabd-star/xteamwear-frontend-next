@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface AdminProduct {
   _id: string;
@@ -54,7 +55,17 @@ export default function AdminProductsPage() {
       </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 animate-pulse">
+              <div className="w-12 h-12 bg-gray-200 rounded" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+                <div className="h-3 bg-gray-200 rounded w-1/5" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : products.length === 0 ? (
         <p className="text-gray-500">No products yet. Add your first one.</p>
       ) : (
@@ -86,7 +97,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="p-3 max-w-[250px] truncate">{product.name}</td>
                   <td className="p-3">{product.category}</td>
-                  <td className="p-3">Rs.{product.newPrice.toLocaleString("en-PK")}</td>
+                  <td className="p-3">{formatPrice(product.newPrice)}</td>
                   <td className="p-3">
                     <span
                       className={`px-2 py-1 rounded text-xs ${

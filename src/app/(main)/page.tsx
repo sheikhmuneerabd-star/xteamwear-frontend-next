@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
+import ProductCardSkeleton from "@/components/shared/ProductCardSkeleton";
 import TeamImage from "@/components/home/TeamImage";
 import FactoryCard from "@/components/home/FactoryCard";
 import ShirtCard from "@/components/home/ShirtCard";
@@ -82,7 +83,11 @@ export default function HomePage() {
         <h3 className="ml-[40px] text-2xl font-medium pt-10 pb-8">LATEST HOT PRODUCTS</h3>
         <div className="w-[93.8%] mx-auto">
           {loading ? (
-            <p className="text-center py-10 text-gray-500">Loading products...</p>
+            <div className="grid grid-cols-1 min-[375px]:grid-cols-2 min-[475px]:grid-cols-2 min-[768px]:grid-cols-3 min-[1024px]:grid-cols-4 min-[1440px]:grid-cols-4 w-full gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
           ) : products.length === 0 ? (
             <p className="text-center py-10 text-gray-500">No products available yet.</p>
           ) : (

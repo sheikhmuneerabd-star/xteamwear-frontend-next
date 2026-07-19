@@ -59,7 +59,17 @@ export default function AdminOrdersPage() {
       </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 animate-pulse">
+              <div className="w-12 h-12 bg-gray-200 rounded" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+                <div className="h-3 bg-gray-200 rounded w-1/5" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : filteredOrders.length === 0 ? (
         <p className="text-gray-500">No orders found.</p>
       ) : (

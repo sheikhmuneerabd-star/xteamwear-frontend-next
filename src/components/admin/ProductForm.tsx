@@ -153,7 +153,7 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Old Price (PKR)</label>
+          <label className="block text-sm font-medium mb-1">Old Price (USD)</label>
           <input
             className="w-full border border-gray-300 rounded-md p-2 outline-none focus:border-black"
             type="number"
@@ -164,7 +164,7 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">New Price (PKR)</label>
+          <label className="block text-sm font-medium mb-1">New Price (USD)</label>
           <input
             className="w-full border border-gray-300 rounded-md p-2 outline-none focus:border-black"
             type="number"

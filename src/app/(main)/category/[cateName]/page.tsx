@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
+import ProductSkeleton from "@/components/category/ProductSkeleton";
 import CateLinkBar from "@/components/category/CateLinkBar";
 import LeftCate from "@/components/category/LeftCate";
 import ClearStockBox from "@/components/category/ClearStockBox";
@@ -22,6 +24,7 @@ interface DbProductResponse {
   oldPrice: number;
   newPrice: number;
   category: string;
+  subCategory?: string;
   available: boolean;
   variants: { color: string; icon: string; images: string[]; sku: string; stock: number }[];
 }
@@ -30,6 +33,9 @@ export default function CategorySection() {
   const params = useParams<{ cateName: string }>();
   const cateName = decodeURIComponent(params.cateName || "");
 
+  const searchParams = useSearchParams();
+  const subFromUrl = decodeURIComponent(searchParams.get("sub") || "");
+
   const [grid, setGrid] = useState(3);
   const [itemPerPageCard, setItemPerPageCard] = useState(10);
   const options = [10, 20, 25, 30, 50];
@@ -37,8 +43,22 @@ export default function CategorySection() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [activeCategory, setActiveCategory] = useState("");
+  const [subActiveCategory, setSubActiveCategory] = useState("");
+  const [stockOpen, setStockOpen] = useState(false);
+  const [outStockOpen, setOutStockOpen] = useState(false);
+
+  useEffect(() => {
+    if (cateName) setActiveCategory(cateName);
+  }, [cateName]);
+
+  useEffect(() => {
+    setSubActiveCategory(subFromUrl);
+  }, [subFromUrl]);
+
   useEffect(() => {
     async function fetchProducts() {
+      setLoading(true);
       try {
         const res = await fetch("/api/products");
         const data = await res.json();
@@ -48,6 +68,7 @@ export default function CategorySection() {
           oldPrice: p.oldPrice,
           newPrice: p.newPrice,
           category: p.category,
+          subCategory: p.subCategory,
           available: p.available,
           variants: p.variants,
         }));
@@ -70,15 +91,6 @@ export default function CategorySection() {
       window.scrollBy({ top: 200, behavior: "smooth" });
     }, 100);
   };
-
-  const [activeCategory, setActiveCategory] = useState("");
-  const [subActiveCategory, setSubActiveCategory] = useState("");
-  const [stockOpen, setStockOpen] = useState(false);
-  const [outStockOpen, setOutStockOpen] = useState(false);
-
-  useEffect(() => {
-    if (cateName) setActiveCategory(cateName);
-  }, [cateName]);
 
   return (
     <div>
@@ -114,7 +126,7 @@ export default function CategorySection() {
           />
 
           {loading ? (
-            <p className="text-center py-16 text-gray-500">Loading products...</p>
+            <ProductSkeleton grid={grid} />
           ) : (
             <>
               <CardCateSec

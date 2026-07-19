@@ -4,12 +4,13 @@ import Image from "next/image";
 import { FiEdit } from "react-icons/fi";
 import { IoMdClose } from "react-icons/io";
 import type { CartItem } from "@/context/CartContext";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface ProductsDetailsDemoProps {
   item: CartItem;
-  onIncrease: (id: number, color: string) => void;
-  onDecrease: (id: number, color: string) => void;
-  onRemove: (id: number, color: string) => void;
+  onIncrease: (id: number | string, color: string) => void;
+  onDecrease: (id: number | string, color: string) => void;
+  onRemove: (id: number | string, color: string) => void;
 }
 
 export default function ProductsDetailsDemo({ item, onIncrease, onDecrease, onRemove }: ProductsDetailsDemoProps) {
@@ -54,8 +55,8 @@ export default function ProductsDetailsDemo({ item, onIncrease, onDecrease, onRe
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full lg:w-[45%] gap-4">
         <div className="text-[14px]">
-          <p className="line-through text-gray-500">Rs.{item.oldPrice.toLocaleString("en-PK")} PKR</p>
-          <p>Rs.{item.newPrice.toLocaleString("en-PK")} PKR</p>
+          <p className="line-through text-gray-500">{formatPrice(item.oldPrice)}</p>
+          <p>{formatPrice(item.newPrice)}</p>
         </div>
 
         <div className="border border-gray-400 rounded-md flex justify-between items-center w-[100px] h-[40px] shrink-0">
@@ -77,7 +78,7 @@ export default function ProductsDetailsDemo({ item, onIncrease, onDecrease, onRe
         </div>
 
         <div className="flex justify-between items-center w-full sm:w-auto gap-3">
-          <p>Rs.{lineTotal.toLocaleString("en-PK")} PKR</p>
+          <p>${lineTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
           <IoMdClose className="text-xl cursor-pointer" onClick={() => onRemove(item.id, item.color)} />
         </div>
       </div>

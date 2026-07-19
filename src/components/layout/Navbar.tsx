@@ -219,9 +219,9 @@ export default function Navbar() {
       {/* Desktop */}
       <div className="w-full xl:flex hidden">
         <div className="w-[91%] h-[110px] mx-auto flex items-center justify-between">
-          <div>
+          <Link href="/" className="cursor-pointer">
             <Image className="w-[80%] h-auto" src={logo} alt="xteamwear" />
-          </div>
+          </Link>
 
           <div className="flex w-[36%] h-[45px] mr-[50px] rounded-xl relative">
             <label
@@ -260,57 +260,6 @@ export default function Navbar() {
                   <span>Cart</span>
                 </div>
               </Link>
-              <div className="relative" ref={languageBoxRef}>
-                <div
-                  className="flex items-center gap-[4px] cursor-pointer"
-                  onClick={() => setLanguageCountry(!languageCountry)}
-                >
-                  <Image
-                    src={`https://flagcdn.com/w40/${selectedCountry.code}.png`}
-                    width={24}
-                    height={24}
-                    unoptimized
-                    alt={selectedCountry.name}
-                    className="w-6 h-6"
-                  />
-                  <IoMdArrowDropdown className="text-gray-600" />
-                </div>
-                <div
-                  id="languageCountryBox"
-                  className="bg-white z-50 w-[120px] py-3 flex flex-col gap-[12px] justify-center items-center rounded-md absolute top-8 -left-6 shadowNavCon opacity-0 pointer-events-none"
-                  style={{
-                    opacity: languageCountry ? 1 : 0,
-                    pointerEvents: languageCountry ? "auto" : "none",
-                  }}
-                >
-                  {countries.map((item) => (
-                    <div
-                      key={item.code}
-                      className="w-[85px] flex items-center gap-2 cursor-pointer group"
-                      onClick={() => {
-                        setSelectedCountry(item);
-                        setLanguageCountry(false);
-                      }}
-                    >
-                      <Image
-                        src={`https://flagcdn.com/w40/${item.code}.png`}
-                        width={24}
-                        height={24}
-                        unoptimized
-                        alt={item.name}
-                        className="w-6 h-6"
-                      />
-                      <span
-                        className={`font-medium group-hover:border-black ${
-                          selectedCountry.name === item.name ? "border-black" : ""
-                        } border-b-[1.5px]`}
-                      >
-                        {item.name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
             {status === "authenticated" ? (
               <div className="flex items-center gap-1 group cursor-pointer relative" ref={accountBoxRef}>

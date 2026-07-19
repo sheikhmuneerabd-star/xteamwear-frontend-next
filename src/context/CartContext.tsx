@@ -13,9 +13,9 @@ export interface CartItem extends Product {
 interface CartContextValue {
   cart: CartItem[];
   addToCart: (product: Product, color: string, sizingDetailData?: SizingFormData) => void;
-  increase: (id: number, color: string) => void;
-  decrease: (id: number, color: string) => void;
-  removeFromCart: (id: number, color: string) => void;
+  increase: (id: number | string, color: string) => void;
+  decrease: (id: number | string, color: string) => void;
+  removeFromCart: (id: number | string, color: string) => void;
   clearCart: () => void;
 }
 
@@ -40,13 +40,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const increase = (id: number, color: string) => {
+  const increase = (id: number | string, color: string) => {
     setCart((prev) =>
       prev.map((item) => (item.id === id && item.color === color ? { ...item, qty: item.qty + 1 } : item))
     );
   };
 
-  const decrease = (id: number, color: string) => {
+  const decrease = (id: number | string, color: string) => {
     setCart((prev) =>
       prev
         .map((item) => (item.id === id && item.color === color ? { ...item, qty: item.qty - 1 } : item))
@@ -54,7 +54,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const removeFromCart = (id: number, color: string) => {
+  const removeFromCart = (id: number | string, color: string) => {
     setCart((prev) => prev.filter((item) => !(item.id === id && item.color === color)));
   };
 

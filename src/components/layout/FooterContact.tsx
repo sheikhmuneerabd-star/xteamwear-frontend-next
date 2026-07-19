@@ -1,16 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { RiMessage2Fill, RiInstagramFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
 import { GrFacebookOption } from "react-icons/gr";
 import { AiFillTikTok } from "react-icons/ai";
 import { FaYoutube } from "react-icons/fa";
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface FooterColumn {
   id: number;
@@ -87,24 +82,6 @@ export default function FooterContact() {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useGSAP(() => {
-    const tl = gsap.timeline();
-    tl.from(".footerContact", {
-      y: 50,
-      duration: 0.6,
-      opacity: 0,
-      stagger: 0.2,
-      scrollTrigger: {
-        trigger: ".footerContact",
-        scroller: "body",
-        scrub: 2,
-        once: true,
-        start: "top 100%",
-        end: "top 30%",
-      },
-    });
   }, []);
 
   return (

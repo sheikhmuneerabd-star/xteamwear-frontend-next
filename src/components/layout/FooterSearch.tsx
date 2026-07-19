@@ -1,46 +1,9 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useState } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function FooterSearch() {
   const [focus, setFocus] = useState(false);
-
-  useGSAP(() => {
-    const tl = gsap.timeline();
-    tl.from(".rec", {
-      y: 50,
-      duration: 0.6,
-      opacity: 0,
-      stagger: 0.2,
-      scrollTrigger: {
-        trigger: ".rec",
-        scroller: "body",
-        scrub: 2,
-        once: true,
-        start: "top 100%",
-        end: "top 30%",
-      },
-    });
-    tl.from(".searchBox", {
-      y: 50,
-      duration: 0.6,
-      opacity: 0,
-      stagger: 0.2,
-      scrollTrigger: {
-        trigger: ".searchBox",
-        scroller: "body",
-        scrub: 2,
-        once: true,
-        start: "top 100%",
-        end: "top 30%",
-      },
-    });
-  }, []);
 
   return (
     <div className="mt-9 flex items-center bg-gray-100 h-[50vh]">
