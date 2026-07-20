@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "flagcdn.com" },
-      { protocol: "https", hostname: "xteamwear.com" }, // ← naya
+      { protocol: "https", hostname: "xteamwear.com" },
     ],
   },
 };

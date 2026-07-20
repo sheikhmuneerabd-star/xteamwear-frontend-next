@@ -28,7 +28,7 @@ export default function FooterSearch() {
           </div>
           <button
             type="button"
-            className="bg-white rounded-xl cursor-pointer border hover:-translate-y-2 transition-all duration-300 border-yellow-400 md:w-[155px] w-full h-[40px] text-[15px] hover:bg-yellow-400"
+            className="bg-white rounded-xl cursor-pointer border hover:-translate-y-2 transition-all duration-300 border-[#0B1E3D] md:w-[155px] w-full h-[40px] text-[15px] hover:bg-[#C6FF00] hover:text-[#0B1E3D] hover:border-[#C6FF00]"
           >
             Submit
           </button>

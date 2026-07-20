@@ -20,7 +20,7 @@ interface PlayerRow {
 interface SizingFormData {
   teamName: string;
   playerNumberOption: string;
-  logo: File | null;
+  logo: string;
   sponsorOption: string;
   sponsorLocation: string;
   note: string;
@@ -36,7 +36,7 @@ interface SizingSystemProps {
 const emptyForm: SizingFormData = {
   teamName: "",
   playerNumberOption: "",
-  logo: null,
+  logo: "",
   sponsorOption: "",
   sponsorLocation: "",
   note: "",
@@ -50,6 +50,8 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
   const [playerNumberOpen, setPlayerNumberOpen] = useState(false);
   const [logoOpen, setLogoOpen] = useState(false);
   const [sponsorOpen, setSponsorOpen] = useState(false);
+
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const [preview, setPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -74,6 +76,15 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
   };
 
   const handleSubmit = () => {
+    if (uploadingLogo) {
+      alert("Logo abhi upload ho raha hai, thora intezar karo");
+      return;
+    }
+    if (!formData.teamName) {
+      alert("Team Name required");
+      return;
+    }
+
     if (!formData.teamName) {
       alert("Team Name required");
       return;
@@ -241,7 +252,9 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
                 className="w-[60px] mt-[7px] h-[60px] flex justify-center items-center border-[1.3px] border-dashed border-gray-800 rounded-md cursor-pointer overflow-hidden relative"
                 onClick={handleRef}
               >
-                {preview ? (
+                {uploadingLogo ? (
+                  <span className="text-[10px] text-gray-600">...</span>
+                ) : preview ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={preview} alt="preview" className="w-full h-full object-cover" />
                 ) : (
@@ -251,11 +264,32 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
                   className="hidden"
                   ref={fileRef}
                   type="file"
-                  onChange={(e) => {
+                  accept="image/*"
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
-                    if (file) {
-                      setPreview(URL.createObjectURL(file));
-                      setFormData((prev) => ({ ...prev, logo: file }));
+                    if (!file) return;
+
+                    setPreview(URL.createObjectURL(file)); // instant local preview
+                    setUploadingLogo(true);
+
+                    try {
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      const res = await fetch("/api/upload", { method: "POST", body: formData });
+                      const data = await res.json();
+
+                      if (!res.ok) {
+                        alert(data.error || "Logo upload failed");
+                        setPreview(null);
+                        return;
+                      }
+
+                      setFormData((prev) => ({ ...prev, logo: data.url })); // ab URL string save hoga
+                    } catch {
+                      alert("Logo upload failed. Please try again.");
+                      setPreview(null);
+                    } finally {
+                      setUploadingLogo(false);
                     }
                   }}
                 />

@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, oldPrice, newPrice, category, variants } = body;
+    const { name, oldPrice, newPrice, category, subCategory, available, variants } = body;
 
     if (!name || !oldPrice || !newPrice || !category || !variants?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -53,9 +53,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `SKU "${duplicate}" is already in use` }, { status: 409 });
     }
 
-    const available = variants.some((v: { stock: number }) => v.stock > 0);
-
-    const product = await Product.create({ name, oldPrice, newPrice, category, available, variants });
+    const product = await Product.create({
+      name,
+      oldPrice,
+      newPrice,
+      category,
+      subCategory,
+      available,
+      variants,
+    });
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {

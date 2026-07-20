@@ -173,7 +173,7 @@ function NestedDropdownItem({
                   )}
                 </div>
                 {subCate.item && (
-                  <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white border shadow-md absolute left-[235px] -top-[8px] px-5 py-2">
+                  <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white border border-gray-200 shadow-md absolute left-[235px] -top-[8px] px-5 py-2">
                     {subCate.item.map((subItem, i2) => {
                       const itemCategoryName = isGroupHeading ? subCate.name : cate.title;
                       return (
@@ -263,16 +263,16 @@ function CategoryMegaMenu({ onEnter, onLeave }: { onEnter: (e: React.MouseEvent<
                   <RiArrowRightSLine className="absolute left-[201px] top-[5px] text-lg text-gray-500" />
                 </div>
               </Link>
-              <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white rounded-md border border-gray-200 shadow-md absolute left-[225px] -top-[4px] px-5 py-2">
+              <div className="w-[260px] h-fit text-gray-700 pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white rounded-md border border-gray-200 shadow-md absolute left-[225px] -top-[4px] px-5 py-2">
                 {item.subcategories.map((title, index) => (
-                  <div key={index} className="cursor-pointer mt-2">
+                  <div className="text-sm cursor-pointer mt-2">
                     <Link
                       href={`/category/${encodeURIComponent(item.name)}?sub=${encodeURIComponent(title)}`}
-                      className="text-sm"
+                      key={index}
                     >
                       {title}
+                      <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
                     </Link>
-                    <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
                   </div>
                 ))}
               </div>
@@ -312,7 +312,7 @@ export default function CategoryBar() {
   return (
     <div>
       {/* Static bar */}
-      <div className="w-full categoryBackground hidden xl:flex bg-yellow-400">
+      <div className="w-full categoryBackground hidden xl:flex bg-[#0B1E3D] text-white">
         <div className="w-[92%] h-[47px] mx-auto flex justify-between items-center category">
           <CategoryMegaMenu onEnter={enter} onLeave={leave} />
 
@@ -335,7 +335,7 @@ export default function CategoryBar() {
             ))}
 
             <div>
-              <Link href="/bespoke" className="text-red-600">
+              <Link href="/bespoke" className="text-[#FF5A36]">
                 Bespoke
               </Link>
             </div>
@@ -368,7 +368,7 @@ export default function CategoryBar() {
 
       {/* Sticky bar that slides in on scroll-up */}
       <div
-        className={`fixed top-0 left-0 right-0 z-50 bg-yellow-400 hidden xl:flex justify-between h-[80px] px-4 items-center transition-all duration-150 ${
+        className={`fixed top-0 left-0 right-0 z-50 bg-[#0B1E3D] text-white hidden xl:flex justify-between h-[80px] px-4 items-center transition-all duration-150 ${
           cateShow ? "translate-y-0" : "-translate-y-full"
         }`}
       >
@@ -426,7 +426,7 @@ export default function CategoryBar() {
 
         <Link href="/cart" className="relative">
           <PiShoppingCartLight className="text-[32px] group-hover:scale-110 transition-all duration-200" />
-          <span className="absolute -top-[9px] -right-[6px] flex items-center justify-center bg-red-500 rounded-full font-semibold text-white text-[14.5px] w-[25px] h-[25px]">
+          <span className="absolute -top-[9px] -right-[6px] flex items-center justify-center bg-[#FF5A36] rounded-full font-semibold text-white text-[14.5px] w-[25px] h-[25px]">
             {cart.length}
           </span>
         </Link>

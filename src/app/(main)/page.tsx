@@ -9,9 +9,9 @@ import TeamImage from "@/components/home/TeamImage";
 import FactoryCard from "@/components/home/FactoryCard";
 import ShirtCard from "@/components/home/ShirtCard";
 import TestimonialSlider from "@/components/home/TestimonialSlider";
-import LatestPostSec from "@/components/home/LatestPostSec";
-import LatestCards from "@/components/home/LatestCards";
+import ImagesSection from "@/components/home/ImagesSection";
 import type { Product } from "@/types/product";
+import PromiseSection from "@/components/home/PromiseSection";
 
 export default function HomePage() {
   const [showMore, setShowMore] = useState(4);
@@ -74,7 +74,7 @@ export default function HomePage() {
     <div>
       <TeamImage />
 
-      <h3 className="text-center text-2xl font-medium xl:mt-0 mt-5 xteamwearA">
+      <h3 className="text-center text-2xl font-medium xl:mt-8 mt-5 xteamwearA">
         XTEAMWEAR ADVANTAGES
       </h3>
       <FactoryCard />
@@ -99,7 +99,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setShowMore(showMore + 4)}
-              className="bg-white text-center text-[14px] font-medium w-[300px] h-[42px] rounded-md shadow-md mt-10 transition-all duration-200 hover:border-black border-[1.3px] hover:-translate-y-2"
+              className="bg-white text-center text-[14px] font-medium w-[300px] h-[42px] rounded-md shadow-md mt-10 transition-all duration-200 hover:border-[#0B1E3D] hover:text-[#0B1E3D] border-[1.3px] hover:-translate-y-2"
             >
               SHOW MORE
             </button>
@@ -109,14 +109,9 @@ export default function HomePage() {
 
       <TestimonialSlider />
 
-      <div className="latest">
-        <h1 className="text-center text-2xl font-medium latestP">LATEST POSTS</h1>
-        <p className="text-center text-[15px] text-gray-600 font-medium latestT">
-          Phasellus lorem malesuada ligula pulvinar cosmo
-        </p>
-        <LatestPostSec />
-        <LatestCards />
-      </div>
+      <ImagesSection />
+
+      <PromiseSection />
     </div>
   );
 }

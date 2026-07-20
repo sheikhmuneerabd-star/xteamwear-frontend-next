@@ -28,10 +28,10 @@ export default function TestimonialSlider() {
 
   return (
     <div className="md:flex-row flex flex-col gap-8 justify-center max-w-6xl mx-auto lg:px-0 px-5 py-10">
-      <div className="bg-[#e8e1db] p-8 rounded-3xl lg:w-[350px] md:w-[370px] sm:w-[320px] w-full relative">
-        <p className="text-5xl text-amber-700">&ldquo;</p>
+      <div className="bg-[#F1EFEA] p-8 rounded-3xl lg:w-[350px] md:w-[370px] sm:w-[320px] w-full relative">
+        <p className="text-5xl text-[#FF5A36]">&ldquo;</p>
 
-        <div className="flex text-orange-400 my-3">⭐⭐⭐⭐⭐</div>
+        <div className="flex text-[#FF5A36] my-3">⭐⭐⭐⭐⭐</div>
 
         <p className="text-gray-700">
           We had a last-minute player transfer just days before our jerseys

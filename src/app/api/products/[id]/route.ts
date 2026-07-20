@@ -48,8 +48,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
       if (duplicate) {
         return NextResponse.json({ error: `SKU "${duplicate}" is already in use` }, { status: 409 });
       }
-
-      body.available = body.variants.some((v: { stock: number }) => v.stock > 0);
     }
 
     await connectDB();

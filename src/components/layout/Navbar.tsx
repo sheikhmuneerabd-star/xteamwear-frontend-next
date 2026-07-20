@@ -13,7 +13,6 @@ import { BsArrowLeft } from "react-icons/bs";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import { RiUserAddLine } from "react-icons/ri";
 
-import logo from "@/assets/logo.svg";
 import greenShirt from "@/assets/greenShirt.jpg";
 import orangeShirt from "@/assets/orangeShirt.jpg";
 import { useCart } from "@/context/CartContext";
@@ -68,12 +67,12 @@ function PopularProductCard() {
         <span className="text-[11px] line-clamp-2 font-medium hover:text-blue-600 cursor-pointer">
           Whirlwind - Men&apos;s Sublimated Footbal Lorem ipsum dolor sit amet.
         </span>
-        <p className="text-gray-800 font-medium text-[15px] line-through">Rs.19,053.53</p>
-        <p className="text-gray-800 font-medium text-[15px] line-through">PKR</p>
-        <p className="text-red-600 font-medium text-[15px]">Rs.13,645.45</p>
-        <p className="text-red-600 font-medium text-[15px]">PKR</p>
+        <p className="text-gray-800 font-medium text-[15px] line-through">$33.53 (USD)</p>
+        <p className="text-gray-800 font-medium text-[15px] line-through">USD</p>
+        <p className="text-[#FF5A36] font-medium text-[15px]">$28.33 (USD)</p>
+        <p className="text-[#FF5A36] font-medium text-[15px]">USD</p>
         <div className="w-[75%] flex justify-end">
-          <span className="bg-red-600 px-3 py-[3px] rounded text-[14px] text-white">(-20%)</span>
+          <span className="bg-[#FF5A36] px-3 py-[3px] rounded text-[14px] text-white">(-20%)</span>
         </div>
         <div className="relative w-[30px] h-[30px] mt-3 rounded-full border-[1.4px] p-[2px] border-gray-300 overflow-hidden">
           <Image src={greenShirt} alt="GREEN & BLACK" fill sizes="30px" className="rounded-full object-cover" />
@@ -105,7 +104,6 @@ function SearchSuggestions({ variant }: { variant: "desktop" | "mobile" }) {
                 key={tag}
                 className="flex gap-1 items-center bg-gray-100 hover:bg-gray-200 cursor-pointer transition-all duration-200 group text-gray-500 py-[6.5px] px-3"
               >
-                <IoSearch className="group-hover:text-gray-700" />
                 <span className="text-[13px] group-hover:text-gray-700">{tag}</span>
               </div>
             ))}
@@ -138,6 +136,17 @@ export default function Navbar() {
   const [languageCountry, setLanguageCountry] = useState(false);
   const languageBoxRef = useRef<HTMLDivElement>(null);
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+
+  const [logoUrl, setLogoUrl] = useState("");
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const res = await fetch("/api/settings");
+      const data = await res.json();
+      setLogoUrl(data.settings.logo || "");
+    }
+    fetchSettings();
+  }, []);
 
   const [accountOpen, setAccountOpen] = useState(false);
   const accountBoxRef = useRef<HTMLDivElement>(null);
@@ -221,7 +230,9 @@ export default function Navbar() {
       <div className="w-full xl:flex hidden">
         <div className="w-[91%] h-[110px] mx-auto flex items-center justify-between">
           <Link href="/" className="cursor-pointer">
-            <Image className="w-[80%] h-auto" src={logo} alt="xteamwear" />
+            {logoUrl && (
+              <Image className="w-[80%] h-auto" src={logoUrl} alt="xteamwear" width={160} height={60} />
+            )}
           </Link>
 
           <div className="flex w-[36%] h-[45px] mr-[50px] rounded-xl relative">
@@ -238,7 +249,7 @@ export default function Navbar() {
               onFocus={handleSearchFocus}
               onBlur={handleSearchBlur}
             />
-            <IoSearch className="absolute bottom-0 right-0 p-[9px] bg-yellow-400 w-[12%] h-full rounded-tr-xl rounded-br-xl transition-all duration-200 hover:bottom-1 cursor-pointer" />
+            <IoSearch className="absolute bottom-0 right-0 p-[9px] bg-[#C6FF00] text-[#0B1E3D] w-[12%] h-full rounded-tr-xl rounded-br-xl transition-all duration-200 hover:bottom-1 cursor-pointer" />
             <div
               className={`bg-white absolute [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 top-[60px] left-0 w-[125%] h-[300px] rounded-md border border-gray-200 overflow-y-auto overflow-x-hidden z-50 ${
                 searchFocus ? "flex" : "hidden"
@@ -255,7 +266,7 @@ export default function Navbar() {
               <Link href="/cart" className="flex items-center gap-2 group cursor-pointer">
                 <PiShoppingCartLight className="text-[32px] group-hover:scale-110 transition-all duration-200" />
                 <div className="flex flex-col justify-center text-[13px]">
-                  <span className="flex items-center justify-center bg-yellow-400 rounded-full font-semibold text-white w-[30px] h-[17.5px]">
+                  <span className="flex items-center justify-center bg-[#0B1E3D] rounded-full font-semibold text-white w-[30px] h-[17.5px]">
                     {cart.length}
                   </span>
                   <span>Cart</span>
@@ -532,7 +543,7 @@ export default function Navbar() {
                       onFocus={handleSearchFocus}
                       onBlur={handleSearchBlur}
                     />
-                    <IoSearch className="absolute bottom-0 right-0 p-[9px] w-[11.5%] h-full" />
+                    <IoSearch className="absolute bottom-0 right-0 p-[9px] bg-[#C6FF00] text-[#0B1E3D] w-[12%] h-full rounded-tr-xl rounded-br-xl transition-all duration-200 hover:bottom-1 cursor-pointer" />
                   </div>
                 </div>
                 <div className="px-2 py-3 overflow-y-scroll h-[280px] mt-1 w-[95%] mx-auto">
@@ -542,14 +553,18 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="md:w-[16%] w-[34%]">
-            <Image src={logo} alt="xteamwear" className="w-full h-auto" />
-          </div>
+          <Link href="/" className="cursor-pointer">
+            <div className="md:w-[16%] w-[34%]">
+              {logoUrl && (
+                <Image className="w-[80%] h-auto" src={logoUrl} alt="xteamwear" width={160} height={60} />
+              )}
+            </div>
+          </Link>
 
           <div className="flex items-center gap-5 mr-2">
             <PiUserLight className="text-[28px]" />
             <Link href="/cart" className="relative">
-              <span className="absolute -top-[8px] -right-[9px] text-[13px] bg-black text-white w-6 h-6 flex justify-center items-center rounded-full">
+              <span className="absolute -top-[8px] -right-[9px] text-[13px] bg-[#FF5A36] text-white w-6 h-6 flex justify-center items-center rounded-full">
                 {cart.length}
               </span>
               <CgShoppingBag className="text-[28px]" />

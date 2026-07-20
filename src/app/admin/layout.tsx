@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { LuLayoutDashboard, LuPackage, LuShoppingBag, LuArrowLeft, LuTags } from "react-icons/lu";
+import { LuLayoutDashboard, LuPackage, LuShoppingBag, LuArrowLeft, LuTags, LuSettings } from "react-icons/lu";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex min-h-screen">
       <aside className="w-[220px] bg-gray-900 text-white p-5 space-y-4">
-        <h2 className="text-xl font-bold mb-6">Xteamwear Admin</h2>
+        <Link href="/" className="text-xl font-bold mb-6 cursor-pointer">Xteamwear Admin</Link>
         <nav className="flex flex-col gap-2">
           <Link href="/admin" className="hover:bg-gray-800 rounded px-3 py-2">
             Dashboard
@@ -30,6 +30,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           >
             <LuTags className="text-lg" />
             Categories
+          </Link>
+          <Link
+            href="/admin/settings"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 transition-colors"
+          >
+            <LuSettings className="text-lg" />
+            Site Settings
           </Link>
           <Link href="/" className="hover:bg-gray-800 rounded px-3 py-2 text-gray-400 mt-8">
             ← Back to Store

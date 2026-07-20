@@ -7,7 +7,7 @@ export interface PlayerRow {
 export interface SizingFormData {
   teamName: string;
   playerNumberOption: string;
-  logo: File | null;
+  logo: string;
   sponsorOption: string;
   sponsorLocation: string;
   note: string;

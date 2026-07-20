@@ -29,19 +29,9 @@ interface ProductFormProps {
 
 const emptyVariant: VariantInput = { color: "", icon: "", images: ["", ""], sku: "", stock: "0" };
 
-const [dbCategories, setDbCategories] = useState<{ name: string; subcategories: string[] }[]>([]);
-
-useEffect(() => {
-  async function fetchCategories() {
-    const res = await fetch("/api/categories");
-    const data = await res.json();
-    setDbCategories(data.categories || []);
-  }
-  fetchCategories();
-}, []);
-
 export default function ProductForm({ initialValues, productId }: ProductFormProps) {
   const router = useRouter();
+  const [dbCategories, setDbCategories] = useState<{ name: string; subcategories: string[] }[]>([]);
   const [values, setValues] = useState<ProductFormValues>({
     name: initialValues?.name || "",
     oldPrice: initialValues?.oldPrice || "",
@@ -53,6 +43,15 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const res = await fetch("/api/categories");
+      const data = await res.json();
+      setDbCategories(data.categories || []);
+    }
+    fetchCategories();
+  }, []);
 
   const handleColorChange = (index: number, value: string) => {
     setValues((prev) => {
