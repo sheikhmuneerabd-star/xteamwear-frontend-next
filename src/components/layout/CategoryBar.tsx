@@ -11,7 +11,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import categoryLogo from "@/assets/categoryLogo.webp";
-import category from "@/data/categoryBarItems";
 import topCategoriesData12 from "@/data/topCategoriesData12";
 import topCategoriesData34 from "@/data/topCategoriesData34";
 import topCategoriesData56 from "@/data/topCategoriesData56";
@@ -220,7 +219,24 @@ function NestedDropdownItem({
   );
 }
 
+interface DbCategory {
+  _id: string;
+  name: string;
+  subcategories: string[];
+}
+
 function CategoryMegaMenu({ onEnter, onLeave }: { onEnter: (e: React.MouseEvent<HTMLElement>) => void; onLeave: (e: React.MouseEvent<HTMLElement>) => void }) {
+  const [categories, setCategories] = useState<DbCategory[]>([]);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const res = await fetch("/api/categories");
+      const data = await res.json();
+      setCategories(data.categories || []);
+    }
+    fetchCategories();
+  }, []);
+
   return (
     <div className="relative group/main">
       <div className="h-[39px] mt-2 flex gap-1 cursor-pointer">
@@ -232,8 +248,8 @@ function CategoryMegaMenu({ onEnter, onLeave }: { onEnter: (e: React.MouseEvent<
       </div>
       <div className="bg-white absolute z-50 opacity-0 group-hover/main:opacity-100 pointer-events-none group-hover/main:pointer-events-auto translate-y-4 group-hover/main:translate-y-0 transition-all duration-200 top-[46px] w-[260px] h-fit border-gray-200 border shadow-md p-5">
         <div className="flex flex-col gap-4">
-          {category.map((item) => (
-            <div key={item.id} className="relative group/item w-[225px]">
+          {categories.map((item) => (
+            <div key={item._id} className="relative group/item w-[225px]">
               <Link href={`/category/${encodeURIComponent(item.name)}`}>
                 <div className="flex items-center justify-between group font-medium cursor-pointer">
                   <span
@@ -248,21 +264,16 @@ function CategoryMegaMenu({ onEnter, onLeave }: { onEnter: (e: React.MouseEvent<
                 </div>
               </Link>
               <div className="w-[260px] h-fit pointer-events-none opacity-0 group-hover/item:opacity-100 -translate-y-5 group-hover/item:translate-y-0 group-hover/item:pointer-events-auto transition-all duration-200 bg-white rounded-md border border-gray-200 shadow-md absolute left-[225px] -top-[4px] px-5 py-2">
-                {item.title.map((title, index) => (
-                  <Link
+                {item.subcategories.map((title, index) => (
+                  <div key={index} className="cursor-pointer mt-2">
+                    <Link
                       href={`/category/${encodeURIComponent(item.name)}?sub=${encodeURIComponent(title)}`}
-                      key={index}
+                      className="text-sm"
                     >
-                    <div className="cursor-pointer mt-2">
-                      <Link
-                        href={`/category/${encodeURIComponent(item.name)}?sub=${encodeURIComponent(title)}`}
-                        className="text-sm"
-                      >
-                        {title}
-                      </Link>
-                      <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
-                    </div>
-                  </Link>
+                      {title}
+                    </Link>
+                    <div className="w-full h-[1px] bg-gray-100 mt-[10px]"></div>
+                  </div>
                 ))}
               </div>
             </div>

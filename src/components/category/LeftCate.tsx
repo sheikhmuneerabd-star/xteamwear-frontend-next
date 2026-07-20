@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IoIosArrowForward } from "react-icons/io";
-import leftCategoriesData from "@/data/leftCategoryData";
+
+interface DbCategory {
+  _id: string;
+  name: string;
+  subcategories: string[];
+}
 
 interface LeftCateProps {
   setActiveCategory: (title: string) => void;
@@ -17,8 +22,18 @@ export default function LeftCate({
   setSubActiveCategory,
   subActiveCategory,
 }: LeftCateProps) {
+  const [categories, setCategories] = useState<DbCategory[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const res = await fetch("/api/categories");
+      const data = await res.json();
+      setCategories(data.categories || []);
+    }
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -31,9 +46,9 @@ export default function LeftCate({
   }, []);
 
   useEffect(() => {
-    const index = leftCategoriesData.findIndex((c) => c.title === activeCategory);
+    const index = categories.findIndex((c) => c.name === activeCategory);
     if (index !== -1) setOpenIndex(index);
-  }, [activeCategory]);
+  }, [activeCategory, categories]);
 
   return (
     <div ref={containerRef}>
@@ -41,29 +56,29 @@ export default function LeftCate({
         <h2 className="font-medium border-b border-gray-900 pb-2">CATEGORIES</h2>
 
         <div className="mt-3">
-          {leftCategoriesData.map((cate, index) => {
+          {categories.map((cate, index) => {
             const isOpen = openIndex === index;
 
             return (
-              <div key={cate.id} className="mb-2">
+              <div key={cate._id} className="mb-2">
                 <button
                   type="button"
                   onClick={() => {
                     setOpenIndex(isOpen ? null : index);
-                    setActiveCategory(cate.title);
+                    setActiveCategory(cate.name);
                   }}
                   aria-expanded={isOpen}
                   aria-controls={`section-${index}`}
-                  className="w-full flex cursor-pointer justify-between items-center pl-0 p-2 group"
+                  className="w-full flex justify-between items-center pl-0 p-2 group"
                 >
                   <div className="flex w-full items-center relative">
                     <IoIosArrowForward className="text-[15px] mt-[3.3px]" />
                     <p
                       className={`text-sm font-medium absolute top-0 left-1 bg-white group-hover:translate-x-3 transition-all duration-200 ${
-                        activeCategory === cate.title ? "translate-x-3 text-black" : "text-gray-600"
+                        activeCategory === cate.name ? "translate-x-3 text-black" : "text-gray-600"
                       }`}
                     >
-                      {cate.title}
+                      {cate.name}
                     </p>
                   </div>
 
@@ -81,8 +96,6 @@ export default function LeftCate({
                   </div>
                 </button>
 
-                {/* CSS grid-rows accordion — no ref/scrollHeight measurement needed,
-                    avoids the "useRef inside .map()" hook-rule violation from the original */}
                 <div
                   id={`section-${index}`}
                   role="region"
@@ -91,7 +104,7 @@ export default function LeftCate({
                   }`}
                 >
                   <div className="min-h-0 pl-4 pb-2 space-y-1">
-                    {cate.items.map((item, i) => (
+                    {cate.subcategories.map((item, i) => (
                       <div
                         key={i}
                         className="relative h-[30px] flex items-center cursor-pointer group"

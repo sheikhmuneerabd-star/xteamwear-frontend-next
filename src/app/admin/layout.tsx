@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { LuLayoutDashboard, LuPackage, LuShoppingBag, LuArrowLeft, LuTags } from "react-icons/lu";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -22,6 +23,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
           <Link href="/admin/orders" className="hover:bg-gray-800 rounded px-3 py-2">
             Orders
+          </Link>
+          <Link
+            href="/admin/categories"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            <LuTags className="text-lg" />
+            Categories
           </Link>
           <Link href="/" className="hover:bg-gray-800 rounded px-3 py-2 text-gray-400 mt-8">
             ← Back to Store

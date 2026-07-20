@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploader from "./ImageUploader";
-import leftCategoriesData from "@/data/leftCategoryData";
+import { useState, useEffect } from "react";
 
 interface VariantInput {
   color: string;
@@ -29,6 +28,17 @@ interface ProductFormProps {
 }
 
 const emptyVariant: VariantInput = { color: "", icon: "", images: ["", ""], sku: "", stock: "0" };
+
+const [dbCategories, setDbCategories] = useState<{ name: string; subcategories: string[] }[]>([]);
+
+useEffect(() => {
+  async function fetchCategories() {
+    const res = await fetch("/api/categories");
+    const data = await res.json();
+    setDbCategories(data.categories || []);
+  }
+  fetchCategories();
+}, []);
 
 export default function ProductForm({ initialValues, productId }: ProductFormProps) {
   const router = useRouter();
@@ -186,9 +196,9 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
             required
           >
             <option value="">Select category</option>
-            {leftCategoriesData.map((cat) => (
-              <option key={cat.id} value={cat.title}>
-                {cat.title}
+            {dbCategories.map((cat) => (
+              <option key={cat.name} value={cat.name}>
+                {cat.name}
               </option>
             ))}
           </select>
@@ -203,9 +213,9 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
             disabled={!values.category}
           >
             <option value="">None</option>
-            {leftCategoriesData
-              .find((cat) => cat.title === values.category)
-              ?.items.map((item) => (
+            {dbCategories
+              .find((cat) => cat.name === values.category)
+              ?.subcategories.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>

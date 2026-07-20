@@ -144,6 +144,7 @@ export default function Navbar() {
 
   const { cart } = useCart();
   const { data: session, status } = useSession();
+  const isAdmin = session?.user?.role === "admin";
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -280,9 +281,20 @@ export default function Navbar() {
                   }}
                 >
                   <p className="px-4 text-xs text-gray-500 truncate">{session.user?.email}</p>
+
+                  {isAdmin && (
+                    <Link href="/admin" className="px-4 py-2 text-left text-sm hover:bg-gray-100">
+                      <button
+                        type="button"
+                        className="cursor-pointer"
+                      >
+                          Admin
+                      </button>
+                    </Link>
+                  )}
                   <button
                     type="button"
-                    className="px-4 py-2 text-left text-sm hover:bg-gray-100"
+                    className="px-4 py-2 text-left text-sm hover:bg-gray-100 cursor-pointer"
                     onClick={() => signOut({ callbackUrl: "/" })}
                   >
                     Sign Out
