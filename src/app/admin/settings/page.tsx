@@ -12,9 +12,15 @@ interface Advantage {
   image: string;
   title: string;
 }
+interface SocialPost {
+  image: string;
+  caption: string;
+  link: string;
+}
 
 const emptySlide: HeroSlide = { imageDesktop: "", imageMobile: "" };
 const emptyAdvantage: Advantage = { image: "", title: "" };
+const emptyPost: SocialPost = { image: "", caption: "", link: "" };
 
 export default function SiteSettingsPage() {
   const [logo, setLogo] = useState("");
@@ -24,6 +30,7 @@ export default function SiteSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [socialPosts, setSocialPosts] = useState<SocialPost[]>([]);
 
   useEffect(() => {
     async function load() {
@@ -34,6 +41,7 @@ export default function SiteSettingsPage() {
       setSquadImages(data.settings.squadImages?.length ? data.settings.squadImages : [""]);
       setAdvantages(data.settings.advantages?.length ? data.settings.advantages : [emptyAdvantage]);
       setLoading(false);
+      setSocialPosts(data.settings.socialPosts?.length ? data.settings.socialPosts : [emptyPost]);
     }
     load();
   }, []);
@@ -71,6 +79,16 @@ export default function SiteSettingsPage() {
   const addAdvantage = () => setAdvantages((prev) => [...prev, { ...emptyAdvantage }]);
   const removeAdvantage = (index: number) => setAdvantages((prev) => prev.filter((_, i) => i !== index));
 
+  const updatePost = (index: number, field: keyof SocialPost, value: string) => {
+    setSocialPosts((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+  const addPost = () => setSocialPosts((prev) => [...prev, { ...emptyPost }]);
+  const removePost = (index: number) => setSocialPosts((prev) => prev.filter((_, i) => i !== index));
+
   const handleSave = async () => {
     setSaving(true);
     setMessage("");
@@ -83,6 +101,7 @@ export default function SiteSettingsPage() {
         heroSlides: slides,
         squadImages: squadImages.filter(Boolean),
         advantages,
+        socialPosts,
       }),
     });
 

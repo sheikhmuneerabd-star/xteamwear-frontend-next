@@ -3,10 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { IoIosArrowForward } from "react-icons/io";
 
+interface DbSubcategory {
+  name: string;
+  items: string[];
+}
+
 interface DbCategory {
   _id: string;
   name: string;
-  subcategories: string[];
+  subcategories: DbSubcategory[];
 }
 
 interface LeftCateProps {
@@ -104,19 +109,19 @@ export default function LeftCate({
                   }`}
                 >
                   <div className="min-h-0 pl-4 pb-2 space-y-1">
-                    {cate.subcategories.map((item, i) => (
+                    {cate.subcategories.map((sub, i) => (
                       <div
-                        key={i}
+                        key={sub.name}
                         className="relative h-[30px] flex items-center cursor-pointer group"
-                        onClick={() => setSubActiveCategory(item)}
+                        onClick={() => setSubActiveCategory(sub.name)}
                       >
                         <IoIosArrowForward className="text-sm text-gray-600" />
                         <p
                           className={`absolute top-[3.3px] left-1 bg-white text-sm group-hover:translate-x-3 transition-all duration-200 ${
-                            subActiveCategory === item ? "translate-x-3 text-black" : "text-gray-600"
+                            subActiveCategory === sub.name ? "translate-x-3 text-black" : "text-gray-600"
                           }`}
                         >
-                          {item}
+                          {sub.name}
                         </p>
                       </div>
                     ))}

@@ -3,10 +3,99 @@
 import { useEffect, useState } from "react";
 import { LuPlus, LuTrash2, LuPencil, LuX, LuCheck } from "react-icons/lu";
 
+interface Subcategory {
+  name: string;
+  items: string[];
+}
+
 interface Category {
   _id: string;
   name: string;
-  subcategories: string[];
+  subcategories: Subcategory[];
+}
+
+// Row shape used only inside the form (items kept as a comma-separated
+// string while typing, converted to string[] on submit)
+interface SubRow {
+  name: string;
+  items: string;
+}
+
+const emptyRow = (): SubRow => ({ name: "", items: "" });
+
+const subcategoriesToRows = (subcategories: Subcategory[]): SubRow[] =>
+  subcategories.length > 0
+    ? subcategories.map((s) => ({ name: s.name, items: s.items.join(", ") }))
+    : [emptyRow()];
+
+const rowsToSubcategories = (rows: SubRow[]): Subcategory[] =>
+  rows
+    .filter((r) => r.name.trim())
+    .map((r) => ({
+      name: r.name.trim(),
+      items: r.items
+        .split(",")
+        .map((i) => i.trim())
+        .filter(Boolean),
+    }));
+
+function SubRowsEditor({
+  rows,
+  onChange,
+}: {
+  rows: SubRow[];
+  onChange: (rows: SubRow[]) => void;
+}) {
+  const updateRow = (index: number, field: keyof SubRow, value: string) => {
+    const next = rows.map((r, i) => (i === index ? { ...r, [field]: value } : r));
+    onChange(next);
+  };
+
+  const addRow = () => onChange([...rows, emptyRow()]);
+
+  const removeRow = (index: number) => {
+    const next = rows.filter((_, i) => i !== index);
+    onChange(next.length > 0 ? next : [emptyRow()]);
+  };
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-medium text-gray-500">Subcategories</p>
+      {rows.map((row, index) => (
+        <div key={index} className="flex gap-2 items-start">
+          <input
+            className="flex-1 border border-gray-300 rounded-md p-2 text-sm outline-none focus:border-black"
+            type="text"
+            placeholder="Subcategory name (e.g. Winter Wear)"
+            value={row.name}
+            onChange={(e) => updateRow(index, "name", e.target.value)}
+          />
+          <input
+            className="flex-1 border border-gray-300 rounded-md p-2 text-sm outline-none focus:border-black"
+            type="text"
+            placeholder="Items, comma-separated (optional)"
+            value={row.items}
+            onChange={(e) => updateRow(index, "items", e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => removeRow(index)}
+            className="text-gray-400 hover:text-red-600 p-2"
+            aria-label="Remove subcategory row"
+          >
+            <LuX />
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addRow}
+        className="flex items-center gap-1 text-xs font-medium text-gray-600 hover:text-black"
+      >
+        <LuPlus className="text-xs" /> Add subcategory
+      </button>
+    </div>
+  );
 }
 
 export default function AdminCategoriesPage() {
@@ -15,12 +104,12 @@ export default function AdminCategoriesPage() {
   const [seeding, setSeeding] = useState(false);
 
   const [newName, setNewName] = useState("");
-  const [newSubs, setNewSubs] = useState("");
+  const [newSubRows, setNewSubRows] = useState<SubRow[]>([emptyRow()]);
   const [creating, setCreating] = useState(false);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
-  const [editSubs, setEditSubs] = useState("");
+  const [editSubRows, setEditSubRows] = useState<SubRow[]>([emptyRow()]);
 
   const [error, setError] = useState("");
 
@@ -59,7 +148,7 @@ export default function AdminCategoriesPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: newName,
-        subcategories: newSubs.split(",").map((s) => s.trim()).filter(Boolean),
+        subcategories: rowsToSubcategories(newSubRows),
       }),
     });
     const data = await res.json();
@@ -68,7 +157,7 @@ export default function AdminCategoriesPage() {
       setError(data.error || "Failed to create category");
     } else {
       setNewName("");
-      setNewSubs("");
+      setNewSubRows([emptyRow()]);
       fetchCategories();
     }
     setCreating(false);
@@ -77,13 +166,13 @@ export default function AdminCategoriesPage() {
   const startEdit = (cat: Category) => {
     setEditingId(cat._id);
     setEditName(cat.name);
-    setEditSubs(cat.subcategories.join(", "));
+    setEditSubRows(subcategoriesToRows(cat.subcategories));
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setEditName("");
-    setEditSubs("");
+    setEditSubRows([emptyRow()]);
   };
 
   const saveEdit = async (id: string) => {
@@ -93,7 +182,7 @@ export default function AdminCategoriesPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: editName,
-        subcategories: editSubs.split(",").map((s) => s.trim()).filter(Boolean),
+        subcategories: rowsToSubcategories(editSubRows),
       }),
     });
     const data = await res.json();
@@ -141,22 +230,14 @@ export default function AdminCategoriesPage() {
       {/* Add new category */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
         <h2 className="font-semibold mb-4">Add New Category</h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          <input
-            className="border border-gray-300 rounded-md p-2.5 text-sm outline-none focus:border-black"
-            type="text"
-            placeholder="Category name (e.g. Football)"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-          />
-          <input
-            className="border border-gray-300 rounded-md p-2.5 text-sm outline-none focus:border-black"
-            type="text"
-            placeholder="Subcategories, comma-separated (e.g. Jersey, Shorts)"
-            value={newSubs}
-            onChange={(e) => setNewSubs(e.target.value)}
-          />
-        </div>
+        <input
+          className="w-full border border-gray-300 rounded-md p-2.5 text-sm outline-none focus:border-black mb-4"
+          type="text"
+          placeholder="Category name (e.g. Football)"
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+        />
+        <SubRowsEditor rows={newSubRows} onChange={setNewSubRows} />
         <button
           type="button"
           onClick={handleCreate}
@@ -186,12 +267,7 @@ export default function AdminCategoriesPage() {
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                   />
-                  <input
-                    className="w-full border border-gray-300 rounded-md p-2.5 text-sm outline-none focus:border-black"
-                    value={editSubs}
-                    onChange={(e) => setEditSubs(e.target.value)}
-                    placeholder="Subcategories, comma-separated"
-                  />
+                  <SubRowsEditor rows={editSubRows} onChange={setEditSubRows} />
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -213,14 +289,21 @@ export default function AdminCategoriesPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-medium">{cat.name}</p>
-                    <div className="flex flex-wrap gap-1.5 mt-2">
+                    <div className="flex flex-col gap-2 mt-2">
                       {cat.subcategories.length === 0 ? (
                         <span className="text-xs text-gray-400">No subcategories</span>
                       ) : (
                         cat.subcategories.map((sub) => (
-                          <span key={sub} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                            {sub}
-                          </span>
+                          <div key={sub.name} className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-xs bg-gray-100 text-gray-700 font-medium px-2 py-1 rounded">
+                              {sub.name}
+                            </span>
+                            {sub.items.map((item) => (
+                              <span key={item} className="text-xs bg-gray-50 text-gray-500 px-2 py-1 rounded border border-gray-100">
+                                {item}
+                              </span>
+                            ))}
+                          </div>
                         ))
                       )}
                     </div>

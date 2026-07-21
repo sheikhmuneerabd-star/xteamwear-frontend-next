@@ -33,6 +33,12 @@ const AdvantageSchema = new Schema<IAdvantage>(
   { _id: false }
 );
 
+export interface ISocialPost {
+  image: string;
+  caption: string;
+  link?: string;
+}
+
 const SiteSettingsSchema = new Schema<ISiteSettings>({
   logo: { type: String, default: "" },
   heroSlides: { type: [HeroSlideSchema], default: [] },

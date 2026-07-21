@@ -3,6 +3,21 @@ import { connectDB } from "@/lib/db";
 import Category from "@/lib/models/Category";
 import { auth } from "@/auth";
 
+interface SubcategoryInput {
+  name?: string;
+  items?: string[];
+}
+
+function sanitizeSubcategories(subcategories: SubcategoryInput[] | undefined) {
+  if (!Array.isArray(subcategories)) return [];
+  return subcategories
+    .map((sub) => ({
+      name: (sub.name || "").trim(),
+      items: Array.isArray(sub.items) ? sub.items.map((i) => i.trim()).filter(Boolean) : [],
+    }))
+    .filter((sub) => sub.name);
+}
+
 export async function GET() {
   try {
     await connectDB();
@@ -37,7 +52,7 @@ export async function POST(request: Request) {
     const count = await Category.countDocuments();
     const category = await Category.create({
       name: name.trim(),
-      subcategories: (subcategories || []).map((s: string) => s.trim()).filter(Boolean),
+      subcategories: sanitizeSubcategories(subcategories),
       order: count,
     });
 

@@ -18,6 +18,7 @@ interface ProductFormValues {
   newPrice: string;
   category: string;
   subCategory: string;
+  item: string;
   available: boolean;
   variants: VariantInput[];
 }
@@ -27,17 +28,28 @@ interface ProductFormProps {
   productId?: string; // agar exist karta hai, to Edit mode hai
 }
 
+interface DbSubcategory {
+  name: string;
+  items: string[];
+}
+
+interface DbCategory {
+  name: string;
+  subcategories: DbSubcategory[];
+}
+
 const emptyVariant: VariantInput = { color: "", icon: "", images: ["", ""], sku: "", stock: "0" };
 
 export default function ProductForm({ initialValues, productId }: ProductFormProps) {
   const router = useRouter();
-  const [dbCategories, setDbCategories] = useState<{ name: string; subcategories: string[] }[]>([]);
+  const [dbCategories, setDbCategories] = useState<DbCategory[]>([]);
   const [values, setValues] = useState<ProductFormValues>({
     name: initialValues?.name || "",
     oldPrice: initialValues?.oldPrice || "",
     newPrice: initialValues?.newPrice || "",
     category: initialValues?.category || "",
     subCategory: initialValues?.subCategory || "",
+    item: initialValues?.item || "",
     available: initialValues?.available ?? true,
     variants: initialValues?.variants?.length ? initialValues.variants : [emptyVariant],
   });
@@ -114,6 +126,7 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
       newPrice: Number(values.newPrice),
       category: values.category,
       subCategory: values.subCategory || undefined,
+      item: values.item || undefined,
       available: values.available,
       variants: values.variants.map((v) => ({
         color: v.color,
@@ -214,9 +227,29 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
             <option value="">None</option>
             {dbCategories
               .find((cat) => cat.name === values.category)
-              ?.subcategories.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+              ?.subcategories.map((sub) => (
+                <option key={sub.name} value={sub.name}>
+                  {sub.name}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Item (optional)</label>
+          <select
+            className="w-full border border-gray-300 rounded-md p-2 outline-none focus:border-black bg-white disabled:bg-gray-100"
+            value={values.item}
+            onChange={(e) => setValues((prev) => ({ ...prev, item: e.target.value }))}
+            disabled={!values.subCategory}
+          >
+            <option value="">None</option>
+            {dbCategories
+              .find((cat) => cat.name === values.category)
+              ?.subcategories.find((sub) => sub.name === values.subCategory)
+              ?.items.map((it) => (
+                <option key={it} value={it}>
+                  {it}
                 </option>
               ))}
           </select>

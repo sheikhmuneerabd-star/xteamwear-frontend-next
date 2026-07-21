@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "flagcdn.com" },
       { protocol: "https", hostname: "xteamwear.com" },
+      { protocol: "https", hostname: "bespoketeamwear.com" },
     ],
   },
 };

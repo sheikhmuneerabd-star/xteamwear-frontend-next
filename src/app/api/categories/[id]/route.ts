@@ -7,6 +7,21 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
+interface SubcategoryInput {
+  name?: string;
+  items?: string[];
+}
+
+function sanitizeSubcategories(subcategories: SubcategoryInput[] | undefined) {
+  if (!Array.isArray(subcategories)) return [];
+  return subcategories
+    .map((sub) => ({
+      name: (sub.name || "").trim(),
+      items: Array.isArray(sub.items) ? sub.items.map((i) => i.trim()).filter(Boolean) : [],
+    }))
+    .filter((sub) => sub.name);
+}
+
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const session = await auth();
@@ -15,18 +30,30 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const { name, subcategories } = await request.json();
+    const { name, subcategories, order } = await request.json();
 
     if (!name) {
       return NextResponse.json({ error: "Category name is required" }, { status: 400 });
     }
 
     await connectDB();
-    const category = await Category.findByIdAndUpdate(
-      id,
-      { name: name.trim(), subcategories: (subcategories || []).map((s: string) => s.trim()).filter(Boolean) },
-      { new: true, runValidators: true }
-    );
+
+    const update: {
+      name: string;
+      subcategories: ReturnType<typeof sanitizeSubcategories>;
+      order?: number;
+    } = {
+      name: name.trim(),
+      subcategories: sanitizeSubcategories(subcategories),
+    };
+    if (typeof order === "number") {
+      update.order = order;
+    }
+
+    const category = await Category.findByIdAndUpdate(id, update, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!category) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 });

@@ -43,10 +43,10 @@ export default function GlobalSquad() {
   return (
     <div className="py-12 bg-white">
       <div className="text-center mb-8 px-4">
-        <h2 className="text-2xl md:text-[34px] font-medium tracking-wide">
+        <h2 className="text-[22px] md:text-[34px] font-semibold tracking-wide">
           JOIN THE GLOBAL SQUAD
         </h2>
-        <p className="text-gray-600 text-[15px] md:text-lg mt-2">
+        <p className="text-gray-600 text-[14px] md:text-lg mt-2">
           by 1,000,000+ teams globally. From grassroots to professional league.
         </p>
       </div>

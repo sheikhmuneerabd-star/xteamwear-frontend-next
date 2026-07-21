@@ -14,6 +14,7 @@ export interface IProduct extends Document {
   newPrice: number;
   category: string;
   subCategory?: string;
+  item?: string;
   available: boolean; // ab auto-calculated hota hai variants ke stock se
   variants: IProductVariant[];
   createdAt: Date;
@@ -37,6 +38,7 @@ const ProductSchema = new Schema<IProduct>(
     newPrice: { type: Number, required: true },
     category: { type: String, required: true, trim: true },
     subCategory: { type: String, trim: true },
+    item: { type: String, trim: true },
     available: { type: Boolean, default: true },
     variants: { type: [ProductVariantSchema], required: true },
   },
