@@ -280,7 +280,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setAccountOpen(!accountOpen)}
-                  className="flex items-center gap-2.5"
+                  className="flex items-center gap-2.5 cursor-pointer"
                 >
                   <div className="w-[42px] h-[42px] rounded-full border border-[#E6E1D6] group-hover:border-[#A9762F] flex items-center justify-center transition-colors duration-200">
                     <PiUserLight className="text-[21px] text-[#0B1E3D] group-hover:text-[#A9762F] transition-colors duration-200" />
