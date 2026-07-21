@@ -14,6 +14,7 @@ import PromiseSection from "@/components/home/PromiseSection";
 import EliteCollectionBanner from "@/components/home/EliteCollectionBanner";
 import OfficialPartnersSection from "@/components/home/OfficialPartnersSection";
 import CategoryShowcase from "@/components/home/CategoryShowcase";
+import TestimonialSlider from "@/components/home/TestimonialSlider";
 
 export default function HomePage() {
   const [showMore, setShowMore] = useState(4);
@@ -135,6 +136,8 @@ export default function HomePage() {
       <CategoryShowcase />
 
       <ImagesSection />
+        
+      <TestimonialSlider />
 
       <PromiseSection />
     </div>
