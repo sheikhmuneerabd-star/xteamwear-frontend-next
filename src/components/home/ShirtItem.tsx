@@ -11,7 +11,9 @@ interface ShirtItemProps {
 }
 
 export default function ShirtItem({ shirt }: ShirtItemProps) {
-  const [active, setActive] = useState<ProductVariant>(shirt.variants[0]);
+  const [active, setActive] = useState<ProductVariant>(
+    shirt.variants[0] || {}
+  );
 
   const handleVariantClick = (
     e: React.MouseEvent<HTMLDivElement>,
@@ -22,70 +24,105 @@ export default function ShirtItem({ shirt }: ShirtItemProps) {
     setActive(variant);
   };
 
+  // Calculate discount percentage dynamically if old price exists
+  const discountPercent =
+    shirt.oldPrice && shirt.newPrice
+      ? Math.round(((shirt.oldPrice - shirt.newPrice) / shirt.oldPrice) * 100)
+      : null;
+
+  const mainImage = active.images?.[0] || active.images?.[0] || "/placeholder.jpg";
+  const hoverImage = active.images?.[1] || mainImage;
+
   return (
     <Link
-      href={`/card/${shirt.id}/${encodeURIComponent(active.color)}`}
-      className="shirt"
+      href={`/card/${shirt.id}/${encodeURIComponent(active.color || "default")}`}
+      className="group block h-full font-sans"
     >
-      <div className="group rounded-md shadow-lg shadow-gray-300 p-4">
+      <div className="h-full rounded-2xl bg-white border border-slate-100 p-3 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1">
         <div>
-          <div className="cursor-pointer group/img group-hover:-translate-y-2 transition-all duration-300 relative rounded aspect-[4/5] overflow-hidden">
+          {/* Product Image Stage */}
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-slate-100">
+            {/* Main Image */}
             <Image
-              src={active.images[0]}
+              src={mainImage}
               alt={shirt.name}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover opacity-100 group-hover/img:opacity-0 transition-opacity duration-700 ease-in-out"
+              className="object-cover transition-opacity duration-500 group-hover:opacity-0"
             />
+
+            {/* Hover Image */}
             <Image
-              src={active.images[1]}
-              alt={`${shirt.name} - alternate view`}
+              src={hoverImage}
+              alt={`${shirt.name} - view`}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover absolute top-0 left-0 opacity-0 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-700 ease-out"
+              className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
             />
-            <div className="absolute flex flex-col items-end gap-1 right-0 top-0">
-              <p className="bg-[#C6FF00] text-[#0B1E3D] rounded text-center xl:text-[13px] lg:text-[13px] text-[10px] xl:py-[1px] lg:py-[1px] py-0 xl:w-[42px] lg:w-[42px] w-[34px]">
+
+            {/* Floating Badges Container */}
+            <div className="absolute top-2.5 right-2.5 flex flex-col items-end gap-1.5 z-10">
+              <span className="bg-[#0B1426] text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full shadow-md">
                 New
-              </p>
-              <p className="bg-[#FF5A36] text-white rounded text-center xl:text-[13px] lg:text-[13px] text-[11px] py-[1px] xl:w-[78px] lg:w-[78px] w-[62px]">
-                Sale 20%
-              </p>
+              </span>
+              {discountPercent && (
+                <span className="bg-amber-500 text-slate-950 text-[10px] sm:text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow-md">
+                  -{discountPercent}%
+                </span>
+              )}
             </div>
           </div>
 
-          <div className="md:pt-4 md:pl-4 md:pr-4 pt-3 pl-2 pb-0">
-            <p className="text-sm md:text-base lg:text-lg line-clamp-2 text-gray-700 hover:text-[#0B1E3D] cursor-pointer transition-all duration-300">
+          {/* Product Info Section */}
+          <div className="pt-4 px-1 pb-1">
+            {/* Title */}
+            <h3 className="text-sm md:text-base font-semibold text-[#0B1426] line-clamp-1 group-hover:text-amber-600 transition-colors duration-200">
               {shirt.name}
-            </p>
-            <p className="text-gray-600 text-sm md:text-base lg:text-lg mt-2 line-through cursor-pointer">
-              {formatPrice(shirt.oldPrice)}
-            </p>
-            <div className="text-[#FF5A36] flex items-center gap-2 cursor-pointer text-sm md:text-base lg:text-lg font-medium">
-              {formatPrice(shirt.newPrice)}
-              <p className="bg-[#FF5A36] text-white xl:px-3 lg:px-3 px-2 xl:text-[15px] lg:text-[15px] text-[10px] xl:pt-1 lg:pt-1 pt-[2px] xl:pb-[5px] lg:pb-[5px] pb-[2px] rounded cursor-text hidden md:flex">
-                (-20%)
-              </p>
-            </div>
-            <div className="flex gap-1">
-              {shirt.variants.map((variant, index) => (
-                <div
-                  key={index}
-                  className="relative w-[30px] h-[30px] mt-3 rounded-full cursor-pointer border-[1.4px] p-[2px] border-gray-300 overflow-hidden"
-                  onClick={(e) => handleVariantClick(e, variant)}
-                >
-                  <Image
-                    src={variant.icon}
-                    alt={variant.color}
-                    fill
-                    sizes="30px"
-                    className="rounded-full object-cover"
-                  />
-                </div>
-              ))}
+            </h3>
+
+            {/* Price Section */}
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className="text-base sm:text-lg font-bold text-[#0B1426]">
+                {formatPrice(shirt.newPrice)}
+              </span>
+
+              {shirt.oldPrice && (
+                <span className="text-xs sm:text-sm text-slate-400 line-through font-medium">
+                  {formatPrice(shirt.oldPrice)}
+                </span>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Color Swatches Selection */}
+        {shirt.variants && shirt.variants.length > 0 && (
+          <div className="pt-2 pb-1 px-1 flex items-center gap-2 overflow-x-auto no-scrollbar">
+            {shirt.variants.map((variant, index) => {
+              const isSelected = active.color === variant.color;
+              return (
+                <div
+                  key={index}
+                  title={variant.color}
+                  onClick={(e) => handleVariantClick(e, variant)}
+                  className={`relative shrink-0 w-7 h-7 rounded-full cursor-pointer transition-all duration-200 p-[2px] ${
+                    isSelected
+                      ? "ring-2 ring-amber-500 ring-offset-1 scale-105"
+                      : "opacity-75 hover:opacity-100 border border-slate-300"
+                  }`}
+                >
+                  <Image
+                    src={variant.icon || variant.images?.[0] || "/placeholder.jpg"}
+                    alt={variant.color}
+                    fill
+                    sizes="28px"
+                    className="rounded-full object-cover"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </Link>
   );

@@ -5,6 +5,7 @@ import WhatsApp from "@/components/layout/WhatsApp";
 import FooterSearch from "@/components/layout/FooterSearch";
 import FooterContact from "@/components/layout/FooterContact";
 import CopyRightFooter from "@/components/layout/CopyRightFooter";
+import Footer from "@/components/layout/Footer";
 
 export default function MainLayout({
   children,
@@ -13,14 +14,11 @@ export default function MainLayout({
 }>) {
   return (
     <>
-      <NavContact />
       <Navbar />
       <CategoryBar />
       {children}
       <WhatsApp />
-      <FooterSearch />
-      <FooterContact />
-      <CopyRightFooter />
+      <Footer />
     </>
   );
 }

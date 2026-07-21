@@ -13,9 +13,11 @@ export default function ShirtCard({ showMore, products }: ShirtCardProps) {
   useSafeScrollFade(".shirt", [showMore, products]);
 
   return (
-    <div className="grid grid-cols-1 min-[375px]:grid-cols-2 min-[475px]:grid-cols-2 min-[768px]:grid-cols-3 min-[1024px]:grid-cols-4 min-[1440px]:grid-cols-4 w-full gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
       {products.slice(0, showMore).map((shirt) => (
-        <ShirtItem key={shirt.id} shirt={shirt} />
+        <div key={shirt.id} className="shirt">
+          <ShirtItem shirt={shirt} />
+        </div>
       ))}
     </div>
   );

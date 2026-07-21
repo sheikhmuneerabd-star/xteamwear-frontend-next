@@ -1,9 +1,9 @@
 "use client";
 import { useSession, signOut } from "next-auth/react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IoIosSearch, IoMdClose, IoMdArrowDropdown } from "react-icons/io";
+import { IoIosSearch, IoMdClose } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 import { PiShoppingCartLight, PiUserLight } from "react-icons/pi";
 import { HiMiniBars3 } from "react-icons/hi2";
@@ -16,6 +16,14 @@ import { RiUserAddLine } from "react-icons/ri";
 import greenShirt from "@/assets/greenShirt.jpg";
 import orangeShirt from "@/assets/orangeShirt.jpg";
 import { useCart } from "@/context/CartContext";
+
+/**
+ * ---- Design tokens (brand-specific, not a generic template) ----
+ * Navy      #0B1E3D  – existing brand ink, used for wordmark & primary text
+ * Brass     #A9762F  – replaces the stock "neon e-commerce accent"; reads as tailored/premium
+ * Ivory     #FAF8F3  – warm surface for panels/dropdowns
+ * Hairline  #E6E1D6  – soft structural borders instead of harsh gray-300
+ */
 
 interface CategoryMenuEntry {
   id: number;
@@ -35,19 +43,11 @@ const categoriesCategory: CategoryMenuEntry[] = [
   { id: 3, name: "Baseball", items: ["Baseball Ball 1", "Baseball Ball 2", "Baseball Ball 3"] },
 ];
 
-const countries = [
-  { name: "Pakistan", code: "pk" },
-  { name: "Iran", code: "ir" },
-  { name: "Turkey", code: "tr" },
-  { name: "Yemen", code: "ye" },
-  { name: "China", code: "cn" },
-];
-
-/** Reused 3x in the original — extracted to remove duplication */
+/** Reused product card for search suggestions — restyled with brass accents instead of orange/lime */
 function PopularProductCard() {
   return (
-    <div className="group flex flex-col justify-center">
-      <div className="w-full h-[180px] group/img group-hover:-translate-y-2 transition-all duration-300 relative cursor-pointer overflow-hidden">
+    <div className="group flex flex-col justify-center shrink-0">
+      <div className="w-full h-[180px] group/img group-hover:-translate-y-2 transition-all duration-300 relative cursor-pointer overflow-hidden rounded-sm">
         <Image
           src={greenShirt}
           alt="Popular product"
@@ -63,19 +63,21 @@ function PopularProductCard() {
           className="object-cover absolute top-0 left-0 opacity-0 group-hover/img:opacity-100 ease-out hover:scale-105 transition-all duration-700"
         />
       </div>
-      <div className="w-[150px] p-4">
-        <span className="text-[11px] line-clamp-2 font-medium hover:text-blue-600 cursor-pointer">
-          Whirlwind - Men&apos;s Sublimated Footbal Lorem ipsum dolor sit amet.
+      <div className="w-[150px] pt-3">
+        <span className="text-[11px] leading-snug line-clamp-2 font-medium text-[#0B1E3D] hover:text-[#A9762F] cursor-pointer">
+          Whirlwind — Men&apos;s Sublimated Football Kit
         </span>
-        <p className="text-gray-800 font-medium text-[15px] line-through">$33.53 (USD)</p>
-        <p className="text-gray-800 font-medium text-[15px] line-through">USD</p>
-        <p className="text-[#FF5A36] font-medium text-[15px]">$28.33 (USD)</p>
-        <p className="text-[#FF5A36] font-medium text-[15px]">USD</p>
-        <div className="w-[75%] flex justify-end">
-          <span className="bg-[#FF5A36] px-3 py-[3px] rounded text-[14px] text-white">(-20%)</span>
+        <div className="flex items-baseline gap-2 mt-1">
+          <p className="text-gray-400 font-medium text-[13px] line-through">$33.53</p>
+          <p className="text-[#A9762F] font-semibold text-[14px]">$28.33</p>
         </div>
-        <div className="relative w-[30px] h-[30px] mt-3 rounded-full border-[1.4px] p-[2px] border-gray-300 overflow-hidden">
-          <Image src={greenShirt} alt="GREEN & BLACK" fill sizes="30px" className="rounded-full object-cover" />
+        <div className="w-full flex justify-between items-center mt-2">
+          <div className="relative w-[22px] h-[22px] rounded-full border border-[#E6E1D6] overflow-hidden">
+            <Image src={greenShirt} alt="Colorway" fill sizes="22px" className="rounded-full object-cover" />
+          </div>
+          <span className="text-[11px] tracking-wide font-medium text-[#A9762F] border border-[#A9762F]/40 px-2 py-[2px] rounded-full">
+            −20%
+          </span>
         </div>
       </div>
     </div>
@@ -83,18 +85,20 @@ function PopularProductCard() {
 }
 
 const searchTagGroups = [
-  ["uniform pakages", "fluorescent jersey", "sleeveless jersey"],
-  ["loremous saliduar", "long sleeve shirts", "shorts & pants"],
-  ["reversible basketball jersey", "bespoke", "socks & accessories"],
+  ["uniform packages", "fluorescent jersey", "sleeveless jersey"],
+  ["long sleeve shirts", "shorts & pants", "training kits"],
+  ["reversible basketball jersey", "bespoke fits", "socks & accessories"],
 ];
 
 /** Search trending tags + popular products — shared between desktop dropdown and mobile sidebar */
 function SearchSuggestions({ variant }: { variant: "desktop" | "mobile" }) {
-  const wrapClass = variant === "desktop" ? "flex gap-2 pt-5" : "flex flex-wrap gap-2 pt-5";
+  const wrapClass = variant === "desktop" ? "flex flex-wrap gap-2 pt-4" : "flex flex-wrap gap-2 pt-4";
   return (
     <>
-      <div className="p-2 border-b">
-        <h2 className="font-semibold text-sm">SUBLIMATED JERSEY</h2>
+      <div className="pb-3 border-b border-[#E6E1D6]">
+        <span className="text-[11px] tracking-[0.14em] font-semibold text-[#A9762F] uppercase">
+          Trending — Sublimated Jersey
+        </span>
       </div>
       <div>
         {searchTagGroups.map((group, gi) => (
@@ -102,17 +106,19 @@ function SearchSuggestions({ variant }: { variant: "desktop" | "mobile" }) {
             {group.map((tag) => (
               <div
                 key={tag}
-                className="flex gap-1 items-center bg-gray-100 hover:bg-gray-200 cursor-pointer transition-all duration-200 group text-gray-500 py-[6.5px] px-3"
+                className="flex gap-1 items-center border border-[#E6E1D6] hover:border-[#A9762F] hover:bg-[#A9762F]/5 cursor-pointer transition-all duration-200 group py-[6px] px-3 rounded-full"
               >
-                <span className="text-[13px] group-hover:text-gray-700">{tag}</span>
+                <span className="text-[12.5px] text-[#0B1E3D]/70 group-hover:text-[#0B1E3D]">{tag}</span>
               </div>
             ))}
           </div>
         ))}
       </div>
-      <div className="mt-7">
-        <h2 className="font-semibold text-sm border-b pb-2">POPULAR PRODUCTS</h2>
-        <div className="mt-4 flex gap-3 overflow-x-auto">
+      <div className="mt-6">
+        <span className="text-[11px] tracking-[0.14em] font-semibold text-[#0B1E3D] uppercase border-b border-[#E6E1D6] pb-2 block">
+          Popular Products
+        </span>
+        <div className="mt-4 flex gap-4 overflow-x-auto pb-3 [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar-track]:bg-[#E6E1D6] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#A9762F]/60 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-[#A9762F]">
           <PopularProductCard />
           <PopularProductCard />
           <PopularProductCard />
@@ -133,9 +139,6 @@ export default function Navbar() {
   const [openCategory, setOpenCategory] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const searchSideBar = useRef<HTMLDivElement>(null);
-  const [languageCountry, setLanguageCountry] = useState(false);
-  const languageBoxRef = useRef<HTMLDivElement>(null);
-  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
 
   const [logoUrl, setLogoUrl] = useState("");
 
@@ -186,16 +189,6 @@ export default function Navbar() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (languageBoxRef.current && !languageBoxRef.current.contains(event.target as Node)) {
-        setLanguageCountry(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
       if (accountBoxRef.current && !accountBoxRef.current.contains(event.target as Node)) {
         setAccountOpen(false);
       }
@@ -226,86 +219,96 @@ export default function Navbar() {
 
   return (
     <div>
-      {/* Desktop */}
-      <div className="w-full xl:flex hidden">
-        <div className="w-[91%] h-[110px] mx-auto flex items-center justify-between">
-          <Link href="/" className="cursor-pointer">
-            {logoUrl && (
-              <Image className="w-[80%] h-auto" src={logoUrl} alt="xteamwear" width={160} height={60} />
+      {/* ================= Desktop ================= */}
+      <div className="w-full xl:flex hidden border-b border-[#E6E1D6] bg-white">
+        <div className="w-[91%] h-[100px] mx-auto flex items-center justify-between">
+          {/* Wordmark */}
+          <Link href="/" className="cursor-pointer shrink-0">
+            {logoUrl ? (
+              <Image className="w-[80%] h-auto" src={logoUrl} alt="BeSpoke Wear" width={160} height={60} />
+            ) : (
+              <span className="font-serif text-2xl tracking-tight text-[#0B1E3D]">BeSpoke Wear</span>
             )}
           </Link>
 
-          <div className="flex w-[36%] h-[45px] mr-[50px] rounded-xl relative">
-            <label
-              className={`absolute top-[10px] left-3 transition-all duration-300 ${
-                focus ? "-translate-x-1 opacity-0" : "translate-x-0 opacity-100"
+          {/* Signature search — soft pill with brass icon-button, not a bare underline */}
+          <div className="flex flex-col w-[34%] mr-10 relative">
+            <div
+              className={`flex items-center h-[46px] rounded-full bg-[#FAF8F3] border transition-all duration-300 pl-4 pr-1 ${
+                focus ? "border-[#A9762F] shadow-[0_0_0_3px_rgba(169,118,47,0.12)]" : "border-[#E6E1D6]"
               }`}
             >
-              Search the store
-            </label>
-            <input
-              className="w-full h-full rounded-xl outline-none pl-3 shadowSearch shadow-[inset_0_1px_3px_rgba(0,0,0,0.12)] text-[15px] placeholder-gray-600"
-              type="text"
-              onFocus={handleSearchFocus}
-              onBlur={handleSearchBlur}
-            />
-            <IoSearch className="absolute bottom-0 right-0 p-[9px] bg-[#C6FF00] text-[#0B1E3D] w-[12%] h-full rounded-tr-xl rounded-br-xl transition-all duration-200 hover:bottom-1 cursor-pointer" />
+              <input
+                className="w-full h-full outline-none text-[14.5px] bg-transparent placeholder-[#0B1E3D]/40 text-[#0B1E3D]"
+                type="text"
+                placeholder="Search the store"
+                onFocus={handleSearchFocus}
+                onBlur={handleSearchBlur}
+              />
+              <button
+                type="button"
+                aria-label="Search"
+                className="shrink-0 w-[36px] h-[36px] rounded-full bg-[#0B1E3D] hover:bg-[#A9762F] flex items-center justify-center transition-colors duration-300 cursor-pointer"
+              >
+                <IoSearch className="text-[16px] text-white" />
+              </button>
+            </div>
             <div
-              className={`bg-white absolute [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 top-[60px] left-0 w-[125%] h-[300px] rounded-md border border-gray-200 overflow-y-auto overflow-x-hidden z-50 ${
+              className={`bg-white absolute [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#E6E1D6] top-[54px] left-0 w-[130%] max-h-[320px] rounded-md border border-[#E6E1D6] shadow-[0_12px_28px_-8px_rgba(11,30,61,0.15)] overflow-y-auto overflow-x-hidden z-50 ${
                 searchFocus ? "flex" : "hidden"
               }`}
             >
-              <div className="p-5">
+              <div className="p-5 w-full">
                 <SearchSuggestions variant="desktop" />
               </div>
             </div>
           </div>
 
-          <div className="flex gap-5">
-            <div className="flex flex-col justify-center items-center">
-              <Link href="/cart" className="flex items-center gap-2 group cursor-pointer">
-                <PiShoppingCartLight className="text-[32px] group-hover:scale-110 transition-all duration-200" />
-                <div className="flex flex-col justify-center text-[13px]">
-                  <span className="flex items-center justify-center bg-[#0B1E3D] rounded-full font-semibold text-white w-[30px] h-[17.5px]">
-                    {cart.length}
-                  </span>
-                  <span>Cart</span>
-                </div>
-              </Link>
-            </div>
+          <div className="flex gap-4 items-center">
+            <Link href="/cart" className="flex items-center gap-2.5 group cursor-pointer pr-4 border-r border-[#E6E1D6]">
+              <div className="relative w-[42px] h-[42px] rounded-full border border-[#E6E1D6] group-hover:border-[#A9762F] flex items-center justify-center transition-colors duration-200">
+                <PiShoppingCartLight className="text-[21px] text-[#0B1E3D] group-hover:text-[#A9762F] transition-colors duration-200" />
+                <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-[#A9762F] rounded-full font-semibold text-white text-[10.5px] w-[17px] h-[17px] ring-2 ring-white">
+                  {cart.length}
+                </span>
+              </div>
+              <span className="text-[13px] text-[#0B1E3D] font-medium hidden 2xl:inline">Cart</span>
+            </Link>
+
             {status === "authenticated" ? (
-              <div className="flex items-center gap-1 group cursor-pointer relative" ref={accountBoxRef}>
-                <PiUserLight
-                  className="text-[40px] group-hover:scale-110 transition-all duration-200"
+              <div className="flex items-center gap-2 group cursor-pointer relative" ref={accountBoxRef}>
+                <button
+                  type="button"
                   onClick={() => setAccountOpen(!accountOpen)}
-                />
-                <div className="flex flex-col text-[13px]" onClick={() => setAccountOpen(!accountOpen)}>
-                  <span>Hi, {session.user?.name?.split(" ")[0]}</span>
-                  <span className="font-semibold">My account</span>
-                </div>
+                  className="flex items-center gap-2.5"
+                >
+                  <div className="w-[42px] h-[42px] rounded-full border border-[#E6E1D6] group-hover:border-[#A9762F] flex items-center justify-center transition-colors duration-200">
+                    <PiUserLight className="text-[21px] text-[#0B1E3D] group-hover:text-[#A9762F] transition-colors duration-200" />
+                  </div>
+                  <div className="flex flex-col text-[13px] items-start leading-tight">
+                    <span className="text-[#0B1E3D]/60 text-[11.5px]">Hi, {session.user?.name?.split(" ")[0]}</span>
+                    <span className="font-semibold text-[#0B1E3D]">My Account</span>
+                  </div>
+                </button>
                 <div
-                  className="bg-white z-50 w-[160px] py-3 flex flex-col gap-2 rounded-md absolute top-12 right-0 shadowNavCon transition-all duration-300"
+                  className="bg-white z-50 w-[190px] py-2 flex flex-col rounded-md absolute top-[52px] right-0 border border-[#E6E1D6] shadow-[0_12px_28px_-8px_rgba(11,30,61,0.18)] transition-all duration-300"
                   style={{
                     opacity: accountOpen ? 1 : 0,
                     pointerEvents: accountOpen ? "auto" : "none",
-                    transform: accountOpen ? "translateY(0)" : "translateY(-10px)",
+                    transform: accountOpen ? "translateY(0)" : "translateY(-8px)",
                   }}
                 >
-                  <p className="px-4 text-xs text-gray-500 truncate">{session.user?.email}</p>
-
+                  <p className="px-4 pb-2 mb-1 text-xs text-[#0B1E3D]/50 truncate border-b border-[#E6E1D6]">
+                    {session.user?.email}
+                  </p>
                   {isAdmin && (
-                    <Link href="/admin" className="px-4 py-2 text-left text-sm hover:bg-gray-100">
-                      <button
-                        type="button"
-                        className="cursor-pointer"
-                      >
-                          Admin
-                      </button>
+                    <Link href="/admin" className="px-4 py-2 text-left text-sm text-[#0B1E3D] hover:bg-[#A9762F]/5">
+                      Admin
                     </Link>
                   )}
                   <button
                     type="button"
-                    className="px-4 py-2 text-left text-sm hover:bg-gray-100 cursor-pointer"
+                    className="px-4 py-2 text-left text-sm text-[#0B1E3D] hover:bg-[#A9762F]/5 cursor-pointer"
                     onClick={() => signOut({ callbackUrl: "/" })}
                   >
                     Sign Out
@@ -313,11 +316,13 @@ export default function Navbar() {
                 </div>
               </div>
             ) : (
-              <Link href="/sign-in" className="flex items-center gap-1 group cursor-pointer">
-                <PiUserLight className="text-[40px] group-hover:scale-110 transition-all duration-200" />
-                <div className="flex flex-col text-[13px]">
-                  <span>Sign In or Register</span>
-                  <span className="font-semibold">My account</span>
+              <Link href="/sign-in" className="flex items-center gap-2.5 group cursor-pointer">
+                <div className="w-[42px] h-[42px] rounded-full border border-[#E6E1D6] group-hover:border-[#A9762F] flex items-center justify-center transition-colors duration-200">
+                  <PiUserLight className="text-[21px] text-[#0B1E3D] group-hover:text-[#A9762F] transition-colors duration-200" />
+                </div>
+                <div className="flex flex-col text-[13px] leading-tight">
+                  <span className="text-[#0B1E3D]/60 text-[11.5px]">Sign In or Register</span>
+                  <span className="font-semibold text-[#0B1E3D]">My Account</span>
                 </div>
               </Link>
             )}
@@ -325,11 +330,11 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile */}
+      {/* ================= Mobile ================= */}
       <div className="fixed top-0 left-0 right-0 z-[999] shadow-sm shadow-gray-200 transition-all duration-200 w-full h-[54px] bg-white xl:hidden flex">
         {(openSearch || toggle) && (
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-[#0B1E3D]/40 z-40"
             onClick={() => {
               setOpenSearch(false);
               setToggle(false);
@@ -339,63 +344,63 @@ export default function Navbar() {
         <div className="w-[97%] flex items-center justify-between mx-auto">
           <div className="flex items-center gap-5">
             <div className="relative">
-              <HiMiniBars3 className="text-3xl" onClick={() => setToggle(!toggle)} />
+              <HiMiniBars3 className="text-3xl text-[#0B1E3D]" onClick={() => setToggle(!toggle)} />
               <div
                 className={`fixed overflow-scroll top-0 left-0 bg-white md:w-[370px] max-[320px]:w-[300px] w-[340px] h-full z-50 transition-all duration-300 ${
                   toggle ? "translate-x-0" : "-translate-x-full"
                 }`}
                 ref={menuSideBar}
               >
-                <div className="p-3 flex justify-between items-center">
-                  <div className="flex gap-2">
+                <div className="p-4 flex justify-between items-center border-b border-[#E6E1D6]">
+                  <div className="flex gap-5">
                     <h1
-                      className={`text-lg font-medium transition-all duration-300 ${
-                        openMenu ? "text-gray-900" : "text-gray-400"
+                      className={`text-[15px] tracking-wide font-semibold uppercase transition-all duration-300 ${
+                        openMenu ? "text-[#0B1E3D]" : "text-[#0B1E3D]/35"
                       }`}
                       onClick={handleMenu}
                     >
                       Menu
                     </h1>
                     <h1
-                      className={`text-lg font-medium transition-all duration-300 ${
-                        openCategory ? "text-gray-900" : "text-gray-400"
+                      className={`text-[15px] tracking-wide font-semibold uppercase transition-all duration-300 ${
+                        openCategory ? "text-[#0B1E3D]" : "text-[#0B1E3D]/35"
                       }`}
                       onClick={handleCategory}
                     >
                       Category
                     </h1>
                   </div>
-                  <IoMdClose className="text-[27px]" onClick={() => setToggle(false)} />
+                  <IoMdClose className="text-[24px] text-[#0B1E3D]" onClick={() => setToggle(false)} />
                 </div>
 
                 <div>
                   <div className={openMenu ? "block" : "hidden"}>
-                    <Link href="/" className="flex text-[17px] items-center justify-between border-b border-gray-300 p-3">
-                      <h2 className="font-medium">Home</h2>
+                    <Link href="/" className="flex text-[16px] items-center justify-between border-b border-[#E6E1D6] p-4">
+                      <h2 className="font-medium text-[#0B1E3D]">Home</h2>
                     </Link>
                     {categoriesMenu.map((cate) => (
                       <div key={cate.id} className="relative">
                         <div
-                          className="flex text-[17px] items-center justify-between border-b border-gray-300 p-3"
+                          className="flex text-[16px] items-center justify-between border-b border-[#E6E1D6] p-4"
                           onClick={() => setActiveMenu(cate.id)}
                         >
-                          <h2 className="font-medium">{cate.name}</h2>
-                          <MdOutlineArrowForwardIos />
+                          <h2 className="font-medium text-[#0B1E3D]">{cate.name}</h2>
+                          <MdOutlineArrowForwardIos className="text-[#A9762F] text-[13px]" />
                         </div>
                         <div
                           className={`fixed overflow-scroll top-0 left-0 h-full w-[370px] bg-white z-50 transition-all duration-200 ${
                             activeMenu === cate.id ? "translate-x-0" : "-translate-x-full"
                           }`}
                         >
-                          <div className="bg-gray-100">
-                            <div className="flex font-medium justify-between p-3 items-center w-[225px]">
-                              <BsArrowLeft className="text-[24px]" onClick={() => setActiveMenu(null)} />
-                              <h2>{cate.name}</h2>
+                          <div className="bg-[#FAF8F3] border-b border-[#E6E1D6]">
+                            <div className="flex font-medium justify-between p-4 items-center w-[225px]">
+                              <BsArrowLeft className="text-[22px] text-[#0B1E3D]" onClick={() => setActiveMenu(null)} />
+                              <h2 className="text-[#0B1E3D]">{cate.name}</h2>
                             </div>
                           </div>
                           <div>
                             {cate.items.map((item, index) => (
-                              <div className="text-[15px] border-b border-gray-200 p-4" key={index}>
+                              <div className="text-[14.5px] text-[#0B1E3D]/80 border-b border-[#E6E1D6] p-4" key={index}>
                                 {item}
                               </div>
                             ))}
@@ -410,26 +415,26 @@ export default function Navbar() {
                       <div key={cateCate.id} className="relative">
                         <Link
                           href={`/category/${encodeURIComponent(cateCate.name)}`}
-                          className="flex text-[17px] items-center justify-between border-b border-gray-300 p-3"
+                          className="flex text-[16px] items-center justify-between border-b border-[#E6E1D6] p-4"
                           onClick={() => setActiveCategory(cateCate.id)}
                         >
-                          <h2 className="font-medium">{cateCate.name}</h2>
-                          <MdOutlineArrowForwardIos />
+                          <h2 className="font-medium text-[#0B1E3D]">{cateCate.name}</h2>
+                          <MdOutlineArrowForwardIos className="text-[#A9762F] text-[13px]" />
                         </Link>
                         <div
                           className={`fixed overflow-scroll top-0 left-0 h-full w-[370px] bg-white z-50 transition-all duration-200 ${
                             activeCategory === cateCate.id ? "translate-x-0" : "-translate-x-full"
                           }`}
                         >
-                          <div className="bg-gray-100">
-                            <div className="flex font-medium justify-between p-3 items-center w-[225px]">
-                              <BsArrowLeft className="text-[24px]" onClick={() => setActiveCategory(null)} />
-                              <h2>{cateCate.name}</h2>
+                          <div className="bg-[#FAF8F3] border-b border-[#E6E1D6]">
+                            <div className="flex font-medium justify-between p-4 items-center w-[225px]">
+                              <BsArrowLeft className="text-[22px] text-[#0B1E3D]" onClick={() => setActiveCategory(null)} />
+                              <h2 className="text-[#0B1E3D]">{cateCate.name}</h2>
                             </div>
                           </div>
                           <div>
                             {cateCate.items.map((item, index) => (
-                              <div key={index} className="text-[15px] border-b border-gray-200 p-4">
+                              <div key={index} className="text-[14.5px] text-[#0B1E3D]/80 border-b border-[#E6E1D6] p-4">
                                 {item}
                               </div>
                             ))}
@@ -442,69 +447,68 @@ export default function Navbar() {
                   <div>
                     {status === "authenticated" ? (
                       <>
-                        <div className="flex gap-1 items-center p-3 border-b border-gray-300">
-                          <HiOutlineUserCircle className="text-[24px]" />
-                          <span className="text-[16px]">Hi, {session.user?.name?.split(" ")[0]}</span>
+                        <div className="flex gap-2 items-center p-4 border-b border-[#E6E1D6]">
+                          <HiOutlineUserCircle className="text-[22px] text-[#A9762F]" />
+                          <span className="text-[15px] text-[#0B1E3D]">Hi, {session.user?.name?.split(" ")[0]}</span>
                         </div>
                         <button
                           type="button"
-                          className="w-full flex gap-1 items-center p-3 border-b border-gray-300 text-left"
+                          className="w-full flex gap-2 items-center p-4 border-b border-[#E6E1D6] text-left"
                           onClick={() => signOut({ callbackUrl: "/" })}
                         >
-                          <RiUserAddLine className="text-[24px]" />
-                          <span className="text-[16px]">Sign Out</span>
+                          <RiUserAddLine className="text-[22px] text-[#A9762F]" />
+                          <span className="text-[15px] text-[#0B1E3D]">Sign Out</span>
                         </button>
                       </>
                     ) : (
                       <>
-                        <Link href="/sign-in" className="flex gap-1 items-center p-3 border-b border-gray-300">
-                          <HiOutlineUserCircle className="text-[24px]" />
-                          <span className="text-[16px]">Sign In</span>
+                        <Link href="/sign-in" className="flex gap-2 items-center p-4 border-b border-[#E6E1D6]">
+                          <HiOutlineUserCircle className="text-[22px] text-[#A9762F]" />
+                          <span className="text-[15px] text-[#0B1E3D]">Sign In</span>
                         </Link>
-                        <Link href="/sign-in" className="flex gap-1 items-center p-3 border-b border-gray-300">
-                          <RiUserAddLine className="text-[24px]" />
-                          <span className="text-[16px]">Create an account</span>
+                        <Link href="/sign-in" className="flex gap-2 items-center p-4 border-b border-[#E6E1D6]">
+                          <RiUserAddLine className="text-[22px] text-[#A9762F]" />
+                          <span className="text-[15px] text-[#0B1E3D]">Create an account</span>
                         </Link>
                       </>
                     )}
                   </div>
 
                   <div>
-                    <div className="p-3 bg-gray-100">
-                      <h2 className="font-medium">CURRENCY</h2>
+                    <div className="p-4 bg-[#FAF8F3]">
+                      <span className="text-[12px] tracking-[0.12em] font-semibold text-[#0B1E3D]/60 uppercase">
+                        Currency
+                      </span>
                     </div>
-                    <div className="p-[13px] flex justify-between gap-[12px] items-center">
+                    <div className="p-4 flex justify-between gap-3 items-center">
                       {["us", "eu", "gb", "ch"].map((code, i) => (
                         <div key={code} className="flex items-center gap-2 cursor-pointer group">
                           <Image
                             src={`https://flagcdn.com/w40/${code}.png`}
-                            width={24}
-                            height={24}
+                            width={22}
+                            height={22}
                             unoptimized
                             alt={code}
-                            className="w-6 h-6 rounded-full"
+                            className="w-[22px] h-[22px] rounded-full"
                           />
-                          <span className="font-medium group-hover:border-black border-b-[1.5px] border-white">
+                          <span className="font-medium text-[13.5px] text-[#0B1E3D] group-hover:text-[#A9762F] border-b border-transparent group-hover:border-[#A9762F]">
                             {["USD", "EUR", "GBP", "CHF"][i]}
                           </span>
                         </div>
                       ))}
                     </div>
-                    <div className="p-[13px] flex gap-[12px] items-center">
+                    <div className="px-4 pb-4 flex gap-3 items-center">
                       {["au", "ca"].map((code, i) => (
-                        <div
-                          key={code}
-                          className={`flex items-center gap-2 cursor-pointer group ${i === 1 ? "ml-[18px]" : ""}`}
-                        >
+                        <div key={code} className="flex items-center gap-2 cursor-pointer group">
                           <Image
                             src={`https://flagcdn.com/w40/${code}.png`}
-                            width={24}
-                            height={24}
+                            width={22}
+                            height={22}
                             unoptimized
                             alt={code}
-                            className="w-6 h-6 rounded-full"
+                            className="w-[22px] h-[22px] rounded-full"
                           />
-                          <span className="font-medium group-hover:border-black border-b-[1.5px] border-white">
+                          <span className="font-medium text-[13.5px] text-[#0B1E3D] group-hover:text-[#A9762F] border-b border-transparent group-hover:border-[#A9762F]">
                             {["AUD", "CAD"][i]}
                           </span>
                         </div>
@@ -515,7 +519,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            <IoIosSearch className="text-[28px]" onClick={() => setOpenSearch(true)} />
+            <IoIosSearch className="text-[26px] text-[#0B1E3D]" onClick={() => setOpenSearch(true)} />
 
             <div className="relative">
               <div
@@ -524,29 +528,23 @@ export default function Navbar() {
                 }`}
                 ref={searchSideBar}
               >
-                <div className="px-4 py-3 flex justify-between items-center">
-                  <h2 className="font-medium text-lg">Search</h2>
-                  <IoMdClose className="text-[27px]" onClick={() => setOpenSearch(false)} />
+                <div className="px-4 py-4 flex justify-between items-center border-b border-[#E6E1D6]">
+                  <h2 className="font-medium text-[16px] text-[#0B1E3D]">Search</h2>
+                  <IoMdClose className="text-[24px] text-[#0B1E3D]" onClick={() => setOpenSearch(false)} />
                 </div>
-                <div className="px-4 py-3">
-                  <div className="relative h-[43px]">
-                    <label
-                      className={`absolute top-[10px] left-3 transition-all duration-300 ${
-                        focus ? "-translate-x-1 opacity-0" : "translate-x-0 opacity-100"
-                      }`}
-                    >
-                      Search product...
-                    </label>
+                <div className="px-4 py-4">
+                  <div className="flex items-center gap-2 border-b-[1.5px] border-[#0B1E3D]/15 focus-within:border-[#A9762F] transition-colors duration-300 pb-2">
+                    <IoSearch className="text-[17px] text-[#0B1E3D]/50" />
                     <input
-                      className="w-full h-full rounded border-b border-gray-300 outline-none pl-3 shadowSearch text-[15px] placeholder-gray-600"
+                      className="w-full outline-none text-[14.5px] bg-transparent placeholder-gray-400 text-[#0B1E3D]"
                       type="text"
+                      placeholder="Search product..."
                       onFocus={handleSearchFocus}
                       onBlur={handleSearchBlur}
                     />
-                    <IoSearch className="absolute bottom-0 right-0 p-[9px] bg-[#C6FF00] text-[#0B1E3D] w-[12%] h-full rounded-tr-xl rounded-br-xl transition-all duration-200 hover:bottom-1 cursor-pointer" />
                   </div>
                 </div>
-                <div className="px-2 py-3 overflow-y-scroll h-[280px] mt-1 w-[95%] mx-auto">
+                <div className="px-4 py-2 overflow-y-scroll h-[280px] mt-1">
                   <SearchSuggestions variant="mobile" />
                 </div>
               </div>
@@ -555,19 +553,21 @@ export default function Navbar() {
 
           <Link href="/" className="cursor-pointer">
             <div className="md:w-[16%] w-[34%]">
-              {logoUrl && (
-                <Image className="w-[80%] h-auto" src={logoUrl} alt="xteamwear" width={160} height={60} />
+              {logoUrl ? (
+                <Image className="w-[80%] h-auto" src={logoUrl} alt="BeSpoke Wear" width={160} height={60} />
+              ) : (
+                <span className="font-serif text-lg text-[#0B1E3D]">BeSpoke Wear</span>
               )}
             </div>
           </Link>
 
           <div className="flex items-center gap-5 mr-2">
-            <PiUserLight className="text-[28px]" />
+            <PiUserLight className="text-[24px] text-[#0B1E3D]" />
             <Link href="/cart" className="relative">
-              <span className="absolute -top-[8px] -right-[9px] text-[13px] bg-[#FF5A36] text-white w-6 h-6 flex justify-center items-center rounded-full">
+              <span className="absolute -top-[8px] -right-[9px] text-[11px] bg-[#A9762F] text-white w-5 h-5 flex justify-center items-center rounded-full">
                 {cart.length}
               </span>
-              <CgShoppingBag className="text-[28px]" />
+              <CgShoppingBag className="text-[24px] text-[#0B1E3D]" />
             </Link>
           </div>
         </div>

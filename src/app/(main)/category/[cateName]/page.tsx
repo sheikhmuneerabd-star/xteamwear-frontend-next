@@ -25,6 +25,7 @@ interface DbProductResponse {
   newPrice: number;
   category: string;
   subCategory?: string;
+  item?: string;
   available: boolean;
   variants: { color: string; icon: string; images: string[]; sku: string; stock: number }[];
 }
@@ -69,6 +70,7 @@ export default function CategorySection() {
           newPrice: p.newPrice,
           category: p.category,
           subCategory: p.subCategory,
+          item: p.item,
           available: p.available,
           variants: p.variants,
         }));

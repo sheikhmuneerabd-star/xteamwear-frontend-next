@@ -18,5 +18,6 @@ export interface Product {
   variants: ProductVariant[];
   category?: string;
   subCategory?: string;
+  item?: string;
   available?: boolean;
 }

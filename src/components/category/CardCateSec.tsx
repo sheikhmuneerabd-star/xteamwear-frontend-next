@@ -24,13 +24,18 @@ export default function CardCateSec({ categoryCardImg, stockOpen, outStockOpen, 
 
     const filteredData = categoryCardImg
       .filter((item) => normalize(item.category) === normalize(activeCategory))
-      .filter((item) => !subActiveCategory || normalize(item.subCategory) === normalize(subActiveCategory))
+      .filter(
+        (product) =>
+          !subActiveCategory ||
+          normalize(product.subCategory) === normalize(subActiveCategory) ||
+          normalize(product.item) === normalize(subActiveCategory)
+      )
       .filter((item) => {
-      if (stockOpen && outStockOpen) return true;
-      if (stockOpen) return item.available;
-      if (outStockOpen) return !item.available;
-      return true;
-    });
+        if (stockOpen && outStockOpen) return true;
+        if (stockOpen) return item.available;
+        if (outStockOpen) return !item.available;
+        return true;
+      });
 
   return (
     <div className="mt-10">

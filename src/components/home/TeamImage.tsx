@@ -2,149 +2,158 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay, EffectFade } from "swiper/modules";
+import { Navigation, Autoplay, EffectFade, Pagination } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 import "swiper/css";
 import "swiper/css/navigation";
+import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 
 interface HeroSlide {
   imageDesktop: string;
   imageMobile: string;
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaLink?: string;
 }
 
-export default function TeamImage() {
+export default function HeroSlider() {
   const swiperRef = useRef<SwiperType | null>(null);
-  const mobileSwiperRef = useRef<SwiperType | null>(null);
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchSettings() {
-      const res = await fetch("/api/settings");
-      const data = await res.json();
-      setSlides(data.settings.heroSlides || []);
-      setLoading(false);
+      try {
+        const res = await fetch("/api/settings");
+        const data = await res.json();
+        setSlides(data?.settings?.heroSlides || []);
+      } catch (err) {
+        console.error("Failed to load hero slides", err);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchSettings();
   }, []);
 
-  if (loading || slides.length === 0) {
-    return <div className="h-[95vh] bg-gray-200 animate-pulse hidden xl:block" />;
+  // Premium Skeleton Loader
+  if (loading) {
+    return (
+      <div className="w-full h-[70vh] lg:h-[88vh] bg-slate-900 animate-pulse flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
+  if (slides.length === 0) return null;
+
   return (
-    <div className="relative group">
-      {/* Desktop */}
-      <div className="h-[95vh] relative overflow-hidden hidden xl:block">
-        <Swiper
-          modules={[Navigation, Autoplay, EffectFade]}
-          navigation={false}
-          loop
-          autoplay={{ delay: 5000, disableOnInteraction: false }}
-          speed={900}
-          effect="fade"
-          fadeEffect={{ crossFade: true }}
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          className="h-full w-full"
-        >
-          {slides.map((slide, i) => (
-            <SwiperSlide key={i}>
-              <div className="absolute top-0 left-0 w-full h-full">
-                <Image
-                  className="object-cover"
-                  src={slide.imageDesktop}
-                  alt={`Hero slide ${i + 1}`}
-                  fill
-                  priority={i === 0}
-                  sizes="100vw"
+    <section className="relative w-full h-[75vh] sm:h-[85vh] lg:h-[90vh] bg-slate-950 font-sans group overflow-hidden">
+      <Swiper
+        modules={[Navigation, Autoplay, EffectFade, Pagination]}
+        loop
+        autoplay={{ delay: 5500, disableOnInteraction: false }}
+        speed={1000}
+        effect="fade"
+        fadeEffect={{ crossFade: true }}
+        pagination={{
+          clickable: true,
+          el: ".custom-hero-pagination",
+          bulletActiveClass: "!bg-amber-500 !w-8",
+          bulletClass: "inline-block w-2.5 h-2.5 bg-white/40 rounded-full transition-all duration-300 cursor-pointer mx-1",
+        }}
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+        className="w-full h-full"
+      >
+        {slides.map((slide, i) => (
+          <SwiperSlide key={i} className="relative w-full h-full overflow-hidden">
+            {/* Responsive Background Images */}
+            <div className="absolute inset-0 w-full h-full">
+              <picture>
+                <source media="(min-width: 1024px)" srcSet={slide.imageDesktop} />
+                <img
+                  src={slide.imageMobile || slide.imageDesktop}
+                  alt={slide.title || `Bespoke Wear Hero Slide ${i + 1}`}
+                  className="w-full h-full object-cover object-center transform scale-105 group-hover:scale-100 transition-transform duration-1000 ease-out"
                 />
-                <div className="flex flex-col items-center absolute bottom-[80px] left-1/2 -translate-x-1/2 z-10">
-                  <button className="border-[2px] rounded text-white text-sm px-7 hover:bg-[#C6FF00] hover:text-[#0B1E3D] hover:border-[#C6FF00] font-medium transition-all duration-200 cursor-pointer hover:-translate-y-2 py-3 border-white">
-                    SHOP NOW
-                  </button>
+              </picture>
+              
+              {/* Cinematic Vignette Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-slate-950/20" />
+            </div>
+
+            {/* Hero Content Layer */}
+            <div className="relative z-10 max-w-[1440px] h-full mx-auto px-6 sm:px-12 flex flex-col justify-end pb-16 sm:pb-20 lg:pb-24 text-center lg:text-left">
+              <div className="max-w-2xl space-y-4 mx-auto lg:mx-0">
+                
+                {/* Badge */}
+                <span className="inline-block text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-full backdrop-blur-md">
+                  {slide.badge || "NEW SEASON COLLECTION 2026"}
+                </span>
+
+                {/* Main Heading */}
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight uppercase">
+                  {slide.title || "BUILT FOR PERFORMANCE"}
+                </h1>
+
+                {/* Subtitle */}
+                <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-xl font-normal leading-relaxed mx-auto lg:mx-0">
+                  {slide.subtitle || "Custom engineered team kits, elite sublimated jerseys, and bespoke sportswear designed for champions."}
+                </p>
+
+                {/* Action Buttons */}
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                  <Link
+                    href={slide.ctaLink || "/products"}
+                    className="w-full sm:w-auto px-8 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-xl shadow-amber-500/10 hover:-translate-y-0.5 text-center"
+                  >
+                    {slide.ctaText || "SHOP NOW"}
+                  </Link>
+                  
+                  <Link
+                    href="/custom-kit"
+                    className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-extrabold text-xs uppercase tracking-widest rounded-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 text-center"
+                  >
+                    DESIGN YOUR KIT
+                  </Link>
                 </div>
+
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
-        <button
-          type="button"
-          aria-label="Previous slide"
-          onClick={() => swiperRef.current?.slidePrev()}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/30 hover:bg-[#0B1E3D] text-white flex items-center justify-center transition-all duration-200 opacity-0 group-hover:opacity-100"
-        >
-          <IoChevronBack className="text-2xl" />
-        </button>
-        <button
-          type="button"
-          aria-label="Next slide"
-          onClick={() => swiperRef.current?.slideNext()}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/30 hover:bg-[#0B1E3D] text-white flex items-center justify-center transition-all duration-200 opacity-0 group-hover:opacity-100"
-        >
-          <IoChevronForward className="text-2xl" />
-        </button>
-      </div>
+      {/* Navigation Controls */}
+      <button
+        type="button"
+        aria-label="Previous slide"
+        onClick={() => swiperRef.current?.slidePrev()}
+        className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-slate-950/40 hover:bg-amber-500 hover:text-slate-950 border border-white/10 text-white flex items-center justify-center backdrop-blur-md transition-all duration-300 opacity-0 group-hover:opacity-100 cursor-pointer shadow-2xl"
+      >
+        <IoChevronBack className="text-xl" />
+      </button>
 
-      {/* Mobile */}
-      <div className="relative xl:hidden block">
-        <Swiper
-          modules={[Navigation, Autoplay, EffectFade]}
-          loop
-          autoplay={{ delay: 5000, disableOnInteraction: false }}
-          speed={900}
-          effect="fade"
-          fadeEffect={{ crossFade: true }}
-          onSwiper={(swiper) => {
-            mobileSwiperRef.current = swiper;
-          }}
-          className="w-full h-auto"
-        >
-          {slides.map((slide, i) => (
-            <SwiperSlide key={i}>
-              <div className="relative">
-                <Image
-                  className="w-full h-auto"
-                  src={slide.imageMobile}
-                  alt={`Hero slide ${i + 1}`}
-                  width={800}
-                  height={1000}
-                  priority={i === 0}
-                />
-                <div className="absolute inset-0 bg-black/15" />
-                <div className="flex flex-col items-center absolute bottom-[60px] left-1/2 -translate-x-1/2 z-10">
-                  <button className="border-[2px] rounded text-white text-sm px-7 hover:bg-[#C6FF00] hover:text-[#0B1E3D] hover:border-[#C6FF00] font-medium transition-all duration-200 hover:-translate-y-2 py-3 border-white">
-                    SHOP NOW
-                  </button>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+      <button
+        type="button"
+        aria-label="Next slide"
+        onClick={() => swiperRef.current?.slideNext()}
+        className="absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-slate-950/40 hover:bg-amber-500 hover:text-slate-950 border border-white/10 text-white flex items-center justify-center backdrop-blur-md transition-all duration-300 opacity-0 group-hover:opacity-100 cursor-pointer shadow-2xl"
+      >
+        <IoChevronForward className="text-xl" />
+      </button>
 
-        <button
-          type="button"
-          aria-label="Previous slide"
-          onClick={() => mobileSwiperRef.current?.slidePrev()}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/40 active:bg-[#0B1E3D] text-white flex items-center justify-center transition-all duration-200"
-        >
-          <IoChevronBack className="text-xl" />
-        </button>
-        <button
-          type="button"
-          aria-label="Next slide"
-          onClick={() => mobileSwiperRef.current?.slideNext()}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/40 active:bg-[#0B1E3D] text-white flex items-center justify-center transition-all duration-200"
-        >
-          <IoChevronForward className="text-xl" />
-        </button>
-      </div>
-    </div>
+      {/* Slide Pagination Bullets */}
+      <div className="custom-hero-pagination absolute bottom-6 left-0 right-0 z-20 flex justify-center items-center pointer-events-auto" />
+    </section>
   );
 }

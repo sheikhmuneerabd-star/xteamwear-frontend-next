@@ -29,6 +29,7 @@ export default function LeftCate({
 }: LeftCateProps) {
   const [categories, setCategories] = useState<DbCategory[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openSubIndex, setOpenSubIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,6 +55,20 @@ export default function LeftCate({
     const index = categories.findIndex((c) => c.name === activeCategory);
     if (index !== -1) setOpenIndex(index);
   }, [activeCategory, categories]);
+
+  useEffect(() => {
+    if (!subActiveCategory || categories.length === 0) return;
+
+    for (const cate of categories) {
+      const matchedSub = cate.subcategories.find(
+        (sub) => sub.name === subActiveCategory || sub.items.includes(subActiveCategory)
+      );
+      if (matchedSub) {
+        setOpenSubIndex(`${cate._id}-${matchedSub.name}`);
+        break;
+      }
+    }
+  }, [subActiveCategory, categories]);
 
   return (
     <div ref={containerRef}>
@@ -109,22 +124,72 @@ export default function LeftCate({
                   }`}
                 >
                   <div className="min-h-0 pl-4 pb-2 space-y-1">
-                    {cate.subcategories.map((sub, i) => (
-                      <div
-                        key={sub.name}
-                        className="relative h-[30px] flex items-center cursor-pointer group"
-                        onClick={() => setSubActiveCategory(sub.name)}
-                      >
-                        <IoIosArrowForward className="text-sm text-gray-600" />
-                        <p
-                          className={`absolute top-[3.3px] left-1 bg-white text-sm group-hover:translate-x-3 transition-all duration-200 ${
-                            subActiveCategory === sub.name ? "translate-x-3 text-black" : "text-gray-600"
-                          }`}
-                        >
-                          {sub.name}
-                        </p>
-                      </div>
-                    ))}
+                    {cate.subcategories.map((sub) => {
+                      const subKey = `${cate._id}-${sub.name}`;
+                      const isSubOpen = openSubIndex === subKey;
+
+                      return (
+                        <div key={sub.name}>
+                          <div
+                            className="relative h-[30px] flex items-center justify-between cursor-pointer group pr-2"
+                            onClick={() => {
+                              setSubActiveCategory(sub.name);
+                              if (sub.items.length > 0) {
+                                setOpenSubIndex(isSubOpen ? null : subKey);
+                              }
+                            }}
+                          >
+                            <div className="flex items-center">
+                              <IoIosArrowForward className="text-sm text-gray-600" />
+                              <p
+                                className={`absolute top-[3.3px] left-1 bg-white text-sm group-hover:translate-x-3 transition-all duration-200 ${
+                                  subActiveCategory === sub.name ? "translate-x-3 text-black" : "text-gray-600"
+                                }`}
+                              >
+                                {sub.name}
+                              </p>
+                            </div>
+                            {sub.items.length > 0 && (
+                              <IoIosArrowForward
+                                className={`text-xs text-gray-400 transition-transform duration-300 ${
+                                  isSubOpen ? "rotate-90" : ""
+                                }`}
+                              />
+                            )}
+                          </div>
+
+                          {sub.items.length > 0 && (
+                            <div
+                              className={`grid transition-all duration-300 overflow-hidden ${
+                                isSubOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                              }`}
+                            >
+                              <div className="min-h-0 pl-5 space-y-1">
+                                {sub.items.map((it) => (
+                                  <div
+                                    key={it}
+                                    className="relative h-[26px] flex items-center cursor-pointer group"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSubActiveCategory(it);
+                                    }}
+                                  >
+                                    <IoIosArrowForward className="text-[11px] text-gray-400" />
+                                    <p
+                                      className={`absolute top-[3px] left-1 bg-white text-[13px] group-hover:translate-x-3 transition-all duration-200 ${
+                                        subActiveCategory === it ? "translate-x-3 text-black" : "text-gray-500"
+                                      }`}
+                                    >
+                                      {it}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

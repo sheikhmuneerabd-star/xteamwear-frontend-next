@@ -8,10 +8,12 @@ import ProductCardSkeleton from "@/components/shared/ProductCardSkeleton";
 import TeamImage from "@/components/home/TeamImage";
 import FactoryCard from "@/components/home/FactoryCard";
 import ShirtCard from "@/components/home/ShirtCard";
-import TestimonialSlider from "@/components/home/TestimonialSlider";
 import ImagesSection from "@/components/home/ImagesSection";
 import type { Product } from "@/types/product";
 import PromiseSection from "@/components/home/PromiseSection";
+import EliteCollectionBanner from "@/components/home/EliteCollectionBanner";
+import OfficialPartnersSection from "@/components/home/OfficialPartnersSection";
+import CategoryShowcase from "@/components/home/CategoryShowcase";
 
 export default function HomePage() {
   const [showMore, setShowMore] = useState(4);
@@ -74,40 +76,63 @@ export default function HomePage() {
     <div>
       <TeamImage />
 
-      <h3 className="text-center text-2xl font-medium xl:mt-8 mt-5 xteamwearA">
-        XTEAMWEAR ADVANTAGES
-      </h3>
       <FactoryCard />
 
-      <div className="bg-gray-100">
-        <h3 className="ml-[40px] text-2xl font-medium pt-10 pb-8">LATEST HOT PRODUCTS</h3>
-        <div className="w-[93.8%] mx-auto">
+      <section className="bg-slate-50/60 py-16 border-t border-slate-100 font-sans">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-slate-200/60">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                Trending Apparel
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1426] mt-2 tracking-tight">
+                LATEST HOT PRODUCTS
+              </h2>
+            </div>
+            <p className="text-sm text-slate-500 mt-2 md:mt-0">
+              Explore our premium custom sportswear & apparel lineup
+            </p>
+          </div>
+
+          {/* Content Area */}
           {loading ? (
-            <div className="grid grid-cols-1 min-[375px]:grid-cols-2 min-[475px]:grid-cols-2 min-[768px]:grid-cols-3 min-[1024px]:grid-cols-4 min-[1440px]:grid-cols-4 w-full gap-4">
-              {Array.from({ length: 4 }).map((_, i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
               ))}
             </div>
           ) : products.length === 0 ? (
-            <p className="text-center py-10 text-gray-500">No products available yet.</p>
+            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
+              <p className="text-base font-medium text-slate-500">
+                No products available at the moment.
+              </p>
+            </div>
           ) : (
             <ShirtCard showMore={showMore} products={products} />
           )}
-        </div>
-        <div className="flex justify-center pb-10 showMore">
-          {showMore < products.length && (
-            <button
-              type="button"
-              onClick={() => setShowMore(showMore + 4)}
-              className="bg-white text-center text-[14px] font-medium w-[300px] h-[42px] rounded-md shadow-md mt-10 transition-all duration-200 hover:border-[#0B1E3D] hover:text-[#0B1E3D] border-[1.3px] hover:-translate-y-2"
-            >
-              SHOW MORE
-            </button>
+
+          {/* Load More Action */}
+          {!loading && showMore < products.length && (
+            <div className="flex justify-center mt-12">
+              <button
+                type="button"
+                onClick={() => setShowMore((prev) => prev + 4)}
+                className="px-8 py-3 bg-white text-[#0B1426] text-sm font-bold tracking-wide rounded-full border border-slate-300 shadow-sm hover:border-[#0B1426] hover:bg-[#0B1426] hover:text-white transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
+              >
+                LOAD MORE PRODUCTS ({products.length - showMore} LEFT)
+              </button>
+            </div>
           )}
         </div>
-      </div>
+      </section>
 
-      <TestimonialSlider />
+      <EliteCollectionBanner />
+
+      <OfficialPartnersSection />
+
+      <CategoryShowcase />
 
       <ImagesSection />
 
