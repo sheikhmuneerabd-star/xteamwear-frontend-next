@@ -2,18 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useSafeScrollFade } from "@/lib/useSafeScrollFade";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { MdOutlineArrowBackIos, MdOutlineArrowForwardIos } from "react-icons/md";
 
+import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi2";
 import SizingPShirtItem from "./SizingPShirtItem";
 import type { Product } from "@/types/product";
-import { useGSAP } from "@gsap/react";
 
 interface ProductSecProps {
-  handleClick: () => void;
+  handleClick?: () => void;
   category?: string;
   currentProductId: string | number;
 }
@@ -62,53 +60,73 @@ export default function ProductSec({ handleClick, category, currentProductId }: 
     fetchRelated();
   }, [category, currentProductId]);
 
-  useSafeScrollFade(".related-slide", [related]);
-
   if (!loading && related.length === 0) {
     return null;
   }
 
   return (
-    <div className="mt-16">
-      <div className="h-[1px] border"></div>
-      <h2 className="font-semibold text-center text-xl mt-6">RELATED PRODUCTS</h2>
-      <div className="mt-6 relative">
-        {loading ? (
-          <p className="text-center py-10 text-gray-500">Loading...</p>
-        ) : (
-          <>
-            <div className="custom-pre absolute left-0 top-1/2 -translate-y-1/2 z-10 cursor-pointer bg-white shadow-md w-10 h-10 flex items-center justify-center rounded-full">
-              <MdOutlineArrowBackIos />
-            </div>
-            <div className="custom-nex absolute right-0 top-1/2 -translate-y-1/2 z-10 cursor-pointer bg-white shadow-md w-10 h-10 flex items-center justify-center rounded-full">
-              <MdOutlineArrowForwardIos />
-            </div>
+    <section className="mt-12 sm:mt-20 pt-8 sm:pt-10 border-t border-slate-200/80 font-sans px-2 sm:px-0">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-2 mb-6">
+        <div>
+          <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-amber-600 bg-amber-500/10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-500/20">
+            Handpicked Suggestions
+          </span>
+          <h2 className="text-lg sm:text-2xl font-black uppercase tracking-tight text-slate-950 mt-1">
+            Related Products
+          </h2>
+        </div>
 
-            <Swiper
-              modules={[Navigation]}
-              className="pb-10"
-              spaceBetween={16}
-              slidesPerView={4}
-              slidesPerGroup={4}
-              navigation={{ nextEl: ".custom-nex", prevEl: ".custom-pre" }}
-              breakpoints={{
-                0: { slidesPerView: 1, slidesPerGroup: 1 },
-                375: { slidesPerView: 2, slidesPerGroup: 2 },
-                768: { slidesPerView: 3, slidesPerGroup: 3 },
-                1024: { slidesPerView: 4, slidesPerGroup: 4 },
-              }}
-              loop={related.length > 4}
-              speed={700}
-            >
-              {related.map((shirt) => (
-                <SwiperSlide key={shirt.id} className="related-slide">
-                  <SizingPShirtItem shirt={shirt} handleClick={handleClick} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </>
-        )}
+        {/* Navigation Buttons */}
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            className="custom-related-prev w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-950 hover:text-white transition-all flex items-center justify-center shadow-sm disabled:opacity-30 disabled:pointer-events-none"
+            aria-label="Previous Products"
+          >
+            <HiOutlineArrowLeft className="text-xs sm:text-base" />
+          </button>
+          <button
+            type="button"
+            className="custom-related-next w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-slate-200 bg-white hover:bg-slate-950 hover:text-white transition-all flex items-center justify-center shadow-sm disabled:opacity-30 disabled:pointer-events-none"
+            aria-label="Next Products"
+          >
+            <HiOutlineArrowRight className="text-xs sm:text-base" />
+          </button>
+        </div>
       </div>
-    </div>
+
+      {/* Swiper Grid */}
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 py-4">
+          {[1, 2, 3, 4].map((n) => (
+            <div key={n} className="aspect-[4/5] bg-slate-100 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <Swiper
+          modules={[Navigation]}
+          navigation={{
+            nextEl: ".custom-related-next",
+            prevEl: ".custom-related-prev",
+          }}
+          breakpoints={{
+            // Mobile: Exact 2 cards side-by-side
+            0: { slidesPerView: 2, spaceBetween: 8 },
+            // Tablet: 3 cards
+            640: { slidesPerView: 3, spaceBetween: 14 },
+            // Laptop/Desktop: 4 cards
+            1024: { slidesPerView: 4, spaceBetween: 18 },
+          }}
+          className="pb-4"
+        >
+          {related.map((shirt) => (
+            <SwiperSlide key={shirt.id}>
+              <SizingPShirtItem shirt={shirt} handleClick={handleClick} />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
+    </section>
   );
 }

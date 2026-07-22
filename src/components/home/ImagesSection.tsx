@@ -65,16 +65,15 @@ export default function GlobalSquad() {
     };
   }, [activeIndex, handleNext, handlePrev]);
 
-  // Premium Skeleton Loader
   if (loading) {
     return (
-      <section className="py-16 bg-slate-50">
+      <section className="py-12 bg-white">
         <div className="max-w-[1440px] mx-auto px-6">
-          <div className="h-8 bg-slate-200 rounded-md w-64 mx-auto mb-3 animate-pulse" />
-          <div className="h-4 bg-slate-200 rounded-md w-96 mx-auto mb-10 animate-pulse" />
+          <div className="h-6 bg-slate-200 rounded-md w-48 mx-auto mb-2 animate-pulse" />
+          <div className="h-3 bg-slate-200 rounded-md w-72 mx-auto mb-8 animate-pulse" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-48 md:h-60 bg-slate-200 rounded-xl animate-pulse" />
+              <div key={i} className="h-36 bg-slate-200 rounded-xl animate-pulse" />
             ))}
           </div>
         </div>
@@ -85,42 +84,38 @@ export default function GlobalSquad() {
   if (images.length === 0) return null;
 
   return (
-    <section className="py-20 bg-slate-950 text-white font-sans overflow-hidden">
-      {/* Header Section */}
-      <div className="max-w-[1440px] mx-auto text-center mb-12 px-6">
-        <span className="text-xs font-bold uppercase tracking-widest text-amber-500 bg-amber-500/10 px-4 py-1.5 rounded-full border border-amber-500/20">
+    <section className="py-12 bg-white text-slate-900 font-sans overflow-hidden border-t border-slate-200">
+      <div className="max-w-[1440px] mx-auto text-center mb-8 px-6">
+        <span className="text-[11px] font-bold uppercase tracking-widest text-amber-700 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
           Community & Heritage
         </span>
-        <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mt-4">
+        <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight mt-3 text-slate-900">
           JOIN THE GLOBAL SQUAD
         </h2>
-        <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto mt-3">
-          Trusted by over 1,000,000+ athletes & teams globally. From local grassroots clubs to elite championship leagues.
+        <p className="text-slate-600 text-xs md:text-sm max-w-xl mx-auto mt-2">
+          Trusted by over 1,000,000+ athletes & teams globally.
         </p>
       </div>
 
-      {/* Grid Container */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {images.map((src, i) => (
             <div
               key={i}
               onClick={() => setActiveIndex(i)}
-              className="relative group h-44 sm:h-56 lg:h-64 rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-800/80 shadow-md hover:border-amber-500/40 transition-all duration-300"
+              className="relative group h-36 sm:h-44 lg:h-48 rounded-xl overflow-hidden bg-slate-100 cursor-pointer border border-slate-200 shadow-sm hover:border-amber-500 transition-colors"
             >
-              {/* Image */}
               <Image
                 src={src}
                 alt={`Squad athlete ${i + 1}`}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 ease-out"
+                className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out"
               />
 
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-amber-400 flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-xl">
-                  <HiMagnifyingGlassPlus className="text-2xl" />
+              <div className="absolute inset-0 bg-slate-950/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-white/90 text-amber-600 flex items-center justify-center shadow-md">
+                  <HiMagnifyingGlassPlus className="text-xl" />
                 </div>
               </div>
             </div>
@@ -128,50 +123,44 @@ export default function GlobalSquad() {
         </div>
       </div>
 
-      {/* Lightbox / Modal with Gallery Controls */}
       {activeIndex !== null && (
         <div
-          className="fixed inset-0 z-[999] bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4"
+          className="fixed inset-0 z-[999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
           onClick={closeModal}
         >
-          {/* Close Button */}
           <button
             type="button"
             aria-label="Close modal"
             onClick={closeModal}
-            className="absolute top-5 right-5 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
+            className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center"
           >
-            <IoMdClose className="text-2xl" />
+            <IoMdClose className="text-xl" />
           </button>
 
-          {/* Counter Badge */}
-          <div className="absolute top-6 left-6 z-20 text-xs font-semibold tracking-widest text-slate-400 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+          <div className="absolute top-6 left-6 z-20 text-xs font-semibold tracking-widest text-slate-200 bg-black/40 px-3 py-1 rounded-full">
             {activeIndex + 1} / {images.length}
           </div>
 
-          {/* Previous Arrow */}
           <button
             type="button"
             aria-label="Previous image"
             onClick={handlePrev}
-            className="absolute left-4 md:left-8 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-amber-500 hover:text-slate-950 border border-white/10 text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
+            className="absolute left-4 z-20 w-10 h-10 rounded-full bg-white/20 hover:bg-amber-500 hover:text-slate-950 text-white flex items-center justify-center"
           >
-            <HiChevronLeft className="text-2xl" />
+            <HiChevronLeft className="text-xl" />
           </button>
 
-          {/* Next Arrow */}
           <button
             type="button"
             aria-label="Next image"
             onClick={handleNext}
-            className="absolute right-4 md:right-8 z-20 w-12 h-12 rounded-full bg-white/10 hover:bg-amber-500 hover:text-slate-950 border border-white/10 text-white flex items-center justify-center transition-all duration-200 cursor-pointer"
+            className="absolute right-4 z-20 w-10 h-10 rounded-full bg-white/20 hover:bg-amber-500 hover:text-slate-950 text-white flex items-center justify-center"
           >
-            <HiChevronRight className="text-2xl" />
+            <HiChevronRight className="text-xl" />
           </button>
 
-          {/* Active Image Display */}
           <div
-            className="relative w-full max-w-5xl h-[70vh] md:h-[82vh] rounded-2xl overflow-hidden"
+            className="relative w-full max-w-4xl h-[65vh] md:h-[75vh] rounded-xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <Image

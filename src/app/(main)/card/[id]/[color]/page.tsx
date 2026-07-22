@@ -100,18 +100,32 @@ export default function CardPage() {
   }
 
   return (
-    <div className="xl:w-[92%] w-[97%] mx-auto xl:mt-[0px] mt-[55px]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Breadcrumb Header */}
       <LinkBar productName={product.name} />
-      <div className="flex items-start md:flex-row flex-col" ref={detailRef}>
-        <ImageLeftPart product={product} selectedColor={selectedColor || product.variants[0].color} />
+
+      {/* Main Content Grid: Image Left + Customizer Right */}
+      <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-12 items-start relative">
+        {/* Left Part - Image Gallery */}
+        <ImageLeftPart product={product} selectedColor={selectedColor} />
+
+        {/* Right Part - Sizing System Customizer */}
         <SizingSystem
           product={product}
-          selectedColor={selectedColor || product.variants[0].color}
+          selectedColor={selectedColor}
           setSelectedColor={setSelectedColor}
         />
       </div>
+
+      {/* Description Specs */}
       <Description />
-      <ProductSec handleClick={handleClick} category={product.category} currentProductId={product.id} />
+
+      {/* Related Products Carousel */}
+      <ProductSec
+        handleClick={handleClick}
+        category={product.category}
+        currentProductId={product.id}
+      />
     </div>
   );
 }

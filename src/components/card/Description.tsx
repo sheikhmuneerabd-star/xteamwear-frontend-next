@@ -1,73 +1,94 @@
 "use client";
 
 import { useState } from "react";
+import { HiChevronDown } from "react-icons/hi2";
 
 export default function Description() {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="mt-[100px] md:w-[100%] w-[90%] mx-auto">
-      <div className="relative">
-        <div className="border-b flex justify-center">
-          <h2 className="font-semibold border-b-[3px] w-fit border-black pb-4">Description</h2>
+    <div className="mt-12 sm:mt-16 border-t border-slate-200 pt-8 sm:pt-10 max-w-5xl mx-auto px-4 sm:px-0 font-sans">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-slate-950">
+          Product Specifications & Features
+        </h2>
+        <p className="text-[11px] sm:text-xs text-slate-500 font-bold mt-1 uppercase tracking-widest">
+          High-performance sublimated teamwear engineered for extreme durability
+        </p>
+      </div>
+
+      <div className="bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 space-y-6 text-slate-800">
+        
+        {/* Core Specs Grid */}
+        <div>
+          <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-amber-600 mb-3">
+            Material & Craftsmanship
+          </h3>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-semibold text-slate-700">
+            <li className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span>CONVEX-FIT Moisture Management Fabric</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span>100% Polyester Wicking Knit (92/8 Mesh Panels)</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span>Anti-Friction Heat Tagless Inner Labeling</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              <span>Full Sublimation Non-Fade Italian Ink Printing</span>
+            </li>
+          </ul>
         </div>
+
+        {/* Animated Accordion Wrapper */}
         <div
-          className={`mt-7 ${
-            open ? "max-h-[1000px]" : "max-h-[180px]"
-          } transition-all duration-500 ease-in-out overflow-hidden`}
+          className={`grid transition-all duration-300 ease-in-out ${
+            isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          }`}
         >
-          <h2 className="font-semibold text-[20px]">Feature</h2>
-          <div className="ml-5">
-            <ul className="list-disc mb-2 mt-2 text-sm text-gray-700">
-              <li>CONVEX-FIT fabric</li>
-            </ul>
-            <ul className="list-disc space-y-3 text-sm text-gray-700 ml-5">
-              <li>
-                Made from 100% polyester wicking knit with 92% polyester / 8% spandex
-                wicking pinhole mesh
-              </li>
-              <li>High-tech fabrics that are soft, breathable and quick to dry</li>
-              <li>Elastic fabrics that help create a perfect fit</li>
-            </ul>
-            <ul
-              className={`list-disc space-y-3 mt-4 text-sm text-gray-700 ${
-                open ? "opacity-100" : "opacity-25"
-              }`}
-            >
-              <li>Hot print tag with no friction to the skin</li>
-              <li>Colorful and bright design</li>
-            </ul>
-          </div>
-          <div className="mt-6">
-            <h2 className="font-semibold text-[20px]">Guaranteed Delivery</h2>
-            <p className="text-sm text-gray-700">
-              2-Day Turnaround Time, Plus Free 3-Day Shipping on Orders Over $199
-            </p>
-          </div>
-          <div className="mt-6">
-            <h2 className="font-semibold text-[20px]">Decoration</h2>
-            <p className="text-[13px] cursor-pointer text-gray-700 border-b w-fit border-gray-600">
-              Dye Sublimated
-            </p>
-          </div>
-          <div className="mt-6">
-            <h2 className="font-semibold text-[20px]">Minimum Quantity</h2>
-            <p className="text-sm text-gray-700">1</p>
-            <p className="text-sm text-gray-700">
-              Custom Soccer Jersey, Foam Soccer Jersey, Men Soccer Jersey, Soccer Jersey
-              blue black orange, soccer jerseys design for team
-            </p>
+          <div className="overflow-hidden">
+            <div className="space-y-5 pt-4 border-t border-slate-200 text-xs text-slate-600 leading-relaxed">
+              <div>
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-950 mb-1">
+                  Turnaround & Dispatch Guarantee
+                </h4>
+                <p>
+                  Standard custom sublimation manufacturing takes 7-10 business days. Priority expedited express shipping options are available at checkout.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-950 mb-1">
+                  Washing & Care Instructions
+                </h4>
+                <p>
+                  Machine wash cold with similar colors. Do not use fabric softeners or chlorine bleach. Tumble dry low or hang dry for best long-term fabric performance.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="text-center mt-3">
+
+        {/* Toggle Button */}
+        <div className="text-center pt-2">
           <button
             type="button"
-            className="rounded text-sm md:w-[310px] w-[280px] md:h-[45px] h-[42px] mt-2 bg-yellow-400 text-black font-medium transition-all cursor-pointer duration-200 hover:-translate-y-1"
-            onClick={() => setOpen(!open)}
+            onClick={() => setIsOpen(!isOpen)}
+            className="inline-flex cursor-pointer items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 hover:border-slate-950 text-slate-950 text-xs font-extrabold uppercase tracking-wider rounded-full transition-all shadow-sm active:scale-95"
           >
-            {open ? "READ LESS" : "READ MORE"}
+            <span>{isOpen ? "Read Less Details" : "Read Full Specs"}</span>
+            <HiChevronDown
+              className={`text-sm transition-transform duration-300 ${
+                isOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
           </button>
         </div>
+
       </div>
     </div>
   );

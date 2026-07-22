@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-
 import ProductCardSkeleton from "@/components/shared/ProductCardSkeleton";
 import TeamImage from "@/components/home/TeamImage";
 import FactoryCard from "@/components/home/FactoryCard";
@@ -26,15 +23,7 @@ export default function HomePage() {
       try {
         const res = await fetch("/api/products");
         const data = await res.json();
-        const mapped: Product[] = (data.products || []).map((p: {
-          _id: string;
-          name: string;
-          oldPrice: number;
-          newPrice: number;
-          category: string;
-          available: boolean;
-          variants: { color: string; icon: string; images: string[]; sku: string; stock: number }[];
-        }) => ({
+        const mapped: Product[] = (data.products || []).map((p: any) => ({
           id: p._id,
           name: p.name,
           oldPrice: p.oldPrice,
@@ -53,93 +42,104 @@ export default function HomePage() {
     fetchProducts();
   }, []);
 
-  useGSAP(() => {
-    const tl = gsap.timeline();
-    tl.from(".xteamwearA", {
-      y: 60, duration: 0.7, opacity: 0, stagger: 0.2,
-      scrollTrigger: { trigger: ".xteamwearA", scroller: "body", scrub: 2, once: true, start: "top 100%", end: "top 30%" },
-    });
-    tl.from(".showMore", {
-      y: 50, duration: 0.7, opacity: 0, stagger: 0.2,
-      scrollTrigger: { trigger: ".showMore", scroller: "body", scrub: 2, once: true, start: "top 100%", end: "top 30%" },
-    });
-    tl.from(".latestP", {
-      y: 50, duration: 0.6, opacity: 0, stagger: 0.2,
-      scrollTrigger: { trigger: ".latestP", scroller: "body", scrub: 2, once: true, start: "top 100%", end: "top 30%" },
-    });
-    tl.from(".latestT", {
-      y: 50, duration: 0.6, opacity: 0, stagger: 0.2,
-      scrollTrigger: { trigger: ".latestT", scroller: "body", scrub: 2, once: true, start: "top 100%", end: "top 30%" },
-    });
-  }, []);
-
   return (
-    <div>
-      <TeamImage />
+    <main className="w-full bg-white text-slate-900 font-sans overflow-x-hidden selection:bg-amber-500 selection:text-white">
+      
+      {/* 1. HERO BANNER */}
+      <section className="w-full bg-white">
+        <TeamImage />
+      </section>
 
-      <FactoryCard />
+      {/* 2. ADVANTAGES GRID (Factory / Features) */}
+      <section className="w-full bg-slate-50/80 py-12 sm:py-16 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FactoryCard />
+        </div>
+      </section>
 
-      <section className="bg-slate-50/60 py-16 border-t border-slate-100 font-sans">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Section Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-slate-200/60">
+      {/* 3. LATEST HOT PRODUCTS */}
+      <section className="w-full bg-white py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-slate-200">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+              <span className="text-[11px] font-black uppercase tracking-widest text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
                 Trending Apparel
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1426] mt-2 tracking-tight">
-                LATEST HOT PRODUCTS
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-950 mt-2 tracking-tight uppercase">
+                Latest Hot Products
               </h2>
             </div>
-            <p className="text-sm text-slate-500 mt-2 md:mt-0">
+            <p className="text-xs sm:text-sm text-slate-500 mt-2 md:mt-0 font-medium">
               Explore our premium custom sportswear & apparel lineup
             </p>
           </div>
 
-          {/* Content Area */}
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
               ))}
-            </div>
-          ) : products.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
-              <p className="text-base font-medium text-slate-500">
-                No products available at the moment.
-              </p>
             </div>
           ) : (
             <ShirtCard showMore={showMore} products={products} />
           )}
 
-          {/* Load More Action */}
           {!loading && showMore < products.length && (
             <div className="flex justify-center mt-12">
               <button
                 type="button"
                 onClick={() => setShowMore((prev) => prev + 4)}
-                className="px-8 py-3 bg-white text-[#0B1426] text-sm font-bold tracking-wide rounded-full border border-slate-300 shadow-sm hover:border-[#0B1426] hover:bg-[#0B1426] hover:text-white transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
+                className="px-8 py-3.5 bg-slate-950 text-white text-xs font-black tracking-widest uppercase rounded-full shadow-md hover:bg-amber-500 hover:text-slate-950 transition-all duration-300 transform hover:-translate-y-0.5"
               >
-                LOAD MORE PRODUCTS ({products.length - showMore} LEFT)
+                Load More Products ({products.length - showMore} Left)
               </button>
             </div>
           )}
         </div>
       </section>
 
-      <EliteCollectionBanner />
+      {/* 4. ELITE COLLECTION BANNER (Now Light Boxed Layout) */}
+      <section className="w-full bg-slate-50 py-16 sm:py-20 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <EliteCollectionBanner />
+        </div>
+      </section>
 
-      <OfficialPartnersSection />
+      {/* 5. PRO TEAM SPOTLIGHT (LIGHT BACKGROUND) */}
+      <section className="w-full bg-white py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <OfficialPartnersSection />
+        </div>
+      </section>
 
-      <CategoryShowcase />
+      {/* 6. CURATED CATEGORIES (LIGHT BACKGROUND) */}
+      <section className="w-full bg-slate-50/80 py-16 sm:py-24 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CategoryShowcase />
+        </div>
+      </section>
 
-      <ImagesSection />
-        
-      <TestimonialSlider />
+      {/* 7. JOIN THE GLOBAL SQUAD (LIGHT BACKGROUND) */}
+      <section className="w-full bg-white py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ImagesSection />
+        </div>
+      </section>
 
-      <PromiseSection />
-    </div>
+      {/* 8. TESTIMONIALS & REVIEWS (LIGHT BACKGROUND) */}
+      <section className="w-full bg-slate-50/80 py-16 sm:py-24 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <TestimonialSlider />
+        </div>
+      </section>
+
+      {/* 9. BRAND PROMISE & GUARANTEE */}
+      <section className="w-full bg-white py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <PromiseSection />
+        </div>
+      </section>
+
+    </main>
   );
 }

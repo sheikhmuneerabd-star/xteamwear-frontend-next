@@ -68,7 +68,7 @@ export default function PromiseSection() {
             The Bespoke Wear Guarantee
           </h2>
 
-          <p className="text-sm md:text-base text-slate-500 mt-2">
+          <p className="text-sm md:text-base text-slate-400 mt-2">
             Four core standards we guarantee on every custom order, without compromise.
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function PromiseSection() {
                     {item.title}
                   </h3>
 
-                  <p className="text-slate-500 text-sm mt-2 leading-relaxed">
+                  <p className="text-slate-400 text-sm mt-2 leading-relaxed">
                     {item.text}
                   </p>
                 </div>
