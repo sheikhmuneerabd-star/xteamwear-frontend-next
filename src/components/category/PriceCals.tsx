@@ -26,9 +26,10 @@ export default function PriceCals() {
   };
 
   return (
-    <div className="p-4 mt-6">
-      <h1 className="font-medium text-[15px] border-b pb-2 border-gray-600">PRICE</h1>
-      <div className="w-[200px] mt-9">
+    <div className="w-full pt-4 border-t border-gray-100">
+      <h2 className="font-bold text-xs tracking-wider text-gray-900 uppercase mb-4">Price Range</h2>
+      
+      <div className="px-2">
         <Range
           step={1}
           min={0}
@@ -38,12 +39,12 @@ export default function PriceCals() {
           renderTrack={({ props, children }) => (
             <div
               {...props}
-              className="h-2 rounded"
+              className="h-1.5 w-full rounded-full"
               style={{
                 ...props.style,
                 background: getTrackBackground({
                   values,
-                  colors: ["#e5e7eb", "#000", "#e5e7eb"],
+                  colors: ["#e5e7eb", "#f59e0b", "#e5e7eb"],
                   min: 0,
                   max: 180,
                 }),
@@ -54,37 +55,38 @@ export default function PriceCals() {
           )}
           renderThumb={({ props }) => {
             const { key, ...rest } = props;
-            return <div key={key} {...rest} className="h-5 w-5 bg-white border-2 border-black rounded-full" />;
+            return <div key={key} {...rest} className="h-4 w-4 bg-white border-2 border-amber-500 shadow rounded-full focus:outline-none" />;
           }}
         />
+      </div>
 
-        <div className="flex items-center gap-4 mt-6">
-          <div className="relative">
-            <span className="absolute top-3 left-[7px]">$</span>
-            <input
-              type="text"
-              value={values[0]}
-              className="border p-2 text-end w-20 h-[50px] rounded-md border-gray-600 outline-none"
-              onChange={handleMinChange}
-            />
-          </div>
-          <span>to</span>
-          <div className="relative">
-            <span className="absolute top-3 left-[7px]">$</span>
-            <input
-              type="text"
-              value={values[1]}
-              className="border text-end p-2 w-20 h-[50px] rounded-md border-gray-600 outline-none flex justify-between"
-              onChange={handleMaxChange}
-            />
-          </div>
+      <div className="flex items-center gap-2 mt-5">
+        <div className="relative flex-1">
+          <span className="absolute left-2.5 top-2 text-xs text-gray-400">$</span>
+          <input
+            type="number"
+            value={values[0]}
+            onChange={handleMinChange}
+            className="w-full pl-6 pr-2 py-1.5 text-xs rounded-md border border-gray-200 outline-none focus:border-black"
+          />
+        </div>
+        <span className="text-xs text-gray-400">to</span>
+        <div className="relative flex-1">
+          <span className="absolute left-2.5 top-2 text-xs text-gray-400">$</span>
+          <input
+            type="number"
+            value={values[1]}
+            onChange={handleMaxChange}
+            className="w-full pl-6 pr-2 py-1.5 text-xs rounded-md border border-gray-200 outline-none focus:border-black"
+          />
         </div>
       </div>
+
       <button
         type="button"
-        className="rounded text-sm md:w-[210px] w-[280px] md:h-[45px] h-[42px] mt-5 border-yellow-400 hover:bg-yellow-400 border text-black cursor-pointer font-medium transition-all duration-200 hover:-translate-y-1"
+        className="w-full mt-3 py-2 bg-gray-900 text-white rounded-md text-xs font-semibold hover:bg-black transition-colors"
       >
-        APPLY
+        Apply Filter
       </button>
     </div>
   );

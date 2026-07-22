@@ -48,7 +48,7 @@ export default function ShirtItem({ shirt }: ShirtItemProps) {
               alt={shirt.name}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover transition-opacity duration-500 group-hover:opacity-0"
+              className="object-cover transition-opacity duration-500 hover:opacity-0"
             />
 
             {/* Hover Image */}
@@ -57,7 +57,7 @@ export default function ShirtItem({ shirt }: ShirtItemProps) {
               alt={`${shirt.name} - view`}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
+              className="object-cover absolute inset-0 opacity-0 hover:opacity-100 hover:scale-105 transition-all duration-500 ease-out"
             />
 
             {/* Floating Badges Container */}

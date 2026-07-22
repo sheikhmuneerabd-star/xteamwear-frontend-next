@@ -47,7 +47,7 @@ export default function CategoryShowcase() {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-3 h-auto lg:h-[420px] w-full">
+        <div className="flex flex-col lg:flex-row gap-3 h-auto lg:h-[480px] w-full">
           {categories.map((cat) => {
             const isActive = activeCategory === cat.id;
 

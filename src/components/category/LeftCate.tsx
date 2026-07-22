@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { IoIosArrowForward } from "react-icons/io";
 
 interface DbSubcategory {
@@ -30,172 +30,124 @@ export default function LeftCate({
   const [categories, setCategories] = useState<DbCategory[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [openSubIndex, setOpenSubIndex] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchCategories() {
-      const res = await fetch("/api/categories");
-      const data = await res.json();
-      setCategories(data.categories || []);
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        setCategories(data.categories || []);
+      } catch (err) {
+        console.error("Categories fetch failed", err);
+      }
     }
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) {
-        setOpenIndex(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const index = categories.findIndex((c) => c.name === activeCategory);
-    if (index !== -1) setOpenIndex(index);
-  }, [activeCategory, categories]);
-
-  useEffect(() => {
-    if (!subActiveCategory || categories.length === 0) return;
-
-    for (const cate of categories) {
-      const matchedSub = cate.subcategories.find(
-        (sub) => sub.name === subActiveCategory || sub.items.includes(subActiveCategory)
-      );
-      if (matchedSub) {
-        setOpenSubIndex(`${cate._id}-${matchedSub.name}`);
-        break;
-      }
-    }
-  }, [subActiveCategory, categories]);
-
   return (
-    <div ref={containerRef}>
-      <div className="p-4 pt-1">
-        <h2 className="font-medium border-b border-gray-900 pb-2">CATEGORIES</h2>
+    <div className="w-full">
+      <h2 className="font-bold text-sm tracking-wider text-gray-900 uppercase border-b border-gray-200 pb-3">
+        Categories
+      </h2>
 
-        <div className="mt-3">
-          {categories.map((cate, index) => {
-            const isOpen = openIndex === index;
+      <div className="mt-3 space-y-1">
+        {categories.map((cate, index) => {
+          const isOpen = openIndex === index;
+          const isActive = activeCategory === cate.name;
 
-            return (
-              <div key={cate._id} className="mb-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenIndex(isOpen ? null : index);
-                    setActiveCategory(cate.name);
-                  }}
-                  aria-expanded={isOpen}
-                  aria-controls={`section-${index}`}
-                  className="w-full flex justify-between items-center pl-0 p-2 group"
-                >
-                  <div className="flex w-full items-center relative">
-                    <IoIosArrowForward className="text-[15px] mt-[3.3px]" />
-                    <p
-                      className={`text-sm font-medium absolute top-0 left-1 bg-white group-hover:translate-x-3 transition-all duration-200 ${
-                        activeCategory === cate.name ? "translate-x-3 text-black" : "text-gray-600"
-                      }`}
-                    >
-                      {cate.name}
-                    </p>
-                  </div>
+          return (
+            <div key={cate._id} className="text-sm">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenIndex(isOpen ? null : index);
+                  setActiveCategory(cate.name);
+                }}
+                className={`w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-gray-100 text-black font-semibold shadow-xs"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-black"
+                }`}
+              >
+                <div className="flex items-center gap-2.5 overflow-hidden">
+                  <IoIosArrowForward
+                    className={`text-xs text-gray-500 transition-transform duration-300 ${
+                      isOpen ? "rotate-90 text-black" : ""
+                    }`}
+                  />
+                  <span className="truncate">{cate.name}</span>
+                </div>
+              </button>
 
-                  <div className="relative mb-2">
-                    <div
-                      className={`absolute transition-all duration-500 ${
-                        isOpen ? "rotate-90" : ""
-                      } top-0 left-1 w-[2px] h-[10px] bg-gray-800`}
-                    />
-                    <div
-                      className={`absolute transition-all duration-500 ${
-                        isOpen ? "rotate-180" : ""
-                      } top-1 w-[10px] h-[2px] bg-gray-800`}
-                    />
-                  </div>
-                </button>
+              {/* Collapsible Subcategory Dropdown with Smooth Height Animation */}
+              <div
+                className={`grid transition-all duration-300 ease-in-out ${
+                  isOpen ? "grid-rows-[1fr] opacity-100 mt-1 mb-2" : "grid-rows-[0fr] opacity-0"
+                }`}
+              >
+                <div className="overflow-hidden pl-4 space-y-1 border-l-2 border-gray-100 ml-3">
+                  {cate.subcategories?.map((sub) => {
+                    const subKey = `${cate._id}-${sub.name}`;
+                    const isSubOpen = openSubIndex === subKey;
+                    const isSubActive = subActiveCategory === sub.name;
 
-                <div
-                  id={`section-${index}`}
-                  role="region"
-                  className={`grid transition-all duration-500 overflow-hidden ${
-                    isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                  }`}
-                >
-                  <div className="min-h-0 pl-4 pb-2 space-y-1">
-                    {cate.subcategories.map((sub) => {
-                      const subKey = `${cate._id}-${sub.name}`;
-                      const isSubOpen = openSubIndex === subKey;
-
-                      return (
-                        <div key={sub.name}>
-                          <div
-                            className="relative h-[30px] flex items-center justify-between cursor-pointer group pr-2"
-                            onClick={() => {
-                              setSubActiveCategory(sub.name);
-                              if (sub.items.length > 0) {
-                                setOpenSubIndex(isSubOpen ? null : subKey);
-                              }
-                            }}
-                          >
-                            <div className="flex items-center">
-                              <IoIosArrowForward className="text-sm text-gray-600" />
-                              <p
-                                className={`absolute top-[3.3px] left-1 bg-white text-sm group-hover:translate-x-3 transition-all duration-200 ${
-                                  subActiveCategory === sub.name ? "translate-x-3 text-black" : "text-gray-600"
-                                }`}
-                              >
-                                {sub.name}
-                              </p>
-                            </div>
-                            {sub.items.length > 0 && (
-                              <IoIosArrowForward
-                                className={`text-xs text-gray-400 transition-transform duration-300 ${
-                                  isSubOpen ? "rotate-90" : ""
-                                }`}
-                              />
-                            )}
-                          </div>
-
-                          {sub.items.length > 0 && (
-                            <div
-                              className={`grid transition-all duration-300 overflow-hidden ${
-                                isSubOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                    return (
+                      <div key={sub.name}>
+                        <div
+                          className={`flex items-center justify-between py-1.5 px-2 rounded-md cursor-pointer text-xs font-medium transition-colors ${
+                            isSubActive
+                              ? "text-amber-600 bg-amber-50 font-semibold"
+                              : "text-gray-600 hover:text-black hover:bg-gray-50"
+                          }`}
+                          onClick={() => {
+                            setSubActiveCategory(sub.name);
+                            if (sub.items?.length > 0)
+                              setOpenSubIndex(isSubOpen ? null : subKey);
+                          }}
+                        >
+                          <span className="truncate">{sub.name}</span>
+                          {sub.items?.length > 0 && (
+                            <IoIosArrowForward
+                              className={`text-[10px] transition-transform duration-200 ${
+                                isSubOpen ? "rotate-90" : ""
                               }`}
-                            >
-                              <div className="min-h-0 pl-5 space-y-1">
-                                {sub.items.map((it) => (
-                                  <div
-                                    key={it}
-                                    className="relative h-[26px] flex items-center cursor-pointer group"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSubActiveCategory(it);
-                                    }}
-                                  >
-                                    <IoIosArrowForward className="text-[11px] text-gray-400" />
-                                    <p
-                                      className={`absolute top-[3px] left-1 bg-white text-[13px] group-hover:translate-x-3 transition-all duration-200 ${
-                                        subActiveCategory === it ? "translate-x-3 text-black" : "text-gray-500"
-                                      }`}
-                                    >
-                                      {it}
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
+                            />
                           )}
                         </div>
-                      );
-                    })}
-                  </div>
+
+                        {/* Items Dropdown */}
+                        <div
+                          className={`grid transition-all duration-200 ease-in-out ${
+                            isSubOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                          }`}
+                        >
+                          <div className="overflow-hidden pl-3 space-y-1 my-1">
+                            {sub.items?.map((it) => (
+                              <div
+                                key={it}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSubActiveCategory(it);
+                                }}
+                                className={`py-1 text-[12px] cursor-pointer transition-colors ${
+                                  subActiveCategory === it
+                                    ? "text-black font-semibold"
+                                    : "text-gray-500 hover:text-black"
+                                }`}
+                              >
+                                {it}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

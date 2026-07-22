@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import ProductSkeleton from "@/components/category/ProductSkeleton";
 import CateLinkBar from "@/components/category/CateLinkBar";
@@ -95,75 +94,89 @@ export default function CategorySection() {
   };
 
   return (
-    <div>
-      <CateLinkBar cateName={cateName} />
-      <div className="flex">
-        <div className="w-[19%] xl:block hidden">
-          <LeftCate
-            setActiveCategory={setActiveCategory}
-            activeCategory={activeCategory}
-            setSubActiveCategory={setSubActiveCategory}
-            subActiveCategory={subActiveCategory}
-          />
-          <ClearStockBox setStockOpen={setStockOpen} stockOpen={stockOpen} outStockOpen={outStockOpen} setOutStockOpen={setOutStockOpen} />
-          <Available
-            categoryCardImg={products}
-            setStockOpen={setStockOpen}
-            stockOpen={stockOpen}
-            outStockOpen={outStockOpen}
-            setOutStockOpen={setOutStockOpen}
-          />
-          <PriceCals />
-          <FeaturedProducts />
-        </div>
+    <div className="bg-gray-50/50 min-h-screen pb-16 text-slate-800">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <CateLinkBar cateName={cateName} />
+        
+        <div className="flex gap-8 items-start mt-4">
+          {/* Sidebar */}
+          <aside className="hidden xl:block w-72 shrink-0 sticky top-4 space-y-6 bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+            <LeftCate
+              setActiveCategory={setActiveCategory}
+              activeCategory={activeCategory}
+              setSubActiveCategory={setSubActiveCategory}
+              subActiveCategory={subActiveCategory}
+            />
+            <ClearStockBox 
+              setStockOpen={setStockOpen} 
+              stockOpen={stockOpen} 
+              outStockOpen={outStockOpen} 
+              setOutStockOpen={setOutStockOpen} 
+            />
+            <Available
+              categoryCardImg={products}
+              setStockOpen={setStockOpen}
+              stockOpen={stockOpen}
+              outStockOpen={outStockOpen}
+              setOutStockOpen={setOutStockOpen}
+            />
+            <PriceCals />
+            <FeaturedProducts />
+          </aside>
 
-        <div className="xl:w-[78.7%] w-[98%] mx-auto xl:ml-4">
-          <div className="h-[1px] w-[98%] bg-gray-300 mt-3"></div>
-          <RightViewPage
-            grid={grid}
-            selectHandle={setGrid}
-            options={options}
-            itemPerPageCard={itemPerPageCard}
-            setItemPerPageCard={setItemPerPageCard}
-          />
+          {/* Product Listing Main Area */}
+          <main className="flex-1 w-full bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <RightViewPage
+              grid={grid}
+              selectHandle={setGrid}
+              options={options}
+              itemPerPageCard={itemPerPageCard}
+              setItemPerPageCard={setItemPerPageCard}
+            />
 
-          {loading ? (
-            <ProductSkeleton grid={grid} />
-          ) : (
-            <>
-              <CardCateSec
-                categoryCardImg={products}
-                stockOpen={stockOpen}
-                outStockOpen={outStockOpen}
-                grid={grid}
-                itemPerPageCard={itemPerPageCard}
-                activeCategory={activeCategory}
-                subActiveCategory={subActiveCategory}
-              />
-              <div className="flex justify-center mt-3">
+            {loading ? (
+              <ProductSkeleton grid={grid} />
+            ) : (
+              <>
+                <CardCateSec
+                  categoryCardImg={products}
+                  stockOpen={stockOpen}
+                  outStockOpen={outStockOpen}
+                  grid={grid}
+                  itemPerPageCard={itemPerPageCard}
+                  activeCategory={activeCategory}
+                  subActiveCategory={subActiveCategory}
+                />
+                
                 {itemPerPageCard < products.length && (
-                  <button
-                    type="button"
-                    className="rounded text-sm md:w-[310px] w-[280px] md:h-[45px] h-[42px] mt-2 hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1"
-                    onClick={handleShowMore}
-                  >
-                    Show More
-                  </button>
+                  <div className="flex justify-center mt-10">
+                    <button
+                      type="button"
+                      className="px-8 py-3 rounded-lg text-sm font-semibold bg-amber-400 hover:bg-amber-500 text-gray-900 transition-all shadow-sm hover:shadow active:scale-95"
+                      onClick={handleShowMore}
+                    >
+                      Show More Products
+                    </button>
+                  </div>
                 )}
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </main>
         </div>
-      </div>
 
-      <div className="h-[1px] mt-16 w-[90%] mx-auto bg-gray-200"></div>
-      <div className="w-[70%] mx-auto mb-20">
-        <h2 className="text-center text-xl font-medium mt-5 mb-5">RECENTLY VIEWED PRODUCTS</h2>
-        <div className="grid grid-cols-1 min-[375px]:grid-cols-2 min-[475px]:grid-cols-2 min-[768px]:grid-cols-3 min-[1024px]:grid-cols-3 min-[1440px]:grid-cols-3 w-full gap-4">
-          {lastCateCard.map((shirt) => (
-            <LastCateCard key={shirt.id} shirt={shirt} />
-          ))}
-        </div>
+        {/* Recently Viewed */}
+        <section className="mt-20 border-t border-gray-200 pt-12">
+          <h2 className="text-center text-lg font-bold tracking-wider text-gray-900 mb-8 uppercase">
+            Recently Viewed Products
+          </h2>
+          <div className="w-[70%] mx-auto">
+            <div className="grid grid-cols-1 min-[375px]:grid-cols-2 min-[475px]:grid-cols-2 min-[768px]:grid-cols-3 min-[1024px]:grid-cols-3 min-[1440px]:grid-cols-3 w-full gap-4">
+              {lastCateCard.map((shirt) => (
+                <LastCateCard key={shirt.id} shirt={shirt} />
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

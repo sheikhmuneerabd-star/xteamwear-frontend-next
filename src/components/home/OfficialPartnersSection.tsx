@@ -111,7 +111,7 @@ export default function OfficialPartnersSection() {
             <Link
               key={team.id}
               href={team.link}
-              className="group relative h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-md hover:border-amber-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-end"
+              className="group relative h-[420px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-md hover:border-amber-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-end"
             >
               <Image
                 src={team.image}
