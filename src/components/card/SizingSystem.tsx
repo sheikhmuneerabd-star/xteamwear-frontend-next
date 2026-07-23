@@ -7,10 +7,11 @@ import {
   IoCloudUploadOutline, 
   IoShirtOutline, 
   IoCheckmarkCircle,
-  IoInformationCircleOutline 
+  IoInformationCircleOutline,
+  IoAlertCircle
 } from "react-icons/io5";
 import { TbTruckDelivery, TbShirtFilled } from "react-icons/tb";
-import { HiPlus, HiTrash, HiOutlineSparkles } from "react-icons/hi2";
+import { HiPlus, HiTrash, HiOutlineSparkles, HiXMark } from "react-icons/hi2";
 
 import sponserPosition from "@/assets/sponserPosition/sponserPosition.webp";
 import { useCart } from "@/context/CartContext";
@@ -51,6 +52,21 @@ const emptyForm: SizingFormData = {
 
 export default function SizingSystem({ product, selectedColor, setSelectedColor }: SizingSystemProps) {
   const { addToCart } = useCart();
+
+  // Custom Toast State (Alert Replacement)
+  const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
+
+  const showToast = (message: string, type: "error" | "success" = "error") => {
+    setToast({ message, type });
+  };
+
+  // Auto hide toast after 4 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // Mode Selection
   const [decorationMode, setDecorationMode] = useState<"standard" | "bespoke">("standard");
@@ -95,15 +111,15 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
 
   const handleSubmit = () => {
     if (uploadingLogo) {
-      alert("Logo is still uploading. Please wait...");
+      showToast("Logo is still uploading. Please wait...", "error");
       return;
     }
     if (teamNameOpen && !formData.teamName.trim()) {
-      alert("Please enter your Team Name.");
+      showToast("Please enter your Team Name.", "error");
       return;
     }
     if (playerNumberOpen && !formData.playerNumberOption) {
-      alert("Please select a Player Number Position option.");
+      showToast("Please select a Player Number Position option.", "error");
       return;
     }
 
@@ -111,19 +127,45 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
     for (let i = 0; i < formData.players.length; i++) {
       const p = formData.players[i];
       if (!p.size) {
-        alert(`Please select size for Player #${i + 1}`);
+        showToast(`Please select size for Player #${i + 1}`, "error");
         return;
       }
     }
 
     addToCart(product, selectedColor, formData);
-    alert("Product added to your roster cart successfully!");
+    showToast("Product added to your roster cart successfully!", "success");
     setFormData(emptyForm);
     setPreview(null);
   };
 
   return (
-    <div className="xl:w-[48%] md:w-[52%] w-full bg-white font-sans text-slate-900 leading-relaxed">
+    <div className="xl:w-[48%] md:w-[52%] w-full bg-white font-sans text-slate-900 leading-relaxed relative">
+      
+      {/* Dynamic Custom Notification Toast UI */}
+      {toast && (
+        <div
+          className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 p-4 rounded-xl shadow-2xl border text-xs font-bold transition-all transform animate-bounce ${
+            toast.type === "success"
+              ? "bg-emerald-900 text-emerald-100 border-emerald-700"
+              : "bg-red-900 text-red-100 border-red-700"
+          }`}
+        >
+          {toast.type === "success" ? (
+            <IoCheckmarkCircle className="text-xl text-emerald-400 shrink-0" />
+          ) : (
+            <IoAlertCircle className="text-xl text-red-400 shrink-0" />
+          )}
+          <span>{toast.message}</span>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="ml-auto p-1 text-slate-300 hover:text-white"
+          >
+            <HiXMark className="text-base" />
+          </button>
+        </div>
+      )}
+
       <div className="space-y-6">
         
         {/* Title & Tag */}
@@ -314,9 +356,14 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
                           body.append("file", file);
                           const res = await fetch("/api/upload", { method: "POST", body });
                           const data = await res.json();
-                          if (res.ok) setFormData((prev) => ({ ...prev, logo: data.url }));
+                          if (res.ok) {
+                            setFormData((prev) => ({ ...prev, logo: data.url }));
+                            showToast("Logo uploaded successfully!", "success");
+                          } else {
+                            showToast("Upload failed.", "error");
+                          }
                         } catch {
-                          alert("Upload failed.");
+                          showToast("Upload failed.", "error");
                         } finally {
                           setUploadingLogo(false);
                         }
@@ -453,7 +500,8 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
             </p>
             <button
               type="button"
-              className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all"
+              onClick={() => showToast("Request sent! Our team will contact you shortly.", "success")}
+              className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer"
             >
               REQUEST FREE BESPOKE MOCKUP
             </button>

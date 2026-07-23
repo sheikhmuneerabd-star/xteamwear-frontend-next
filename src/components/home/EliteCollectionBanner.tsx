@@ -1,141 +1,211 @@
 "use client";
 
-import Image, { StaticImageData } from "next/image";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { HiArrowUpRight } from "react-icons/hi2";
-import redwoman from "@/assets/redwoman.avif";
-import blueman from "@/assets/blueman.avif";
-import purpleman from "@/assets/purpleman.avif";
+import { ArrowUpRight } from "lucide-react";
 
-interface FeaturedProduct {
-  id: string;
-  name: string;
-  category: string;
-  image: StaticImageData | string;
-  link: string;
+interface CardItem {
   badge?: string;
+  category: string;
+  title: string;
+  image: string;
+  link: string;
 }
 
-const featuredProducts: FeaturedProduct[] = [
-  {
-    id: "1",
-    name: "Sublimated Pro Match Jersey",
-    category: "Pro Football",
-    image: redwoman,
-    link: "/products/pro-match-jersey",
-    badge: "Best Seller",
-  },
-  {
-    id: "2",
-    name: "Ergonomic Training Zip Top",
-    category: "Training Wear",
-    image: blueman,
-    link: "/products/training-zip-top",
-    badge: "New",
-  },
-  {
-    id: "3",
-    name: "Elite Performance Track Suit",
-    category: "Athletic Wear",
-    image: purpleman,
-    link: "/products/performance-tracksuit",
-  },
-];
+interface BannerData {
+  badge: string;
+  heading: string;
+  description: string;
+  mainImage: string;
+  buttonText: string;
+  buttonLink: string;
+  cards: CardItem[];
+}
 
-export default function EliteCollectionBanner() {
+const DEFAULT_BANNER: BannerData = {
+  badge: "BESPOKE WEAR • 2026 RELEASE",
+  heading: "2026 ELITE PERFORMANCE COLLECTION",
+  description:
+    "Engineered with advanced moisture-wicking technology and ergonomic fit. Designed exclusively for professional athletes and modern teams.",
+  mainImage:
+    "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000",
+  buttonText: "EXPLORE FULL COLLECTION",
+  buttonLink: "/category/all",
+  cards: [
+    {
+      badge: "BEST SELLER",
+      category: "PRO FOOTBALL",
+      title: "Sublimated Pro Match Jersey",
+      image:
+        "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=600",
+      link: "/category/Football",
+    },
+    {
+      badge: "NEW",
+      category: "TRAINING WEAR",
+      title: "Ergonomic Training Zip Top",
+      image:
+        "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600",
+      link: "/category/Training",
+    },
+    {
+      badge: "",
+      category: "ATHLETIC WEAR",
+      title: "Elite Performance Track Suit",
+      image:
+        "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600",
+      link: "/category/Winter Wear",
+    },
+  ],
+};
+
+export default function BespokeSection() {
+  const [data, setData] = useState<BannerData>(DEFAULT_BANNER);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function fetchBannerData() {
+      try {
+        let res = await fetch("/api/settings");
+        if (res.ok) {
+          const json = await res.json();
+          const fetchedData = json.settings?.bespokeBanner;
+
+          if (fetchedData && Object.keys(fetchedData).length > 0) {
+            setData({
+              badge: fetchedData.badge || DEFAULT_BANNER.badge,
+              heading: fetchedData.heading || DEFAULT_BANNER.heading,
+              description: fetchedData.description || DEFAULT_BANNER.description,
+              mainImage: fetchedData.mainImage && fetchedData.mainImage.trim() !== "" 
+                ? fetchedData.mainImage 
+                : DEFAULT_BANNER.mainImage,
+              buttonText: fetchedData.buttonText || DEFAULT_BANNER.buttonText,
+              buttonLink: fetchedData.buttonLink || DEFAULT_BANNER.buttonLink,
+              cards:
+                fetchedData.cards && fetchedData.cards.length > 0
+                  ? fetchedData.cards.map((card: CardItem, idx: number) => ({
+                      badge: card.badge || "",
+                      category: card.category || DEFAULT_BANNER.cards[idx]?.category || "",
+                      title: card.title || DEFAULT_BANNER.cards[idx]?.title || "",
+                      image: card.image && card.image.trim() !== "" 
+                        ? card.image 
+                        : DEFAULT_BANNER.cards[idx]?.image || DEFAULT_BANNER.mainImage,
+                      link: card.link || DEFAULT_BANNER.cards[idx]?.link || "/category/all",
+                    }))
+                  : DEFAULT_BANNER.cards,
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching bespoke banner data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBannerData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="w-full h-96 bg-slate-200/60 rounded-3xl animate-pulse" />
+      </div>
+    );
+  }
+
   return (
-    <section className="py-12 bg-white text-slate-900 font-sans overflow-hidden border-t border-slate-200">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Main Banner Container */}
-        <div className="relative rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden shadow-lg">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="bg-[#fcfbfa] border border-slate-200/60 rounded-3xl p-6 sm:p-10 shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
-          {/* Light Glow Effect */}
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          {/* Left Column: Big Main Image */}
+          <div className="lg:col-span-5 relative w-full h-[350px] sm:h-[480px] rounded-2xl overflow-hidden flex items-center justify-center">
+            <img
+              src={data.mainImage}
+              alt={data.heading || "Featured Collection"}
+              className="w-full h-full object-contain transition-all duration-300"
+              onError={(e) => {
+                // Image broken hone par automatic fallback image show hogi
+                (e.target as HTMLImageElement).src = DEFAULT_BANNER.mainImage;
+              }}
+            />
+          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
+          {/* Right Column: Dynamic Text & 3 Cards */}
+          <div className="lg:col-span-7 space-y-6">
             
-            {/* Left Side: Featured Hero Image */}
-            <div className="lg:col-span-5 relative h-[280px] sm:h-[360px] lg:h-[460px] w-full overflow-hidden bg-slate-100">
-              <Image
-                src="/products/baseball/whiteBlackFront1.avif"
-                alt="2026 Elite Performance Collection"
-                fill
-                priority
-                className="object-cover object-center transform hover:scale-105 transition-transform duration-700 ease-out"
-                sizes="(max-width: 1024px) 100vw, 40vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-slate-50/80" />
+            {/* Header Content */}
+            <div className="space-y-3">
+              {data.badge && (
+                <span className="inline-block bg-amber-500/10 border border-amber-500/20 text-amber-600 font-extrabold text-[10px] tracking-widest uppercase px-3 py-1 rounded-full">
+                  {data.badge}
+                </span>
+              )}
+              
+              <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-slate-900 leading-tight">
+                {data.heading}
+              </h2>
+              
+              <p className="text-xs sm:text-sm font-medium text-slate-500 max-w-xl leading-relaxed">
+                {data.description}
+              </p>
+
+              <div className="pt-2">
+                <Link
+                  href={data.buttonLink || "/category/all"}
+                  className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl transition-all shadow-md"
+                >
+                  <span>{data.buttonText}</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
 
-            {/* Right Side: Headline & Product Row */}
-            <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 z-10 flex flex-col justify-between">
-              
-              <div className="space-y-2.5 mb-6">
-                <span className="inline-block text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-amber-700 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
-                  BESPOKE WEAR • 2026 RELEASE
-                </span>
+            {/* Bottom 3 Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+              {data.cards?.map((card, index) => (
+                <Link
+                  key={index}
+                  href={card.link || "/category/all"}
+                  className="group bg-white rounded-2xl p-2.5 border border-slate-200/80 shadow-sm hover:shadow-md transition-all block relative"
+                >
+                  {/* Badge */}
+                  {card.badge && (
+                    <span className="absolute top-4 left-4 z-10 bg-amber-500 text-slate-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-md shadow-sm">
+                      {card.badge}
+                    </span>
+                  )}
 
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 uppercase leading-tight">
-                  2026 ELITE PERFORMANCE COLLECTION
-                </h2>
+                  {/* Card Image */}
+                  <div className="relative w-full h-36 bg-slate-50 rounded-xl overflow-hidden mb-3 flex items-center justify-center">
+                    <img
+                      src={card.image}
+                      alt={card.title || "Collection Item"}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          DEFAULT_BANNER.cards[index]?.image || DEFAULT_BANNER.mainImage;
+                      }}
+                    />
+                  </div>
 
-                <p className="text-slate-600 text-xs sm:text-sm max-w-xl leading-relaxed">
-                  Engineered with advanced moisture-wicking technology and ergonomic fit. Designed exclusively for professional athletes and modern teams.
-                </p>
-
-                <div className="pt-2">
-                  <Link
-                    href="/collections/elite-2026"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-md shadow-amber-500/20 hover:-translate-y-0.5"
-                  >
-                    <span>EXPLORE FULL COLLECTION</span>
-                    <HiArrowUpRight className="text-sm" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Product Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5 border-t border-slate-200">
-                {featuredProducts.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={item.link}
-                    className="group relative rounded-xl bg-white border border-slate-200 p-2 shadow-sm hover:border-amber-500 transition-all duration-300 flex sm:flex-col items-center sm:items-start gap-3 sm:gap-0"
-                  >
-                    <div className="relative w-16 h-16 sm:w-full sm:h-32 rounded-lg overflow-hidden bg-slate-100 shrink-0">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        sizes="(max-width: 640px) 64px, 20vw"
-                      />
-
-                      {item.badge && (
-                        <span className="absolute top-1.5 left-1.5 text-[9px] font-extrabold uppercase tracking-wider text-slate-950 bg-amber-400 px-2 py-0.5 rounded-md z-10 shadow-sm">
-                          {item.badge}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="sm:mt-2.5 flex-1">
-                      <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
-                        {item.category}
-                      </p>
-                      <h3 className="text-xs font-bold text-slate-800 group-hover:text-amber-600 transition-colors line-clamp-1 mt-0.5">
-                        {item.name}
-                      </h3>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-
+                  {/* Card Info */}
+                  <div className="space-y-0.5 px-1">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-amber-600">
+                      {card.category}
+                    </p>
+                    <h3 className="text-xs font-bold text-slate-900 line-clamp-1 group-hover:text-amber-600 transition-colors">
+                      {card.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
             </div>
 
           </div>
-        </div>
 
+        </div>
       </div>
     </section>
   );

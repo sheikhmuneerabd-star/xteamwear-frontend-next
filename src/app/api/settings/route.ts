@@ -9,7 +9,14 @@ export async function GET() {
     let settings = await SiteSettings.findOne();
 
     if (!settings) {
-      settings = await SiteSettings.create({ logo: "", heroSlides: [], squadImages: [], advantages: [] });
+      settings = await SiteSettings.create({
+        logo: "",
+        heroSlides: [],
+        squadImages: [],
+        advantages: [],
+        bespokeBanner: {},
+        categoriesShowcase: [],
+      });
     }
 
     return NextResponse.json({ settings });
@@ -27,18 +34,41 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { logo, heroSlides, squadImages, advantages } = body;
+    
+    // FIX 1: Extract categoriesShowcase from request body
+    const { 
+      logo, 
+      heroSlides, 
+      squadImages, 
+      advantages, 
+      bespokeBanner, 
+      categoriesShowcase 
+    } = body;
 
     await connectDB();
 
     let settings = await SiteSettings.findOne();
     if (!settings) {
-      settings = await SiteSettings.create({ logo, heroSlides, squadImages, advantages });
+      settings = await SiteSettings.create({
+        logo,
+        heroSlides,
+        squadImages,
+        advantages,
+        bespokeBanner,
+        categoriesShowcase, // FIX 2: Pass on creation
+      });
     } else {
       settings.logo = logo;
       settings.heroSlides = heroSlides;
       settings.squadImages = squadImages;
       settings.advantages = advantages;
+      settings.bespokeBanner = bespokeBanner;
+      
+      // FIX 3: Assign categoriesShowcase before saving
+      if (categoriesShowcase !== undefined) {
+        settings.categoriesShowcase = categoriesShowcase;
+      }
+      
       await settings.save();
     }
 

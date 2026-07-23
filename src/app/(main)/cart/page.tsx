@@ -6,13 +6,15 @@ import ProductCarts from "@/components/cart/ProductCarts";
 
 export default function CartPage() {
   return (
-    <div className="lg:w-[92%] w-[95%] mx-auto">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <TopLinks />
-      <h2 className="text-[28px]">YOUR CART</h2>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight uppercase">
+        Your Cart
+      </h1>
       <ProgressBar />
       <Timer />
       <ProductDetails />
       <ProductCarts />
-    </div>
+    </main>
   );
 }

@@ -31,45 +31,51 @@ export default function OrderSummary() {
       <div className="flex xl:flex-col md:flex-row flex-col justify-between">
         <div className="space-y-4 xl:w-full md:w-[48%] w-[98%]">
           <div>
-            <h1 className="text-[21px] border-b-2 border-black pb-1">ORDER SUMMARY</h1>
+            <h1 className="text-[22px] font-extrabold tracking-wide text-gray-900 border-b-2 border-black pb-1 uppercase">
+              ORDER SUMMARY
+            </h1>
           </div>
-          <div className="flex justify-between border-b border-gray-400 pb-3">
-            <p className="text-[14px]">Subtotal</p>
-            <p className="font-semibold">${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
+          
+          <div className="flex justify-between items-center border-b border-gray-300 pb-3">
+            <p className="text-[16px] text-gray-700">Subtotal</p>
+            <p className="font-bold text-[18px] text-gray-900">
+              ${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+            </p>
           </div>
 
+          {/* SHIPPING ESTIMATE WITH ORIGINAL SMOOTH PLUS/MINUS ANIMATION */}
           <div>
             <div>
               <div
-                className="flex justify-between items-center cursor-pointer"
+                className="flex justify-between items-center cursor-pointer py-1"
                 onClick={() => setShippingOpen(!shippingOpen)}
               >
-                <p className="text-[14px]">Get shipping estimate:</p>
-                <div className="relative mb-2">
-                  <div className={`absolute transition-all duration-500 ${shippingOpen ? "rotate-90" : ""} top-0 left-1 w-[2px] h-[10px] bg-gray-800`} />
-                  <div className={`absolute transition-all duration-500 ${shippingOpen ? "rotate-180" : ""} top-1 w-[10px] h-[2px] bg-gray-800`} />
+                <p className="text-[16px] font-medium text-gray-800">Get shipping estimate:</p>
+                <div className="relative mb-2 w-3 h-3 flex items-center justify-center">
+                  <div className={`absolute transition-all duration-500 ${shippingOpen ? "rotate-90 opacity-0" : ""} w-[2px] h-[12px] bg-gray-800`} />
+                  <div className={`absolute transition-all duration-500 ${shippingOpen ? "rotate-180" : ""} w-[12px] h-[2px] bg-gray-800`} />
                 </div>
               </div>
               <div
                 style={{ height: shippingOpen ? shippingRef.current?.scrollHeight + "px" : "0px" }}
                 ref={shippingRef}
-                className="space-y-3 mt-2 overflow-hidden transition-all duration-500"
+                className="space-y-3 overflow-hidden transition-all duration-500 ease-in-out"
               >
-                <select className="w-full text-[14px] p-3 border-[1.5px] border-gray-300 outline-none hover:border-gray-400 transition-all duration-200 rounded-md">
+                <select className="w-full text-[15px] p-3 border-[1.5px] border-gray-300 outline-none hover:border-gray-400 transition-all duration-200 rounded-md bg-white mt-2">
                   <option value="United States">United States</option>
                   <option value="Australia">Australia</option>
                   <option value="France">France</option>
                   <option value="Afghanistan">Afghanistan</option>
                 </select>
                 <input
-                  className="border-[1.3px] rounded-md w-[45%] text-[14px] p-3 border-gray-400 pl-3 outline-none placeholder-gray-600"
+                  className="border-[1.3px] rounded-md w-full text-[15px] p-3 border-gray-400 outline-none placeholder-gray-500"
                   type="text"
                   placeholder="Postal code"
                 />
-                <div className="flex justify-center border-b border-gray-400 pb-6">
+                <div className="flex justify-center border-b border-gray-300 pb-5">
                   <button
                     type="button"
-                    className="rounded text-sm w-full md:h-[45px] h-[42px] hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1"
+                    className="rounded text-[14px] w-full h-[45px] bg-amber-400 hover:bg-yellow-400 border-amber-400 border-[1.5px] text-black font-extrabold tracking-wider transition-all duration-200 hover:-translate-y-0.5 uppercase"
                   >
                     CALCULATE SHIPPING
                   </button>
@@ -77,41 +83,46 @@ export default function OrderSummary() {
               </div>
             </div>
 
-            <div className="mt-4 border-b border-gray-400 pb-5">
-              <div className="flex justify-between items-center cursor-pointer" onClick={() => setCouponOpen(!couponOpen)}>
-                <p>Coupon code</p>
-                <div className="relative mb-2">
-                  <div className={`absolute transition-all duration-500 ${couponOpen ? "rotate-90" : ""} top-0 left-1 w-[2px] h-[10px] bg-gray-800`} />
-                  <div className={`absolute transition-all duration-500 ${couponOpen ? "rotate-180" : ""} top-1 w-[10px] h-[2px] bg-gray-800`} />
+            {/* COUPON CODE WITH ORIGINAL ANIMATION */}
+            <div className="mt-3 border-b border-gray-300 pb-4">
+              <div className="flex justify-between items-center cursor-pointer py-1" onClick={() => setCouponOpen(!couponOpen)}>
+                <p className="text-[16px] font-medium text-gray-800">Coupon code</p>
+                <div className="relative mb-2 w-3 h-3 flex items-center justify-center">
+                  <div className={`absolute transition-all duration-500 ${couponOpen ? "rotate-90 opacity-0" : ""} w-[2px] h-[12px] bg-gray-800`} />
+                  <div className={`absolute transition-all duration-500 ${couponOpen ? "rotate-180" : ""} w-[12px] h-[2px] bg-gray-800`} />
                 </div>
               </div>
               <div
                 style={{ height: couponOpen ? couponRef.current?.scrollHeight + "px" : "0px" }}
                 ref={couponRef}
-                className="mt-3 overflow-hidden transition-all duration-500"
+                className="overflow-hidden transition-all duration-500 ease-in-out"
               >
                 <input
-                  className="border-[1.3px] rounded-md w-full text-[14px] p-3 border-gray-400 pl-3 outline-none placeholder-gray-600"
+                  className="border-[1.3px] rounded-md w-full text-[15px] p-3 border-gray-400 outline-none placeholder-gray-500 mt-2"
                   type="text"
                   placeholder="Enter coupon code"
                 />
-                <p className="text-sm text-gray-600 mt-2">Coupon code will be applied on the checkout page</p>
+                <p className="text-sm text-gray-500 mt-2">Coupon code will be applied on the checkout page</p>
               </div>
             </div>
           </div>
 
-          <div className="md:flex justify-between border-b border-gray-400 pb-5 hidden">
-            <p className="text-sm font-medium">TOTAL:</p>
-            <p className="font-semibold">${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
+          {/* TOTAL & TAX TEXT */}
+          <div className="md:flex justify-between items-center border-b border-gray-300 pb-4 hidden pt-2">
+            <p className="text-[18px] font-extrabold text-gray-900">Total:</p>
+            <p className="text-[20px] font-black text-gray-900">
+              ${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+            </p>
           </div>
-          <p className="text-[14px] text-gray-500">Tax included and shipping calculated at checkout</p>
+          <p className="text-[14px] text-gray-500 font-normal">Tax included and shipping calculated at checkout</p>
         </div>
 
-        <div className="space-y-4 mt-4 xl:w-full md:w-[48%] w-full">
+        {/* BUTTON ACTIONS */}
+        <div className="space-y-3 mt-5 xl:w-full md:w-[48%] w-full">
           <div className="md:flex justify-center hidden">
             <Link
               href="/checkout"
-              className="rounded text-sm w-full md:h-[45px] h-[42px] hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1 flex items-center justify-center"
+              className="rounded text-[14px] w-full h-[48px] bg-amber-400 hover:bg-yellow-400 border-amber-400 border-[1.5px] text-black font-extrabold uppercase tracking-wider transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center"
             >
               PROCEED TO CHECKOUT
             </Link>
@@ -119,43 +130,44 @@ export default function OrderSummary() {
           <div className="md:flex justify-center hidden">
             <button
               type="button"
-              className="rounded text-sm w-full cursor-pointer md:h-[45px] h-[42px] bg-yellow-400 hover:bg-yellow-500 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200"
+              className="rounded text-[14px] w-full cursor-pointer h-[48px] bg-yellow-400 hover:bg-yellow-500 border-yellow-400 border-[1.5px] text-black font-bold transition-all duration-200"
             >
-              <span className="text-blue-600 text-[20px]">Pay</span>
-              <span className="text-blue-400 text-[20px]">Pal</span>
+              <span className="text-blue-700 text-[22px] font-black italic">Pay</span>
+              <span className="text-blue-500 text-[22px] font-black italic">Pal</span>
             </button>
           </div>
           <div className="flex justify-center">
             <button
               type="button"
-              className="rounded text-sm cursor-pointer w-full md:h-[45px] h-[42px] hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1"
+              className="rounded text-[14px] cursor-pointer w-full h-[48px] hover:bg-gray-100 border-gray-400 border-[1.5px] text-black font-extrabold uppercase tracking-wider transition-all duration-200"
             >
               CONTINUE SHOPPING
             </button>
           </div>
         </div>
 
+        {/* MOBILE STICKY BOTTOM BAR */}
         <div className="relative z-50 md:hidden block">
-          <div className="fixed left-0 bottom-0 w-full h-[160px] bg-white shadow-md shadow-gray-600">
-            <div className="flex justify-between p-3">
-              <p className="text-sm font-medium">TOTAL:</p>
-              <p className="font-semibold">${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
+          <div className="fixed left-0 bottom-0 w-full bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.1)] p-4 border-t border-gray-200 space-y-2">
+            <div className="flex justify-between items-center">
+              <p className="text-[16px] font-bold">TOTAL:</p>
+              <p className="font-extrabold text-[18px]">
+                ${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+              </p>
             </div>
-            <div className="md:flex justify-center px-3 py-1">
+            <div className="grid grid-cols-2 gap-2">
               <Link
                 href="/checkout"
-                className="rounded text-sm w-full md:h-[45px] h-[42px] hover:bg-yellow-400 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200 hover:-translate-y-1 flex items-center justify-center"
+                className="rounded text-xs w-full h-[44px] bg-amber-400 text-black font-bold flex items-center justify-center uppercase"
               >
                 PROCEED TO CHECKOUT
               </Link>
-            </div>
-            <div className="md:flex justify-center px-3 py-1">
               <button
                 type="button"
-                className="rounded text-sm w-full cursor-pointer md:h-[45px] h-[42px] bg-yellow-400 hover:bg-yellow-500 border-yellow-400 border-[1.5px] text-black font-medium transition-all duration-200"
+                className="rounded text-xs w-full h-[44px] bg-yellow-400 text-black font-bold flex items-center justify-center"
               >
-                <span className="text-blue-600 text-[20px]">Pay</span>
-                <span className="text-blue-400 text-[20px]">Pal</span>
+                <span className="text-blue-700 text-[18px] font-bold">Pay</span>
+                <span className="text-blue-500 text-[18px] font-bold">Pal</span>
               </button>
             </div>
           </div>

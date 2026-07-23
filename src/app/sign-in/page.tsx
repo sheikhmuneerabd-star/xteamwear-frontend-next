@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import xteamwear from "@/assets/logo.svg";
 import google from "@/assets/google.png";
+import { ImSpinner2 } from "react-icons/im";
 
 export default function SignInUpPage() {
   const router = useRouter();
@@ -40,8 +42,12 @@ export default function SignInUpPage() {
           return;
         }
 
-        // Registration ke turant baad auto sign-in
-        const result = await signIn("credentials", { email, password, redirect: false });
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
+
         if (result?.error) {
           setError("Account created — please sign in.");
           setMode("signin");
@@ -52,8 +58,11 @@ export default function SignInUpPage() {
         return;
       }
 
-      // Sign in mode
-      const result = await signIn("credentials", { email, password, redirect: false });
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
       if (result?.error) {
         setError("Invalid email or password");
@@ -69,89 +78,151 @@ export default function SignInUpPage() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen flex flex-col justify-between">
-      <div className="flex justify-center items-center py-10">
-        <div className="bg-gray-100 rounded-2xl xl:w-[37%] lg:w-[45%] md:w-[58%] w-[92%] px-[40px] py-9">
+    <div className="bg-slate-50 min-h-screen flex flex-col justify-between selection:bg-yellow-200">
+      <div className="flex justify-center items-center py-12 px-4 sm:px-6">
+        <div className="bg-white border border-gray-200/80 shadow-xl rounded-2xl xl:w-[38%] lg:w-[48%] md:w-[65%] w-full max-w-lg px-6 sm:px-10 py-10 transition-all">
           <div className="space-y-6">
+            {/* Logo */}
             <div className="flex justify-center">
-              <Image className="w-[280px] h-auto" src={xteamwear} alt="xteamwear" />
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-2xl font-medium">{mode === "signin" ? "Sign in" : "Create account"}</p>
-              <p className="text-gray-600">
-                {mode === "signin" ? "Sign in or create an account" : "Join Xteamwear to track your orders"}
-              </p>
-
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                className="flex items-center gap-2 bg-white hover:bg-white/50 w-full h-[50px] rounded-lg font-medium border border-gray-600 justify-center"
-              >
-                <Image className="w-[25px] h-auto" src={google} alt="google" /> Continue With Google
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="w-full h-[1px] bg-gray-400"></div>
-              <div className="text-gray-600">or</div>
-              <div className="w-full h-[1px] bg-gray-400"></div>
-            </div>
-
-            <form onSubmit={handleCredentialsSubmit} className="flex flex-col space-y-3">
-              {mode === "register" && (
-                <input
-                  className="w-full h-[50px] rounded-lg bg-gray-100 border-[2px] border-gray-300 placeholder:text-gray-600 focus:border-gray-600 transition-all duration-300 outline-none pl-3"
-                  type="text"
-                  placeholder="Full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+              <Link href="/">
+                <Image
+                  className="w-[220px] sm:w-[260px] h-auto object-contain"
+                  src={xteamwear}
+                  alt="XTeamWear"
+                  priority
                 />
+              </Link>
+            </div>
+
+            {/* Header Text */}
+            <div className="text-center space-y-1">
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+                {mode === "signin" ? "Welcome back" : "Create an account"}
+              </h1>
+              <p className="text-sm text-gray-500">
+                {mode === "signin"
+                  ? "Sign in to access your orders and saved designs"
+                  : "Join Xteamwear to customize and track your sportswear"}
+              </p>
+            </div>
+
+            {/* OAuth Button */}
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="flex items-center justify-center gap-3 bg-white hover:bg-gray-50 active:bg-gray-100 w-full h-12 rounded-xl font-medium border border-gray-300 text-gray-700 transition-all duration-200 shadow-sm"
+            >
+              <Image className="w-5 h-5" src={google} alt="Google" />
+              <span className="text-sm font-semibold">Continue with Google</span>
+            </button>
+
+            {/* Divider */}
+            <div className="relative flex py-1 items-center">
+              <div className="flex-grow border-t border-gray-200"></div>
+              <span className="flex-shrink mx-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                or
+              </span>
+              <div className="flex-grow border-t border-gray-200"></div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleCredentialsSubmit} className="flex flex-col space-y-4">
+              {mode === "register" && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                    Full Name
+                  </label>
+                  <input
+                    className="w-full h-12 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 text-sm placeholder:text-gray-400 focus:bg-white focus:border-black focus:ring-1 focus:ring-black transition-all outline-none px-4"
+                    type="text"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
               )}
 
-              <input
-                className="w-full h-[50px] rounded-lg bg-gray-100 border-[2px] border-gray-300 placeholder:text-gray-600 focus:border-gray-600 transition-all duration-300 outline-none pl-3"
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                  Email Address
+                </label>
+                <input
+                  className="w-full h-12 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 text-sm placeholder:text-gray-400 focus:bg-white focus:border-black focus:ring-1 focus:ring-black transition-all outline-none px-4"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
 
-              <input
-                className="w-full h-[50px] rounded-lg bg-gray-100 border-[2px] border-gray-300 placeholder:text-gray-600 focus:border-gray-600 transition-all duration-300 outline-none pl-3"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                minLength={6}
-                required
-              />
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                  Password
+                </label>
+                <input
+                  className="w-full h-12 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 text-sm placeholder:text-gray-400 focus:bg-white focus:border-black focus:ring-1 focus:ring-black transition-all outline-none px-4"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  minLength={6}
+                  required
+                />
+              </div>
 
-              {error && <p className="text-red-600 text-sm">{error}</p>}
+              {error && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs font-medium">
+                  {error}
+                </div>
+              )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-[50px] rounded-lg font-medium bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 disabled:opacity-60"
+                className="w-full h-12 rounded-xl font-semibold text-sm bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600 text-gray-900 transition-all duration-200 shadow-sm flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "Please wait..." : mode === "signin" ? "Continue" : "Create account"}
+                {loading ? (
+                  <>
+                    <ImSpinner2 className="animate-spin text-lg" />
+                    <span>Processing...</span>
+                  </>
+                ) : mode === "signin" ? (
+                  "Sign In"
+                ) : (
+                  "Create Account"
+                )}
               </button>
             </form>
 
+            {/* Toggle Switch */}
             <p className="text-center text-sm text-gray-600">
               {mode === "signin" ? (
                 <>
                   Don&apos;t have an account?{" "}
-                  <button type="button" className="font-medium underline" onClick={() => { setMode("register"); setError(""); }}>
+                  <button
+                    type="button"
+                    className="font-semibold text-gray-900 underline underline-offset-4 hover:text-black"
+                    onClick={() => {
+                      setMode("register");
+                      setError("");
+                    }}
+                  >
                     Sign up
                   </button>
                 </>
               ) : (
                 <>
                   Already have an account?{" "}
-                  <button type="button" className="font-medium underline" onClick={() => { setMode("signin"); setError(""); }}>
+                  <button
+                    type="button"
+                    className="font-semibold text-gray-900 underline underline-offset-4 hover:text-black"
+                    onClick={() => {
+                      setMode("signin");
+                      setError("");
+                    }}
+                  >
                     Sign in
                   </button>
                 </>
@@ -159,13 +230,20 @@ export default function SignInUpPage() {
             </p>
           </div>
 
-          <div className="flex gap-2 justify-center text-gray-600 text-[14px] mt-4">
-            <p>By continuing, you agree to our</p>
-            <p className="font-medium underline cursor-pointer">Terms of service</p>
+          <div className="flex gap-1.5 justify-center text-gray-500 text-xs mt-8 pt-4 border-t border-gray-100">
+            <span>By continuing, you agree to our</span>
+            <Link href="/terms" className="font-medium underline hover:text-gray-900">
+              Terms of Service
+            </Link>
           </div>
         </div>
       </div>
-      <p className="text-center py-5 text-[14px] font-medium cursor-pointer">Privacy policy</p>
+
+      <div className="text-center py-4 text-xs font-medium text-gray-500">
+        <Link href="/privacy" className="hover:underline">
+          Privacy Policy
+        </Link>
+      </div>
     </div>
   );
 }

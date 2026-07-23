@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image, { StaticImageData } from "next/image";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { HiArrowUpRight } from "react-icons/hi2";
 
@@ -15,21 +14,61 @@ interface CategoryItem {
   id: string;
   title: string;
   itemCount: string;
-  image: StaticImageData | string;
+  image: any;
   link: string;
   tag?: string;
 }
 
-const categories: CategoryItem[] = [
-  { id: "football", title: "Football Kits", itemCount: "48+ Products", image: yellow1, link: "/categories/football", tag: "Popular" },
-  { id: "basketball", title: "Basketball Wear", itemCount: "32+ Products", image: white2, link: "/categories/basketball" },
-  { id: "baseball", title: "Baseball Jerseys", itemCount: "24+ Products", image: green3, link: "/categories/baseball" },
-  { id: "winterwear", title: "Outerwear & Vests", itemCount: "18+ Products", image: black4, link: "/categories/winter-wear" },
-  { id: "training", title: "Athletic Training", itemCount: "50+ Products", image: blue5, link: "/categories/training", tag: "New" },
+const defaultCategories: CategoryItem[] = [
+  { id: "football", title: "Football Kits", itemCount: "48+ Products", image: yellow1.src || yellow1, link: "/category/football", tag: "Popular" },
+  { id: "basketball", title: "Basketball Wear", itemCount: "32+ Products", image: white2.src || white2, link: "/category/basketball" },
+  { id: "baseball", title: "Baseball Jerseys", itemCount: "24+ Products", image: green3.src || green3, link: "/category/baseball" },
+  { id: "winterwear", title: "Outerwear & Vests", itemCount: "18+ Products", image: black4.src || black4, link: "/category/Winter Wear" },
+  { id: "training", title: "Athletic Training", itemCount: "50+ Products", image: blue5.src || blue5, link: "/category/training", tag: "New" },
 ];
 
 export default function CategoryShowcase() {
+  const [categories, setCategories] = useState<CategoryItem[]>(defaultCategories);
   const [activeCategory, setActiveCategory] = useState<string>("football");
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          const fetchedCats = data.settings?.categoriesShowcase;
+
+          if (fetchedCats && fetchedCats.length > 0) {
+            const formatted = fetchedCats.map((cat: any, index: number) => ({
+              id: cat.id || `cat-${index}`,
+              title: cat.title || defaultCategories[index]?.title || "Category",
+              itemCount: cat.itemCount || "0+ Products",
+              image: cat.image && cat.image.trim() !== "" ? cat.image : defaultCategories[index]?.image,
+              link: cat.link || "/category/all",
+              tag: cat.tag || "",
+            }));
+            setCategories(formatted);
+            if (formatted[0]?.id) setActiveCategory(formatted[0].id);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load category showcase", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="py-12 max-w-[1440px] mx-auto px-4">
+        <div className="w-full h-[480px] bg-slate-200/60 rounded-2xl animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <section className="py-12 bg-slate-50 text-slate-900 font-sans overflow-hidden border-t border-slate-200">
@@ -48,24 +87,29 @@ export default function CategoryShowcase() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-3 h-auto lg:h-[480px] w-full">
-          {categories.map((cat) => {
+          {categories.map((cat, idx) => {
             const isActive = activeCategory === cat.id;
+            const imgSrc = typeof cat.image === "string" ? cat.image : cat.image?.src;
 
             return (
               <Link
-                key={cat.id}
+                key={cat.id || idx}
                 href={cat.link}
                 onMouseEnter={() => setActiveCategory(cat.id)}
                 className={`relative group rounded-2xl overflow-hidden border border-slate-200 transition-all duration-300 ease-out flex flex-col justify-end p-5 h-[260px] lg:h-full shadow-sm ${
                   isActive ? "lg:flex-[2.2] border-amber-500 shadow-md" : "lg:flex-1 opacity-90 hover:opacity-100"
                 }`}
               >
-                <Image
-                  src={cat.image}
+                <img
+                  src={imgSrc}
                   alt={cat.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 25vw"
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                  className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                  onError={(e) => {
+                    const fallback = defaultCategories[idx]?.image;
+                    if (fallback) {
+                      (e.target as HTMLImageElement).src = typeof fallback === "string" ? fallback : fallback.src;
+                    }
+                  }}
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent" />

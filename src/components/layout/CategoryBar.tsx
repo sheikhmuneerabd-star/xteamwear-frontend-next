@@ -70,11 +70,13 @@ export default function CategoryBar() {
           
           {/* All Categories Dropdown Trigger */}
           <div className="relative group/megamenu">
-            <button className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-[15px] font-semibold text-white transition-all duration-200 cursor-pointer">
-              <HiOutlineSquares2X2 className="text-xl text-amber-500" />
-              <span>All Categories</span>
-              <HiChevronDown className="text-sm text-slate-300 group-hover/megamenu:rotate-180 transition-transform duration-200" />
-            </button>
+            <Link href="/category/all">
+              <button className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-[15px] font-semibold text-white transition-all duration-200 cursor-pointer">
+                <HiOutlineSquares2X2 className="text-xl text-amber-500" />
+                <span>All Categories</span>
+                <HiChevronDown className="text-sm text-slate-300 group-hover/megamenu:rotate-180 transition-transform duration-200" />
+              </button>
+            </Link>
 
             {/* Level 1 Mega Menu */}
             <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover/megamenu:opacity-100 group-hover/megamenu:visible transition-all duration-200 z-50">

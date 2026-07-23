@@ -113,7 +113,7 @@ export default function HeroSlider() {
                 {/* Action Buttons */}
                 <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                   <Link
-                    href={slide.ctaLink || "/products"}
+                    href={slide.ctaLink || "/category/all"}
                     className="w-full sm:w-auto px-8 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-xl shadow-amber-500/10 hover:-translate-y-0.5 text-center"
                   >
                     {slide.ctaText || "SHOP NOW"}

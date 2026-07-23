@@ -9,44 +9,53 @@ export default function ProductDetails() {
   const { cart, increase, decrease, removeFromCart } = useCart();
 
   return (
-    <div className="mt-8 flex xl:flex-row flex-col justify-between">
-      <div className="xl:w-[65%] w-full overflow-x-auto">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center px-3 font-semibold text-sm py-3 bg-gray-50 gap-2 sm:justify-between">
+    <div className="mt-8 flex xl:flex-row flex-col justify-between items-start gap-8">
+      <div className="xl:w-[65%] w-full">
+        {/* TABLE HEADER */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center px-4 font-bold text-xs py-3 bg-gray-50 text-gray-600 gap-2 sm:justify-between tracking-wider uppercase border-b border-gray-200">
           <p>PRODUCT</p>
-          <div className="hidden sm:flex justify-between w-full sm:w-[50%]">
+          <div className="hidden sm:flex justify-between w-full sm:w-[45%]">
             <p>PRICE</p>
             <p>QUANTITY</p>
-            <p>TOTAL</p>
+            <p className="text-right">TOTAL</p>
           </div>
         </div>
 
         {cart.length === 0 ? (
-          <div className="text-center text-2xl font-medium py-10">Your cart is empty</div>
+          <div className="text-center text-2xl font-medium py-16 text-gray-500 border-b border-gray-200">
+            Your cart is empty
+          </div>
         ) : (
-          cart.map((item) => (
-            <ProductsDetailsDemo
-              key={`${item.id}-${item.variants[0].color}`}
-              item={item}
-              onIncrease={increase}
-              onDecrease={decrease}
-              onRemove={removeFromCart}
-            />
-          ))
+          <div className="divide-y divide-gray-100">
+            {cart.map((item) => (
+              <ProductsDetailsDemo
+                key={`${item.id}-${item.color}`}
+                item={item}
+                onIncrease={increase}
+                onDecrease={decrease}
+                onRemove={removeFromCart}
+              />
+            ))}
+          </div>
         )}
 
-        <div className="mt-5">
-          <h1 className="font-medium text-sm mb-2">Additional Comments</h1>
+        {/* ADDITIONAL COMMENTS */}
+        <div className="mt-8">
+          <h1 className="font-bold text-sm mb-2 text-gray-900 uppercase tracking-wide">
+            Additional Comments
+          </h1>
           <textarea
-            className="xl:w-[75%] w-full h-[90px] resize-none outline-none border border-gray-400 rounded-md pt-3 pl-4 text-sm placeholder-gray-600"
+            className="xl:w-[80%] w-full h-[95px] resize-none outline-none border border-gray-300 rounded-md p-3 text-sm placeholder-gray-400 focus:border-black transition-colors"
             placeholder="Special instruction for seller..."
           />
-          <div className="flex items-center gap-1 mt-3">
-            <AiFillSafetyCertificate className="text-2xl" />
-            <p className="text-gray-600 text-[15px]">Secure shopping guarantee</p>
+          <div className="flex items-center gap-2 mt-3">
+            <AiFillSafetyCertificate className="text-2xl text-emerald-600" />
+            <p className="text-gray-700 text-[15px] font-medium">Secure shopping guarantee</p>
           </div>
         </div>
       </div>
-      <div className="xl:w-[33%] w-full">
+
+      <div className="xl:w-[32%] w-full">
         <OrderSummary />
       </div>
     </div>
