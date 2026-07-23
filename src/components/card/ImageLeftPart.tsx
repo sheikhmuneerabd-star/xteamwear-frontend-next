@@ -100,7 +100,7 @@ export default function ImageLeftPart({ product, selectedColor }: ImageLeftPartP
                   setActiveImageIndex(i);
                   swiperRef?.slideTo(i);
                 }}
-                className={`relative aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                className={`relative cursor-pointer aspect-square w-full rounded-xl overflow-hidden border-2 transition-all duration-200 ${
                   activeImageIndex === i
                     ? "border-amber-500 ring-2 ring-amber-500/20 scale-95"
                     : "border-slate-200 opacity-70 hover:opacity-100"

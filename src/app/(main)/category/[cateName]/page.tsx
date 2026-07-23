@@ -12,10 +12,9 @@ import PriceCals from "@/components/category/PriceCals";
 import FeaturedProducts from "@/components/category/FeaturedProducts";
 import RightViewPage from "@/components/category/RightViewPage";
 import CardCateSec from "@/components/category/CardCateSec";
-import LastCateCard from "@/components/category/LastCateCard";
 
-import lastCateCard from "@/data/lastCateCard";
 import type { Product } from "@/types/product";
+import HomePageProductCard from "@/components/common/HomePageProductCard";
 
 interface DbProductResponse {
   _id: string;
@@ -164,19 +163,25 @@ export default function CategorySection() {
           </main>
         </div>
 
-        {/* Recently Viewed */}
-        <section className="mt-20 border-t border-gray-200 pt-12">
-          <h2 className="text-center text-lg font-bold tracking-wider text-gray-900 mb-8 uppercase">
-            Recently Viewed Products
-          </h2>
-          <div className="w-[70%] mx-auto">
-            <div className="grid grid-cols-1 min-[375px]:grid-cols-2 min-[475px]:grid-cols-2 min-[768px]:grid-cols-3 min-[1024px]:grid-cols-3 min-[1440px]:grid-cols-3 w-full gap-4">
-              {lastCateCard.map((shirt) => (
-                <LastCateCard key={shirt.id} shirt={shirt} />
-              ))}
+        {/* Recently Viewed / Suggested Products */}
+        {!loading && products.length > 0 && (
+          <section className="mt-20 border-t border-gray-200 pt-12">
+            <h2 className="text-center text-lg font-bold tracking-wider text-gray-900 mb-8 uppercase">
+              Recently Viewed Products
+            </h2>
+            <div className="w-[85%] max-w-[1100px] mx-auto">
+              <div className="grid grid-cols-1 min-[375px]:grid-cols-2 min-[768px]:grid-cols-3 w-full gap-4">
+                {products.slice(0, 3).map((product) => (
+                  <HomePageProductCard
+                    key={product.id} 
+                    product={product} 
+                    layout="grid" 
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </div>
     </div>
   );

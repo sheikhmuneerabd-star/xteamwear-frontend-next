@@ -9,7 +9,7 @@ interface VariantInput {
   icon: string;
   images: string[];
   sku: string;
-  stock: string; // form mein string rakha hai, submit pe Number() se convert hoga
+  stock: string | number;
 }
 
 interface ProductFormValues {
@@ -25,7 +25,7 @@ interface ProductFormValues {
 
 interface ProductFormProps {
   initialValues?: Partial<ProductFormValues>;
-  productId?: string; // agar exist karta hai, to Edit mode hai
+  productId?: string;
 }
 
 interface DbSubcategory {
@@ -43,24 +43,38 @@ const emptyVariant: VariantInput = { color: "", icon: "", images: ["", ""], sku:
 export default function ProductForm({ initialValues, productId }: ProductFormProps) {
   const router = useRouter();
   const [dbCategories, setDbCategories] = useState<DbCategory[]>([]);
+  
   const [values, setValues] = useState<ProductFormValues>({
     name: initialValues?.name || "",
-    oldPrice: initialValues?.oldPrice || "",
-    newPrice: initialValues?.newPrice || "",
+    oldPrice: initialValues?.oldPrice !== undefined ? String(initialValues.oldPrice) : "",
+    newPrice: initialValues?.newPrice !== undefined ? String(initialValues.newPrice) : "",
     category: initialValues?.category || "",
     subCategory: initialValues?.subCategory || "",
     item: initialValues?.item || "",
     available: initialValues?.available ?? true,
-    variants: initialValues?.variants?.length ? initialValues.variants : [emptyVariant],
+    variants: initialValues?.variants?.length
+      ? initialValues.variants.map((v) => ({
+          color: v.color || "",
+          icon: v.icon || "",
+          images: v.images || ["", ""],
+          sku: v.sku || "",
+          stock: v.stock !== undefined ? String(v.stock) : "0",
+        }))
+      : [emptyVariant],
   });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchCategories() {
-      const res = await fetch("/api/categories");
-      const data = await res.json();
-      setDbCategories(data.categories || []);
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        setDbCategories(data.categories || []);
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
     }
     fetchCategories();
   }, []);
@@ -96,7 +110,6 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
     e.preventDefault();
     setError("");
 
-    // Image URL validation — Next.js Image ko "/" ya "http(s)://" se shuru hona chahiye
     const isValidImagePath = (path: string) =>
       path.startsWith("/") || path.startsWith("http://") || path.startsWith("https://");
 
@@ -204,7 +217,7 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
           <select
             className="w-full border border-gray-300 rounded-md p-2 outline-none focus:border-black bg-white"
             value={values.category}
-            onChange={(e) => setValues((prev) => ({ ...prev, category: e.target.value, subCategory: "" }))}
+            onChange={(e) => setValues((prev) => ({ ...prev, category: e.target.value, subCategory: "", item: "" }))}
             required
           >
             <option value="">Select category</option>
@@ -221,7 +234,7 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
           <select
             className="w-full border border-gray-300 rounded-md p-2 outline-none focus:border-black bg-white disabled:bg-gray-100"
             value={values.subCategory}
-            onChange={(e) => setValues((prev) => ({ ...prev, subCategory: e.target.value }))}
+            onChange={(e) => setValues((prev) => ({ ...prev, subCategory: e.target.value, item: "" }))}
             disabled={!values.category}
           >
             <option value="">None</option>
@@ -247,7 +260,7 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
             {dbCategories
               .find((cat) => cat.name === values.category)
               ?.subcategories.find((sub) => sub.name === values.subCategory)
-              ?.items.map((it) => (
+              ?.items?.map((it) => (
                 <option key={it} value={it}>
                   {it}
                 </option>
@@ -294,33 +307,43 @@ export default function ProductForm({ initialValues, productId }: ProductFormPro
                 )}
               </div>
 
-              <input
-                className="w-full border border-gray-300 rounded-md p-2 outline-none text-sm"
-                type="text"
-                placeholder="Color name (e.g. Red)"
-                value={variant.color}
-                onChange={(e) => handleColorChange(index, e.target.value)}
-                required
-              />
-
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  className="w-full border border-gray-300 rounded-md p-2 outline-none text-sm uppercase"
-                  type="text"
-                  placeholder="SKU (e.g. JERSEY-RED-M)"
-                  value={variant.sku}
-                  onChange={(e) => handleVariantFieldChange(index, "sku", e.target.value)}
-                  required
-                />
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Color Name</label>
                 <input
                   className="w-full border border-gray-300 rounded-md p-2 outline-none text-sm"
-                  type="number"
-                  min="0"
-                  placeholder="Stock quantity"
-                  value={variant.stock}
-                  onChange={(e) => handleVariantFieldChange(index, "stock", e.target.value)}
+                  type="text"
+                  placeholder="Color name (e.g. Gray)"
+                  value={variant.color}
+                  onChange={(e) => handleColorChange(index, e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">SKU Code</label>
+                  <input
+                    className="w-full border border-gray-300 rounded-md p-2 outline-none text-sm uppercase"
+                    type="text"
+                    placeholder="SKU (e.g. OCEAN-WAVE)"
+                    value={variant.sku}
+                    onChange={(e) => handleVariantFieldChange(index, "sku", e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Stock Quantity</label>
+                  <input
+                    className="w-full border border-gray-300 rounded-md p-2 outline-none text-sm"
+                    type="number"
+                    min="0"
+                    placeholder="Stock quantity (e.g. 10)"
+                    value={variant.stock}
+                    onChange={(e) => handleVariantFieldChange(index, "stock", e.target.value)}
+                    required
+                  />
+                </div>
               </div>
 
               <div>

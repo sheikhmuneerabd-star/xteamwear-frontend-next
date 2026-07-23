@@ -40,7 +40,7 @@ export default function SizingPShirtItem({ shirt, handleClick }: SizingPShirtIte
             alt={shirt.name}
             fill
             sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
-            className="object-cover transition-opacity duration-500 ease-in-out group-hover:opacity-0"
+            className="object-cover transition-opacity duration-500 ease-in-out hover:opacity-0"
           />
         )}
         {activeVariant.images?.[1] && (
@@ -49,7 +49,7 @@ export default function SizingPShirtItem({ shirt, handleClick }: SizingPShirtIte
             alt={`${shirt.name} alternate view`}
             fill
             sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
-            className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
+            className="object-cover absolute inset-0 opacity-0 hover:opacity-100 hover:scale-105 transition-all duration-500 ease-out"
           />
         )}
 

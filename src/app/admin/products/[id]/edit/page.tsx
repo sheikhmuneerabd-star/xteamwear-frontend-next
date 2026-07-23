@@ -1,3 +1,5 @@
+// app/admin/products/[id]/edit/page.tsx
+
 import { connectDB } from "@/lib/db";
 import Product from "@/lib/models/Product";
 import ProductForm from "@/components/admin/ProductForm";
@@ -25,6 +27,7 @@ export default async function EditProductPage({ params }: EditPageProps) {
           newPrice: String(product.newPrice),
           category: product.category,
           subCategory: product.subCategory || "",
+          item: product.item || "", // 👈 YAHAN "item" ADD KAR DIYA HAI
           available: product.available,
           variants: product.variants.map((v) => ({
             color: v.color,

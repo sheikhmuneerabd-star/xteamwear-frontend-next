@@ -7,25 +7,30 @@ import type { Product, ProductVariant } from "@/types/product";
 import { formatPrice } from "@/lib/formatPrice";
 
 export default function Carts({ shirt }: { shirt: Product }) {
-  const [active, setActive] = useState<ProductVariant>(shirt.variants[0]);
-  const discount = Math.round(
-    ((shirt.oldPrice - shirt.newPrice) / shirt.oldPrice) * 100
-  );
+  const [active, setActive] = useState<ProductVariant | undefined>(shirt.variants?.[0]);
+
+  const discount =
+    shirt.oldPrice && shirt.oldPrice > shirt.newPrice
+      ? Math.round(((shirt.oldPrice - shirt.newPrice) / shirt.oldPrice) * 100)
+      : 0;
+
+  const activeImage = active?.images?.[0] || shirt.variants?.[0]?.images?.[0] || "/placeholder.png";
+  const hoverImage = active?.images?.[1] || activeImage;
 
   return (
-    <Link href={`/card/${shirt.id}/${encodeURIComponent(active.color)}`}>
+    <Link href={`/card/${shirt.id}/${encodeURIComponent(active?.color || "")}`}>
       <div className="group rounded-xl border border-gray-200/80 bg-white shadow-sm hover:shadow-xl transition-all duration-300 p-3.5 mb-2">
         {/* Product Image Box */}
         <div className="cursor-pointer group/img relative rounded-lg aspect-[4/5] overflow-hidden bg-gray-50">
           <Image
-            src={active.images[0]}
+            src={activeImage}
             alt={shirt.name}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
             className="object-cover opacity-100 group-hover/img:opacity-0 transition-opacity duration-500 ease-in-out"
           />
           <Image
-            src={active.images[1] ?? active.images[0]}
+            src={hoverImage}
             alt={`${shirt.name} alternate`}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
@@ -56,7 +61,7 @@ export default function Carts({ shirt }: { shirt: Product }) {
               {formatPrice(shirt.newPrice)}
             </span>
 
-            {shirt.oldPrice && (
+            {shirt.oldPrice > shirt.newPrice && (
               <span className="text-xs sm:text-sm text-slate-400 line-through font-medium">
                 {formatPrice(shirt.oldPrice)}
               </span>
@@ -64,32 +69,34 @@ export default function Carts({ shirt }: { shirt: Product }) {
           </div>
 
           {/* Color Variant Icons */}
-          <div className="flex items-center gap-1.5 pt-1">
-            {shirt.variants.map((variant, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setActive(variant);
-                }}
-                className={`relative shrink-0 w-7 h-7 rounded-full cursor-pointer transition-all duration-200 p-[2px] overflow-hidden ${
-                  active.color === variant.color
-                    ? "ring-2 ring-amber-500 ring-offset-1 scale-105"
-                    : "opacity-75 hover:opacity-100 border border-slate-300"
-                }`}
-              >
-                <Image
-                  src={variant.icon}
-                  alt={variant.color}
-                  fill
-                  sizes="24px"
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
+          {shirt.variants?.length > 0 && (
+            <div className="flex items-center gap-1.5 pt-1 flex-wrap">
+              {shirt.variants.map((variant, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActive(variant);
+                  }}
+                  className={`relative shrink-0 w-7 h-7 rounded-full cursor-pointer transition-all duration-200 p-[2px] overflow-hidden ${
+                    active?.color === variant.color
+                      ? "ring-2 ring-amber-500 ring-offset-1 scale-105"
+                      : "opacity-75 hover:opacity-100 border border-slate-300"
+                  }`}
+                >
+                  <Image
+                    src={variant.icon || variant.images?.[0] || "/placeholder.png"}
+                    alt={variant.color}
+                    fill
+                    sizes="24px"
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </Link>

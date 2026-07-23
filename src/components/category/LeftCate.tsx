@@ -44,6 +44,33 @@ export default function LeftCate({
     fetchCategories();
   }, []);
 
+  // 🔄 Auto-expand category and subcategory accordions based on URL/Active Props
+  useEffect(() => {
+    if (!categories.length) return;
+
+    categories.forEach((cat, cIdx) => {
+      // If current active category matches
+      if (cat.name.toLowerCase() === activeCategory.toLowerCase()) {
+        setOpenIndex(cIdx);
+      }
+
+      cat.subcategories?.forEach((sub) => {
+        const subKey = `${cat._id}-${sub.name}`;
+
+        // If activeSub matches subcategory OR an item inside this subcategory
+        const isSubMatch = sub.name.toLowerCase() === subActiveCategory.toLowerCase();
+        const isItemMatch = sub.items?.some(
+          (it) => it.toLowerCase() === subActiveCategory.toLowerCase()
+        );
+
+        if (isSubMatch || isItemMatch) {
+          setOpenIndex(cIdx);
+          setOpenSubIndex(subKey);
+        }
+      });
+    });
+  }, [categories, activeCategory, subActiveCategory]);
+
   return (
     <div className="w-full">
       <h2 className="font-bold text-sm tracking-wider text-gray-900 uppercase border-b border-gray-200 pb-3">
@@ -53,7 +80,7 @@ export default function LeftCate({
       <div className="mt-3 space-y-1">
         {categories.map((cate, index) => {
           const isOpen = openIndex === index;
-          const isActive = activeCategory === cate.name;
+          const isActive = activeCategory.toLowerCase() === cate.name.toLowerCase();
 
           return (
             <div key={cate._id} className="text-sm">
@@ -63,7 +90,7 @@ export default function LeftCate({
                   setOpenIndex(isOpen ? null : index);
                   setActiveCategory(cate.name);
                 }}
-                className={`w-full flex items-center justify-between py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`w-full flex items-center cursor-pointer justify-between py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? "bg-gray-100 text-black font-semibold shadow-xs"
                     : "text-gray-700 hover:bg-gray-50 hover:text-black"
@@ -79,7 +106,7 @@ export default function LeftCate({
                 </div>
               </button>
 
-              {/* Collapsible Subcategory Dropdown with Smooth Height Animation */}
+              {/* Collapsible Subcategory Dropdown */}
               <div
                 className={`grid transition-all duration-300 ease-in-out ${
                   isOpen ? "grid-rows-[1fr] opacity-100 mt-1 mb-2" : "grid-rows-[0fr] opacity-0"
@@ -89,7 +116,8 @@ export default function LeftCate({
                   {cate.subcategories?.map((sub) => {
                     const subKey = `${cate._id}-${sub.name}`;
                     const isSubOpen = openSubIndex === subKey;
-                    const isSubActive = subActiveCategory === sub.name;
+                    const isSubActive =
+                      subActiveCategory.toLowerCase() === sub.name.toLowerCase();
 
                     return (
                       <div key={sub.name}>
@@ -100,9 +128,11 @@ export default function LeftCate({
                               : "text-gray-600 hover:text-black hover:bg-gray-50"
                           }`}
                           onClick={() => {
+                            setActiveCategory(cate.name);
                             setSubActiveCategory(sub.name);
-                            if (sub.items?.length > 0)
+                            if (sub.items?.length > 0) {
                               setOpenSubIndex(isSubOpen ? null : subKey);
+                            }
                           }}
                         >
                           <span className="truncate">{sub.name}</span>
@@ -121,23 +151,28 @@ export default function LeftCate({
                             isSubOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                           }`}
                         >
-                          <div className="overflow-hidden pl-3 space-y-1 my-1">
-                            {sub.items?.map((it) => (
-                              <div
-                                key={it}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSubActiveCategory(it);
-                                }}
-                                className={`py-1 text-[12px] cursor-pointer transition-colors ${
-                                  subActiveCategory === it
-                                    ? "text-black font-semibold"
-                                    : "text-gray-500 hover:text-black"
-                                }`}
-                              >
-                                {it}
-                              </div>
-                            ))}
+                          <div className="overflow-hidden pl-3 space-y-1 my-1 border-l border-amber-200/60 ml-2">
+                            {sub.items?.map((it) => {
+                              const isItemActive =
+                                subActiveCategory.toLowerCase() === it.toLowerCase();
+                              return (
+                                <div
+                                  key={it}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveCategory(cate.name);
+                                    setSubActiveCategory(it);
+                                  }}
+                                  className={`py-1 text-[12px] cursor-pointer transition-colors ${
+                                    isItemActive
+                                      ? "text-amber-600 font-bold"
+                                      : "text-gray-500 hover:text-black"
+                                  }`}
+                                >
+                                  {it}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
