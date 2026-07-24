@@ -16,14 +16,7 @@ import { RiUserAddLine } from "react-icons/ri";
 import greenShirt from "@/assets/greenShirt.jpg";
 import orangeShirt from "@/assets/orangeShirt.jpg";
 import { useCart } from "@/context/CartContext";
-
-/**
- * ---- Design tokens (brand-specific, not a generic template) ----
- * Navy      #0B1E3D  – existing brand ink, used for wordmark & primary text
- * Brass     #A9762F  – replaces the stock "neon e-commerce accent"; reads as tailored/premium
- * Ivory     #FAF8F3  – warm surface for panels/dropdowns
- * Hairline  #E6E1D6  – soft structural borders instead of harsh gray-300
- */
+import { useRouter } from "next/navigation";
 
 interface CategoryMenuEntry {
   id: number;
@@ -43,85 +36,166 @@ const categoriesCategory: CategoryMenuEntry[] = [
   { id: 3, name: "Baseball", items: ["Baseball Ball 1", "Baseball Ball 2", "Baseball Ball 3"] },
 ];
 
-/** Reused product card for search suggestions — restyled with brass accents instead of orange/lime */
-function PopularProductCard() {
+function PopularProductCard({ product, onClick }: { product: any; onClick: () => void }) {
+  const displayPrice = product.newPrice ?? product.price ?? 0;
+  const oldPrice = product.oldPrice;
+  
+  // Pehle variant ki images
+  const firstVariant = product.variants?.[0];
+  const mainImage = firstVariant?.images?.[0] || product.image || "/placeholder.png";
+  const hoverImage = firstVariant?.images?.[1] || mainImage;
+
+  // Discount percentage calculate karein
+  const discount = oldPrice ? Math.round(((oldPrice - displayPrice) / oldPrice) * 100) : 0;
+
   return (
-    <div className="group flex flex-col justify-center shrink-0">
-      <div className="w-full h-[180px] group/img group-hover:-translate-y-2 transition-all duration-300 relative cursor-pointer overflow-hidden rounded-sm">
+    <div className="group flex flex-col justify-center shrink-0 cursor-pointer" onClick={onClick}>
+      <div className="w-full h-[180px] group/img group-hover:-translate-y-2 transition-all duration-300 relative overflow-hidden rounded-sm bg-gray-50">
         <Image
-          src={greenShirt}
-          alt="Popular product"
+          src={mainImage}
+          alt={product.name}
           fill
           sizes="150px"
           className="object-cover opacity-100 group-hover/img:opacity-0 transition-opacity duration-700 ease-in-out"
         />
         <Image
-          src={orangeShirt}
-          alt="Popular product alternate"
+          src={hoverImage}
+          alt={product.name}
           fill
           sizes="150px"
           className="object-cover absolute top-0 left-0 opacity-0 group-hover/img:opacity-100 ease-out hover:scale-105 transition-all duration-700"
         />
       </div>
       <div className="w-[150px] pt-3">
-        <span className="text-[11px] leading-snug line-clamp-2 font-medium text-[#0B1E3D] hover:text-[#A9762F] cursor-pointer">
-          Whirlwind — Men&apos;s Sublimated Football Kit
+        <span className="text-[11px] leading-snug line-clamp-2 font-medium text-[#0B1E3D] group-hover:text-[#A9762F] transition-colors">
+          {product.name}
         </span>
         <div className="flex items-baseline gap-2 mt-1">
-          <p className="text-gray-400 font-medium text-[13px] line-through">$33.53</p>
-          <p className="text-[#A9762F] font-semibold text-[14px]">$28.33</p>
+          {oldPrice && (
+            <p className="text-gray-400 font-medium text-[13px] line-through">${oldPrice}</p>
+          )}
+          <p className="text-[#A9762F] font-semibold text-[14px]">${displayPrice}</p>
         </div>
         <div className="w-full flex justify-between items-center mt-2">
-          <div className="relative w-[22px] h-[22px] rounded-full border border-[#E6E1D6] overflow-hidden">
-            <Image src={greenShirt} alt="Colorway" fill sizes="22px" className="rounded-full object-cover" />
-          </div>
-          <span className="text-[11px] tracking-wide font-medium text-[#A9762F] border border-[#A9762F]/40 px-2 py-[2px] rounded-full">
-            −20%
-          </span>
+          {firstVariant?.icon ? (
+            <div className="relative w-[22px] h-[22px] rounded-full border border-[#E6E1D6] overflow-hidden">
+              <Image src={firstVariant.icon} alt={firstVariant.color || "color"} fill sizes="22px" className="rounded-full object-cover" />
+            </div>
+          ) : <div />}
+          {discount > 0 && (
+            <span className="text-[11px] tracking-wide font-medium text-[#A9762F] border border-[#A9762F]/40 px-2 py-[2px] rounded-full">
+              −{discount}%
+            </span>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-const searchTagGroups = [
-  ["uniform packages", "fluorescent jersey", "sleeveless jersey"],
-  ["long sleeve shirts", "shorts & pants", "training kits"],
-  ["reversible basketball jersey", "bespoke fits", "socks & accessories"],
-];
+function SearchSuggestions({
+  variant,
+  onSelectTag,
+  onProductClick,
+}: {
+  variant: "desktop" | "mobile";
+  onSelectTag?: (tag: string) => void;
+  onProductClick: (prod: any) => void;
+}) {
+  const [tags, setTags] = useState<string[]>([]);
+  const [loadingTags, setLoadingTags] = useState(true);
+  const [popularProducts, setPopularProducts] = useState<any[]>([]);
+  const [loadingPopular, setLoadingPopular] = useState(true);
 
-/** Search trending tags + popular products — shared between desktop dropdown and mobile sidebar */
-function SearchSuggestions({ variant }: { variant: "desktop" | "mobile" }) {
-  const wrapClass = variant === "desktop" ? "flex flex-wrap gap-2 pt-4" : "flex flex-wrap gap-2 pt-4";
+  // 1. Backend `/api/categories` se dynamic Subcategories aur Items fetch karein
+  useEffect(() => {
+    async function fetchTrendingTags() {
+      try {
+        const res = await fetch("/api/trending-tags");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.tags)) {
+          setTags(data.tags);
+        }
+      } catch (err) {
+        console.error("Failed to fetch trending tags:", err);
+      } finally {
+        setLoadingTags(false);
+      }
+    }
+
+    fetchTrendingTags();
+  }, []);
+
+  // 2. Backend se popular products fetch karein
+  useEffect(() => {
+    async function fetchPopular() {
+      try {
+        const res = await fetch("/api/products/search?q=");
+        const data = await res.json();
+        if (data.success) {
+          setPopularProducts(data.products || []);
+        }
+      } catch (err) {
+        console.error("Popular Products fetch error", err);
+      } finally {
+        setLoadingPopular(false);
+      }
+    }
+    fetchPopular();
+  }, []);
+
+  const wrapClass = "flex flex-wrap gap-2 pt-4";
+
   return (
     <>
+      {/* Trending Header */}
       <div className="pb-3 border-b border-[#E6E1D6]">
         <span className="text-[11px] tracking-[0.14em] font-semibold text-[#A9762F] uppercase">
-          Trending — Sublimated Jersey
+          Trending — Categories & Items
         </span>
       </div>
-      <div>
-        {searchTagGroups.map((group, gi) => (
-          <div key={gi} className={wrapClass}>
-            {group.map((tag) => (
-              <div
-                key={tag}
-                className="flex gap-1 items-center border border-[#E6E1D6] hover:border-[#A9762F] hover:bg-[#A9762F]/5 cursor-pointer transition-all duration-200 group py-[6px] px-3 rounded-full"
-              >
-                <span className="text-[12.5px] text-[#0B1E3D]/70 group-hover:text-[#0B1E3D]">{tag}</span>
-              </div>
-            ))}
-          </div>
-        ))}
+
+      {/* Dynamic Tags Grid */}
+      <div className={wrapClass}>
+        {loadingTags ? (
+          <p className="text-xs text-gray-400 py-2">Loading trending items...</p>
+        ) : tags.length > 0 ? (
+          tags.map((tag) => (
+            <button
+              type="button"
+              key={tag}
+              onClick={() => onSelectTag && onSelectTag(tag)}
+              className="flex gap-1 items-center border border-[#E6E1D6] hover:border-[#A9762F] hover:bg-[#A9762F]/10 active:scale-95 cursor-pointer transition-all duration-200 group py-[6px] px-3 rounded-full text-left"
+            >
+              <span className="text-[12.5px] text-[#0B1E3D]/80 group-hover:text-[#A9762F] font-medium">
+                {tag}
+              </span>
+            </button>
+          ))
+        ) : (
+          <p className="text-xs text-gray-400 py-2">No categories available</p>
+        )}
       </div>
+
+      {/* Popular Products Section */}
       <div className="mt-6">
         <span className="text-[11px] tracking-[0.14em] font-semibold text-[#0B1E3D] uppercase border-b border-[#E6E1D6] pb-2 block">
           Popular Products
         </span>
         <div className="mt-4 flex gap-4 overflow-x-auto pb-3 [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar-track]:bg-[#E6E1D6] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#A9762F]/60 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-[#A9762F]">
-          <PopularProductCard />
-          <PopularProductCard />
-          <PopularProductCard />
+          {loadingPopular ? (
+            <p className="text-xs text-gray-400 py-4">Loading popular products...</p>
+          ) : popularProducts.length > 0 ? (
+            popularProducts.map((prod) => (
+              <PopularProductCard
+                key={prod._id}
+                product={prod}
+                onClick={() => onProductClick(prod)}
+              />
+            ))
+          ) : (
+            <p className="text-xs text-gray-400 py-4">No popular products found</p>
+          )}
         </div>
       </div>
     </>
@@ -140,13 +214,26 @@ export default function Navbar() {
   const [openSearch, setOpenSearch] = useState(false);
   const searchSideBar = useRef<HTMLDivElement>(null);
 
+  // Desktop search wrapper ref for click-outside detection
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  const router = useRouter();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
     async function fetchSettings() {
-      const res = await fetch("/api/settings");
-      const data = await res.json();
-      setLogoUrl(data.settings.logo || "");
+      try {
+        const res = await fetch("/api/settings");
+        const data = await res.json();
+        setLogoUrl(data?.settings?.logo || "");
+      } catch (err) {
+        console.error("Settings fetch error", err);
+      }
     }
     fetchSettings();
   }, []);
@@ -157,6 +244,18 @@ export default function Navbar() {
   const { cart } = useCart();
   const { data: session, status } = useSession();
   const isAdmin = session?.user?.role === "admin";
+
+  // Handle Outside Click for Search Box Dropdown
+  useEffect(() => {
+    function handleClickOutsideSearch(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setSearchFocus(false);
+        setFocus(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutsideSearch);
+    return () => document.removeEventListener("mousedown", handleClickOutsideSearch);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -206,15 +305,47 @@ export default function Navbar() {
     setOpenCategory(true);
   };
 
-  const handleSearchFocus = () => {
-    setFocus(true);
-    setSearchFocus(true);
-  };
-  const handleSearchBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (!e.target.value) {
-      setFocus(false);
-      setSearchFocus(false);
-    }
+  useEffect(() => {
+      const fetchSearchResults = async () => {
+        if (!searchQuery.trim()) {
+          setSearchResults([]);
+          return;
+        }
+        setIsLoading(true);
+        try {
+          const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery)}`);
+          const data = await res.json();
+          if (data.success) {
+            setSearchResults(data.products);
+          }
+        } catch (error) {
+          console.error("Search Error:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      const timer = setTimeout(() => {
+        fetchSearchResults();
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // Safe navigation helper
+    const handleProductClick = (prod: any) => {
+    setSearchFocus(false);
+    setFocus(false);
+    setOpenSearch(false);
+
+    // Default color pehle variant se lenge, agar na ho toh "default"
+    const defaultColor = prod.variants?.[0]?.color || "default";
+    
+    // Encoded URL formatting for color name (e.g. spaces handle karne ke liye)
+    const encodedColor = encodeURIComponent(defaultColor);
+
+    // Aapke folder structure ke mutabiq route:
+    router.push(`/card/${prod._id}/${encodedColor}`);
   };
 
   return (
@@ -231,8 +362,8 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* Signature search — soft pill with brass icon-button, not a bare underline */}
-          <div className="flex flex-col w-[34%] mr-10 relative">
+          {/* Search Wrapper with Ref */}
+          <div className="flex flex-col w-[34%] mr-10 relative" ref={searchContainerRef}>
             <div
               className={`flex items-center h-[46px] rounded-full bg-[#FAF8F3] border transition-all duration-300 pl-4 pr-1 ${
                 focus ? "border-[#A9762F] shadow-[0_0_0_3px_rgba(169,118,47,0.12)]" : "border-[#E6E1D6]"
@@ -241,9 +372,13 @@ export default function Navbar() {
               <input
                 className="w-full h-full outline-none text-[14.5px] bg-transparent placeholder-[#0B1E3D]/40 text-[#0B1E3D]"
                 type="text"
-                placeholder="Search the store"
-                onFocus={handleSearchFocus}
-                onBlur={handleSearchBlur}
+                placeholder="Search the store..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => {
+                  setFocus(true);
+                  setSearchFocus(true);
+                }}
               />
               <button
                 type="button"
@@ -253,15 +388,72 @@ export default function Navbar() {
                 <IoSearch className="text-[16px] text-white" />
               </button>
             </div>
-            <div
-              className={`bg-white absolute [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-[#E6E1D6] top-[54px] left-0 w-[130%] max-h-[320px] rounded-md border border-[#E6E1D6] shadow-[0_12px_28px_-8px_rgba(11,30,61,0.15)] overflow-y-auto overflow-x-hidden z-50 ${
-                searchFocus ? "flex" : "hidden"
-              }`}
-            >
-              <div className="p-5 w-full">
-                <SearchSuggestions variant="desktop" />
+
+            {searchFocus && (
+              <div className="bg-white absolute top-[54px] left-0 w-[130%] max-h-[350px] rounded-md border border-[#E6E1D6] shadow-xl overflow-y-auto z-50 p-4
+                [&::-webkit-scrollbar]:w-[5px] 
+                [&::-webkit-scrollbar-track]:bg-transparent 
+                [&::-webkit-scrollbar-thumb]:bg-[#A9762F]/40 
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                hover:[&::-webkit-scrollbar-thumb]:bg-[#A9762F]
+              ">
+                {isLoading ? (
+                  <p className="text-xs text-gray-500 text-center py-4">Searching...</p>
+                ) : searchResults.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[11px] font-semibold text-[#A9762F] uppercase tracking-wider">
+                      Products Found
+                    </span>
+                    {searchResults.map((prod) => {
+                      const displayPrice = prod.newPrice ?? prod.price ?? 0;
+                      const displayImage =
+                        prod.variants?.[0]?.images?.[0] ||
+                        prod.images?.[0] ||
+                        prod.image ||
+                        "/placeholder.png";
+
+                      return (
+                        <div
+                          key={prod._id}
+                          onClick={() => handleProductClick(prod)} // Pure prod object ko pass kiya
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#FAF8F3] transition-colors group cursor-pointer"
+                        >
+                          <div className="w-[45px] h-[45px] relative rounded overflow-hidden border border-[#E6E1D6] shrink-0 bg-gray-50">
+                            <Image
+                              src={displayImage}
+                              alt={prod.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-xs font-medium text-[#0B1E3D] group-hover:text-[#A9762F] line-clamp-1">
+                              {prod.name}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold text-[#A9762F]">
+                                ${displayPrice} USD
+                              </span>
+                              {prod.oldPrice && (
+                                <span className="text-[10px] text-gray-400 line-through">
+                                  ${prod.oldPrice}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : searchQuery ? (
+                  <p className="text-xs text-gray-500 text-center py-4">
+                    No products found for "{searchQuery}"
+                  </p>
+                ) : (
+                  <SearchSuggestions variant="desktop" onSelectTag={(tag) => setSearchQuery(tag)} onProductClick={(prod) => handleProductClick(prod)} />
+                )}
               </div>
-            </div>
+            )}
           </div>
 
           <div className="flex gap-4 items-center">
@@ -473,48 +665,6 @@ export default function Navbar() {
                       </>
                     )}
                   </div>
-
-                  <div>
-                    <div className="p-4 bg-[#FAF8F3]">
-                      <span className="text-[12px] tracking-[0.12em] font-semibold text-[#0B1E3D]/60 uppercase">
-                        Currency
-                      </span>
-                    </div>
-                    <div className="p-4 flex justify-between gap-3 items-center">
-                      {["us", "eu", "gb", "ch"].map((code, i) => (
-                        <div key={code} className="flex items-center gap-2 cursor-pointer group">
-                          <Image
-                            src={`https://flagcdn.com/w40/${code}.png`}
-                            width={22}
-                            height={22}
-                            unoptimized
-                            alt={code}
-                            className="w-[22px] h-[22px] rounded-full"
-                          />
-                          <span className="font-medium text-[13.5px] text-[#0B1E3D] group-hover:text-[#A9762F] border-b border-transparent group-hover:border-[#A9762F]">
-                            {["USD", "EUR", "GBP", "CHF"][i]}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="px-4 pb-4 flex gap-3 items-center">
-                      {["au", "ca"].map((code, i) => (
-                        <div key={code} className="flex items-center gap-2 cursor-pointer group">
-                          <Image
-                            src={`https://flagcdn.com/w40/${code}.png`}
-                            width={22}
-                            height={22}
-                            unoptimized
-                            alt={code}
-                            className="w-[22px] h-[22px] rounded-full"
-                          />
-                          <span className="font-medium text-[13.5px] text-[#0B1E3D] group-hover:text-[#A9762F] border-b border-transparent group-hover:border-[#A9762F]">
-                            {["AUD", "CAD"][i]}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -536,16 +686,20 @@ export default function Navbar() {
                   <div className="flex items-center gap-2 border-b-[1.5px] border-[#0B1E3D]/15 focus-within:border-[#A9762F] transition-colors duration-300 pb-2">
                     <IoSearch className="text-[17px] text-[#0B1E3D]/50" />
                     <input
-                      className="w-full outline-none text-[14.5px] bg-transparent placeholder-gray-400 text-[#0B1E3D]"
+                      className="w-full h-full outline-none text-[14.5px] bg-transparent placeholder-[#0B1E3D]/40 text-[#0B1E3D]"
                       type="text"
-                      placeholder="Search product..."
-                      onFocus={handleSearchFocus}
-                      onBlur={handleSearchBlur}
+                      placeholder="Search the store..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => {
+                        setFocus(true);
+                        setSearchFocus(true);
+                      }}
                     />
                   </div>
                 </div>
                 <div className="px-4 py-2 overflow-y-scroll h-[280px] mt-1">
-                  <SearchSuggestions variant="mobile" />
+                  <SearchSuggestions variant="mobile" onSelectTag={(tag) => setSearchQuery(tag)} onProductClick={(prod) => handleProductClick(prod)} />
                 </div>
               </div>
             </div>

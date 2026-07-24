@@ -43,6 +43,7 @@ export interface ISiteSettings extends Document {
   squadImages: string[];
   advantages: IAdvantage[];
   bespokeBanner?: IBespokeBanner;
+  trendingTags?: string[];
   categoriesShowcase?: ICategoryShowcaseItem[];
 }
 
@@ -107,6 +108,7 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     squadImages: { type: [String], default: [] },
     advantages: { type: [AdvantageSchema], default: [] },
     bespokeBanner: { type: BespokeBannerSchema },
+    trendingTags: { type: [String], default: [] },
     categoriesShowcase: { type: [CategoryShowcaseItemSchema], default: [] },
   },
   { timestamps: true }

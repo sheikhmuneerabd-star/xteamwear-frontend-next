@@ -82,6 +82,8 @@ export default function SiteSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [socialPosts, setSocialPosts] = useState<SocialPost[]>([]);
+  const [trendingTags, setTrendingTags] = useState<string[]>([]);
+  const [newTagInput, setNewTagInput] = useState("");
 
   const [bespokeBanner, setBespokeBanner] = useState<BespokeBanner>(defaultBespokeBanner);
   const [categoriesShowcase, setCategoriesShowcase] = useState<CategoryShowcaseItem[]>(initialCategories);
@@ -99,6 +101,7 @@ export default function SiteSettingsPage() {
         setSquadImages(settings?.squadImages?.length ? settings.squadImages : ["", "", "", ""]);
         setAdvantages(settings?.advantages?.length ? settings.advantages : [emptyAdvantage]);
         setSocialPosts(settings?.socialPosts?.length ? settings.socialPosts : [emptyPost]);
+        setTrendingTags(settings?.trendingTags || []);
 
         if (settings?.bespokeBanner) {
           setBespokeBanner(settings.bespokeBanner);
@@ -191,6 +194,7 @@ export default function SiteSettingsPage() {
           advantages,
           socialPosts,
           bespokeBanner,
+          trendingTags,
           categoriesShowcase,
         }),
       });
@@ -208,6 +212,17 @@ export default function SiteSettingsPage() {
     }
   };
 
+  const handleAddTag = () => {
+    if (!newTagInput.trim()) return;
+    if (trendingTags.includes(newTagInput.trim())) return;
+    setTrendingTags([...trendingTags, newTagInput.trim()]);
+    setNewTagInput("");
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTrendingTags(trendingTags.filter((t) => t !== tagToRemove));
+  };
+
   if (loading) return <p className="p-6">Loading settings...</p>;
 
   return (
@@ -218,6 +233,62 @@ export default function SiteSettingsPage() {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="font-medium mb-3">Navbar Logo</h2>
         <ImageUploader label="Logo" value={logo} onChange={setLogo} />
+      </div>
+
+      {/* Trending Search Tags Section */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-6">
+        <h3 className="text-lg font-bold text-[#0B1E3D] mb-1">
+          Navbar Trending / Search Tags
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">
+          Add custom tags that appear in the navbar search dropdown.
+        </p>
+
+        {/* Tag Input Box */}
+        <div className="flex gap-2 mb-4">
+          <input
+            type="text"
+            value={newTagInput}
+            onChange={(e) => setNewTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddTag();
+              }
+            }}
+            placeholder="Type a tag & press enter (e.g. Football Uniform)..."
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#A9762F]"
+          />
+          <button
+            type="button"
+            onClick={handleAddTag}
+            className="bg-[#A9762F] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#8e6226] transition-colors"
+          >
+            Add Tag
+          </button>
+        </div>
+
+        {/* Active Tags List */}
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+          {trendingTags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-2 bg-[#F3EFE6] text-[#0B1E3D] text-xs font-medium px-3 py-1.5 rounded-full border border-[#E6E1D6]"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => handleRemoveTag(tag)}
+                className="hover:text-red-600 font-bold ml-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </span>
+          ))}
+          {trendingTags.length === 0 && (
+            <p className="text-xs text-gray-400 italic">No search tags added yet.</p>
+          )}
+        </div>
       </div>
 
       {/* Curated Category Cards */}

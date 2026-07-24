@@ -15,7 +15,8 @@ export interface IProduct extends Document {
   category: string;
   subCategory?: string;
   item?: string;
-  available: boolean; // ab auto-calculated hota hai variants ke stock se
+  tags?: string[]; // <--- Yeh TypeScript Interface mein add hona zaroori tha
+  available: boolean;
   variants: IProductVariant[];
   createdAt: Date;
 }
@@ -39,12 +40,14 @@ const ProductSchema = new Schema<IProduct>(
     category: { type: String, required: true, trim: true },
     subCategory: { type: String, trim: true },
     item: { type: String, trim: true },
+    tags: { type: [String], default: [] },
     available: { type: Boolean, default: true },
     variants: { type: [ProductVariantSchema], required: true },
   },
   { timestamps: true }
 );
 
-const Product: Model<IProduct> = mongoose.models.Product || mongoose.model<IProduct>("Product", ProductSchema);
+const Product: Model<IProduct> =
+  mongoose.models.Product || mongoose.model<IProduct>("Product", ProductSchema);
 
 export default Product;
