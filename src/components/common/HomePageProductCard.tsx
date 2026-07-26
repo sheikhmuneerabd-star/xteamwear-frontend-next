@@ -27,13 +27,13 @@ export default function HomePageProductCard({ product, layout = "grid" }: HomePa
   const displayOldPrice = formattedOld.includes("USD") ? formattedOld : `${formattedOld} USD`;
 
   return (
-    <div className="group bg-white rounded-[16px] border border-gray-200/80 p-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full">
-      <div className={layout === "list" ? "flex flex-col md:flex-row gap-5 items-center" : "block"}>
+    <div className="group bg-white rounded-[16px] border border-gray-200/80 p-2 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full">
+      <div className={layout === "list" ? "flex flex-row gap-5" : "block"}>
         
         {/* IMAGE CONTAINER */}
         <div
           className={`group/img relative overflow-hidden rounded-[12px] bg-[#f2f3f5] aspect-[4/5] block shrink-0 ${
-            layout === "list" ? "w-full md:w-[260px]" : "w-full"
+            layout === "list" ? "w-[152px] md:w-[260px]" : "w-full"
           }`}
         >
           <Link href={`/card/${product.id}/${encodeURIComponent(active?.color || "")}`}>

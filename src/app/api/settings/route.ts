@@ -6,10 +6,11 @@ import { auth } from "@/auth";
 export async function GET() {
   try {
     await connectDB();
-    let settings = await SiteSettings.findOne();
+
+    let settings = await SiteSettings.findOne().lean();
 
     if (!settings) {
-      settings = await SiteSettings.create({
+      const newSettings = await SiteSettings.create({
         logo: "",
         heroSlides: [],
         squadImages: [],
@@ -18,12 +19,16 @@ export async function GET() {
         categoriesShowcase: [],
         trendingTags: [],
       });
+      settings = newSettings.toObject();
     }
 
     return NextResponse.json({ success: true, settings });
   } catch (error: any) {
     console.error("Get settings error:", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   }
 }
 
@@ -37,16 +42,18 @@ export async function PUT(request: Request) {
     const body = await request.json();
     await connectDB();
 
-    // Directly update or insert using findOneAndUpdate
     const settings = await SiteSettings.findOneAndUpdate(
       {},
       { $set: body },
       { new: true, upsert: true, runValidators: true }
-    );
+    ).lean();
 
     return NextResponse.json({ success: true, settings });
   } catch (error: any) {
     console.error("Update settings error:", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   }
 }

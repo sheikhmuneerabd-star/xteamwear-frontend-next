@@ -65,24 +65,24 @@ export default function SizingPShirtItem({ shirt, handleClick }: SizingPShirtIte
 
       {/* Details */}
       <div className="pt-2 sm:pt-3 px-0.5 space-y-1">
-        <h3 className="text-[11px] sm:text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors line-clamp-1 leading-tight">
+        <h3 className="text-sm md:text-base font-semibold text-[#0B1426] line-clamp-1 group-hover:text-amber-600 transition-colors duration-200">
           {shirt.name}
         </h3>
 
         {/* Price Row */}
         <div className="flex items-baseline gap-1.5 flex-wrap">
-          <span className="text-xs sm:text-sm font-black text-slate-950">
+          <span className="text-base sm:text-lg font-bold text-[#0B1426]">
             {formatPrice(shirt.newPrice)}
           </span>
           {shirt.oldPrice > shirt.newPrice && (
-            <span className="text-[10px] sm:text-xs font-semibold text-slate-400 line-through">
+            <span className="text-xs sm:text-sm text-slate-400 line-through font-medium">
               {formatPrice(shirt.oldPrice)}
             </span>
           )}
         </div>
 
         {/* Color Swatches */}
-        <div className="flex items-center gap-1 pt-1 overflow-x-auto no-scrollbar">
+        <div className="pt-2 pb-1 px-1 flex items-center gap-2 overflow-x-auto no-scrollbar">
           {shirt.variants.map((variant, idx) => {
             const isSelected = activeVariant.color === variant.color;
             return (
@@ -90,10 +90,10 @@ export default function SizingPShirtItem({ shirt, handleClick }: SizingPShirtIte
                 key={idx}
                 type="button"
                 onClick={(e) => handleVariantClick(e, variant)}
-                className={`relative cursor-pointer w-4 h-4 sm:w-5 sm:h-5 rounded-full border shrink-0 transition-all ${
+                className={`relative shrink-0 w-7 h-7 rounded-full cursor-pointer transition-all duration-200 p-[2px] ${
                   isSelected
-                    ? "border-amber-500 ring-2 ring-amber-500/20 scale-105"
-                    : "border-slate-300"
+                    ? "ring-2 ring-amber-500 ring-offset-1 scale-105"
+                    : "opacity-75 hover:opacity-100 border border-slate-300"
                 }`}
                 title={variant.color}
               >

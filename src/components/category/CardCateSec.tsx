@@ -28,7 +28,6 @@ export default function CardCateSec({
   const normalize = (str?: string) => (str || "").trim().toLowerCase();
 
   const filteredData = categoryCardImg
-    // Fix: "all" word condition handled here
     .filter((item) => {
       const activeCat = normalize(activeCategory);
       if (!activeCat || activeCat === "all") return true;
@@ -71,14 +70,14 @@ export default function CardCateSec({
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 w-full">
       <div
-        className={`grid gap-6 ${
+        className={`w-full gap-4 ${
           grid === 1
-            ? "grid-cols-1"
+            ? "flex flex-col space-y-4"
             : grid === 2
-            ? "grid-cols-1 sm:grid-cols-2"
-            : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            ? "grid grid-cols-2"
+            : "grid grid-cols-2 sm:grid-cols-3"
         }`}
       >
         {filteredData.slice(0, itemPerPageCard).map((shirt) => (

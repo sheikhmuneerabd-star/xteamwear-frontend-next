@@ -65,7 +65,8 @@ export default function ProductSec({ handleClick, category, currentProductId }: 
   }
 
   return (
-    <section className="mt-12 sm:mt-20 pt-8 sm:pt-10 border-t border-slate-200/80 font-sans px-2 sm:px-0">
+
+    <section className="mt-12 sm:mt-20 pt-8 sm:pt-10 border-t border-slate-200/80 font-sans sm:px-0">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-6">
         <div>

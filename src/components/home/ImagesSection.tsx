@@ -68,7 +68,7 @@ export default function GlobalSquad() {
   if (loading) {
     return (
       <section className="py-12 bg-white">
-        <div className="max-w-[1440px] mx-auto px-6">
+        <div className="max-w-[2560px] mx-auto px-6">
           <div className="h-6 bg-slate-200 rounded-md w-48 mx-auto mb-2 animate-pulse" />
           <div className="h-3 bg-slate-200 rounded-md w-72 mx-auto mb-8 animate-pulse" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -85,7 +85,7 @@ export default function GlobalSquad() {
 
   return (
     <section className="py-12 bg-white text-slate-900 font-sans overflow-hidden border-t border-slate-200">
-      <div className="max-w-[1440px] mx-auto text-center mb-8 px-6">
+      <div className="max-w-[2560px] mx-auto text-center mb-8 px-6">
         <span className="text-[11px] font-bold uppercase tracking-widest text-amber-700 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
           Community & Heritage
         </span>
@@ -97,7 +97,7 @@ export default function GlobalSquad() {
         </p>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
+      <div className="max-w-[2560px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {images.map((src, i) => (
             <div

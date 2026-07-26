@@ -25,6 +25,35 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 }
 
+// TOGGLE popular/isFeatured ya partial fields ke liye PATCH Handler
+export async function PATCH(request: Request, { params }: RouteParams) {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+
+    await connectDB();
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { $set: body },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, product });
+  } catch (error) {
+    console.error("Patch product error:", error);
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+  }
+}
+
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const session = await auth();

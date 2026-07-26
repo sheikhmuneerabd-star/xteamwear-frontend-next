@@ -124,7 +124,7 @@ export default function CategorySection() {
           </aside>
 
           {/* Product Listing Main Area */}
-          <main className="flex-1 w-full bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+          <main className="flex-1 w-full bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
             <RightViewPage
               grid={grid}
               selectHandle={setGrid}
@@ -169,7 +169,7 @@ export default function CategorySection() {
             <h2 className="text-center text-lg font-bold tracking-wider text-gray-900 mb-8 uppercase">
               Recently Viewed Products
             </h2>
-            <div className="w-[85%] max-w-[1100px] mx-auto">
+            <div className="w-[90%] max-w-[2560px] mx-auto">
               <div className="grid grid-cols-1 min-[375px]:grid-cols-2 min-[768px]:grid-cols-3 w-full gap-4">
                 {products.slice(0, 3).map((product) => (
                   <HomePageProductCard

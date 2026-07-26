@@ -10,15 +10,21 @@ export async function GET(request: Request) {
     await connectDB();
 
     if (!query) {
-      const popularProducts = await Product.find({ isFeatured: true })
-        .limit(6)
+      let popularProducts = await Product.find({ isPopular: true })
+        .limit(8)
         .lean();
-        
-      const fallback = popularProducts.length > 0 
-        ? popularProducts 
-        : await Product.find({}).limit(6).lean();
 
-      return NextResponse.json({ success: true, products: fallback });
+      if (popularProducts.length === 0) {
+        popularProducts = await Product.find({ isFeatured: true })
+          .limit(8)
+          .lean();
+
+        if (popularProducts.length === 0) {
+          popularProducts = await Product.find({}).limit(8).lean();
+        }
+      }
+
+      return NextResponse.json({ success: true, products: popularProducts });
     }
 
     const words = query
@@ -31,6 +37,7 @@ export async function GET(request: Request) {
     const buildSearchQuery = (regexList: RegExp[]) => ({
       $or: [
         { title: { $in: regexList } },
+        { name: { $in: regexList } },
         { description: { $in: regexList } },
         { category: { $in: regexList } },
         { subCategory: { $in: regexList } },

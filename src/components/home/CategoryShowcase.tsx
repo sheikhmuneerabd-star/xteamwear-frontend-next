@@ -64,7 +64,7 @@ export default function CategoryShowcase() {
 
   if (loading) {
     return (
-      <div className="py-12 max-w-[1440px] mx-auto px-4">
+      <div className="py-12 max-w-[2560px] mx-auto px-4">
         <div className="w-full h-[480px] bg-slate-200/60 rounded-2xl animate-pulse" />
       </div>
     );
@@ -72,7 +72,7 @@ export default function CategoryShowcase() {
 
   return (
     <section className="py-12 bg-slate-50 text-slate-900 font-sans overflow-hidden border-t border-slate-200">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-xl mx-auto space-y-2 mb-8">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-amber-700 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">

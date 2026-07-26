@@ -48,7 +48,7 @@ export default function OfficialPartnersSection() {
   return (
     <section className="py-14 bg-white text-slate-900 font-sans border-t border-slate-100">
       {/* Top Marquee Section */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="text-center space-y-1 mb-6">
           <p className="text-xs font-bold uppercase tracking-widest text-amber-600">
             Trusted Across Professional Leagues
@@ -78,7 +78,7 @@ export default function OfficialPartnersSection() {
       </div>
 
       {/* Grid Cards Section */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featuredTeams.map((team) => (
             <Link

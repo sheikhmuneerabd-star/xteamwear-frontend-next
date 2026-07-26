@@ -1,22 +1,14 @@
 "use client";
+
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IoIosSearch, IoMdClose } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 import { PiShoppingCartLight, PiUserLight } from "react-icons/pi";
-import { HiMiniBars3 } from "react-icons/hi2";
-import { CgShoppingBag } from "react-icons/cg";
-import { MdOutlineArrowForwardIos } from "react-icons/md";
-import { BsArrowLeft } from "react-icons/bs";
-import { HiOutlineUserCircle } from "react-icons/hi2";
-import { RiUserAddLine } from "react-icons/ri";
-
-import greenShirt from "@/assets/greenShirt.jpg";
-import orangeShirt from "@/assets/orangeShirt.jpg";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
+import MobileNavbar from "./MobileNavbar";
 
 interface CategoryMenuEntry {
   id: number;
@@ -40,27 +32,28 @@ function PopularProductCard({ product, onClick }: { product: any; onClick: () =>
   const displayPrice = product.newPrice ?? product.price ?? 0;
   const oldPrice = product.oldPrice;
   
-  // Pehle variant ki images
   const firstVariant = product.variants?.[0];
-  const mainImage = firstVariant?.images?.[0] || product.image || "/placeholder.png";
-  const hoverImage = firstVariant?.images?.[1] || mainImage;
+  
+  const mainImage = firstVariant?.icon || firstVariant?.images?.[0] || product.image || "/placeholder.png";
+  const hoverImage = firstVariant?.images?.[1] || product.variants?.[1]?.icon || mainImage;
 
-  // Discount percentage calculate karein
-  const discount = oldPrice ? Math.round(((oldPrice - displayPrice) / oldPrice) * 100) : 0;
+  const discount = oldPrice && oldPrice > displayPrice 
+    ? Math.round(((oldPrice - displayPrice) / oldPrice) * 100) 
+    : 0;
 
   return (
     <div className="group flex flex-col justify-center shrink-0 cursor-pointer" onClick={onClick}>
-      <div className="w-full h-[180px] group/img group-hover:-translate-y-2 transition-all duration-300 relative overflow-hidden rounded-sm bg-gray-50">
+      <div className="w-full h-[180px] group/img transition-all duration-300 relative overflow-hidden rounded-sm bg-gray-50">
         <Image
           src={mainImage}
-          alt={product.name}
+          alt={product.name || "Product Image"}
           fill
           sizes="150px"
           className="object-cover opacity-100 group-hover/img:opacity-0 transition-opacity duration-700 ease-in-out"
         />
         <Image
           src={hoverImage}
-          alt={product.name}
+          alt={product.name || "Product Image"}
           fill
           sizes="150px"
           className="object-cover absolute top-0 left-0 opacity-0 group-hover/img:opacity-100 ease-out hover:scale-105 transition-all duration-700"
@@ -71,7 +64,7 @@ function PopularProductCard({ product, onClick }: { product: any; onClick: () =>
           {product.name}
         </span>
         <div className="flex items-baseline gap-2 mt-1">
-          {oldPrice && (
+          {oldPrice && oldPrice > displayPrice && (
             <p className="text-gray-400 font-medium text-[13px] line-through">${oldPrice}</p>
           )}
           <p className="text-[#A9762F] font-semibold text-[14px]">${displayPrice}</p>
@@ -94,56 +87,20 @@ function PopularProductCard({ product, onClick }: { product: any; onClick: () =>
 }
 
 function SearchSuggestions({
-  variant,
+  tags,
+  loadingTags,
+  popularProducts,
+  loadingPopular,
   onSelectTag,
   onProductClick,
 }: {
-  variant: "desktop" | "mobile";
+  tags: string[];
+  loadingTags: boolean;
+  popularProducts: any[];
+  loadingPopular: boolean;
   onSelectTag?: (tag: string) => void;
   onProductClick: (prod: any) => void;
 }) {
-  const [tags, setTags] = useState<string[]>([]);
-  const [loadingTags, setLoadingTags] = useState(true);
-  const [popularProducts, setPopularProducts] = useState<any[]>([]);
-  const [loadingPopular, setLoadingPopular] = useState(true);
-
-  // 1. Backend `/api/categories` se dynamic Subcategories aur Items fetch karein
-  useEffect(() => {
-    async function fetchTrendingTags() {
-      try {
-        const res = await fetch("/api/trending-tags");
-        const data = await res.json();
-        if (data.success && Array.isArray(data.tags)) {
-          setTags(data.tags);
-        }
-      } catch (err) {
-        console.error("Failed to fetch trending tags:", err);
-      } finally {
-        setLoadingTags(false);
-      }
-    }
-
-    fetchTrendingTags();
-  }, []);
-
-  // 2. Backend se popular products fetch karein
-  useEffect(() => {
-    async function fetchPopular() {
-      try {
-        const res = await fetch("/api/products/search?q=");
-        const data = await res.json();
-        if (data.success) {
-          setPopularProducts(data.products || []);
-        }
-      } catch (err) {
-        console.error("Popular Products fetch error", err);
-      } finally {
-        setLoadingPopular(false);
-      }
-    }
-    fetchPopular();
-  }, []);
-
   const wrapClass = "flex flex-wrap gap-2 pt-4";
 
   return (
@@ -205,18 +162,8 @@ function SearchSuggestions({
 export default function Navbar() {
   const [focus, setFocus] = useState(false);
   const [searchFocus, setSearchFocus] = useState(false);
-  const [toggle, setToggle] = useState(false);
-  const menuSideBar = useRef<HTMLDivElement>(null);
-  const [activeMenu, setActiveMenu] = useState<number | null>(null);
-  const [activeCategory, setActiveCategory] = useState<number | null>(null);
-  const [openMenu, setOpenMenu] = useState(true);
-  const [openCategory, setOpenCategory] = useState(false);
-  const [openSearch, setOpenSearch] = useState(false);
-  const searchSideBar = useRef<HTMLDivElement>(null);
 
-  // Desktop search wrapper ref for click-outside detection
   const searchContainerRef = useRef<HTMLDivElement>(null);
-
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -225,6 +172,52 @@ export default function Navbar() {
 
   const [logoUrl, setLogoUrl] = useState("");
 
+  // States for Trending Tags and Popular Products (Shared across Desktop & Mobile)
+  const [trendingTags, setTrendingTags] = useState<string[]>([]);
+  const [loadingTags, setLoadingTags] = useState(true);
+  const [popularProducts, setPopularProducts] = useState<any[]>([]);
+  const [loadingPopular, setLoadingPopular] = useState(true);
+
+  // Fetch Trending Tags
+  useEffect(() => {
+    async function fetchTrendingTags() {
+      try {
+        const res = await fetch("/api/trending-tags");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.tags)) {
+          setTrendingTags(data.tags);
+        }
+      } catch (err) {
+        console.error("Failed to fetch trending tags:", err);
+      } finally {
+        setLoadingTags(false);
+      }
+    }
+    fetchTrendingTags();
+  }, []);
+
+  // Fetch Popular Products
+  useEffect(() => {
+    async function fetchPopular() {
+      try {
+        const res = await fetch("/api/popular-products");
+        const data = await res.json();
+        if (data.success && data.products) {
+          setPopularProducts(data.products);
+        } else {
+          setPopularProducts([]);
+        }
+      } catch (err) {
+        console.error("Popular Products fetch error", err);
+        setPopularProducts([]);
+      } finally {
+        setLoadingPopular(false);
+      }
+    }
+    fetchPopular();
+  }, []);
+
+  // Fetch Settings Logo
   useEffect(() => {
     async function fetchSettings() {
       try {
@@ -245,7 +238,7 @@ export default function Navbar() {
   const { data: session, status } = useSession();
   const isAdmin = session?.user?.role === "admin";
 
-  // Handle Outside Click for Search Box Dropdown
+  // Handle Outside Click for Search Box
   useEffect(() => {
     function handleClickOutsideSearch(event: MouseEvent) {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
@@ -257,103 +250,62 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutsideSearch);
   }, []);
 
+  // Handle Outside Click for Account Dropdown
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuSideBar.current && !menuSideBar.current.contains(event.target as Node)) {
-        setToggle(false);
-        setActiveMenu(null);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchSideBar.current && !searchSideBar.current.contains(event.target as Node)) {
-        setOpenSearch(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = openSearch ? "hidden" : "";
-  }, [openSearch]);
-
-  useEffect(() => {
-    document.body.style.overflow = toggle ? "hidden" : "";
-  }, [toggle]);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutsideAccount(event: MouseEvent) {
       if (accountBoxRef.current && !accountBoxRef.current.contains(event.target as Node)) {
         setAccountOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutsideAccount);
+    return () => document.removeEventListener("mousedown", handleClickOutsideAccount);
   }, []);
 
-  const handleMenu = () => {
-    setOpenCategory(false);
-    setOpenMenu(true);
-  };
-  const handleCategory = () => {
-    setOpenMenu(false);
-    setOpenCategory(true);
-  };
-
+  // Search API fetch on Query Change
   useEffect(() => {
-      const fetchSearchResults = async () => {
-        if (!searchQuery.trim()) {
-          setSearchResults([]);
-          return;
+    const fetchSearchResults = async () => {
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery)}`);
+        const data = await res.json();
+        if (data.success) {
+          setSearchResults(data.products);
         }
-        setIsLoading(true);
-        try {
-          const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery)}`);
-          const data = await res.json();
-          if (data.success) {
-            setSearchResults(data.products);
-          }
-        } catch (error) {
-          console.error("Search Error:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
+      } catch (error) {
+        console.error("Search Error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      const timer = setTimeout(() => {
-        fetchSearchResults();
-      }, 300);
+    const timer = setTimeout(() => {
+      fetchSearchResults();
+    }, 300);
 
-      return () => clearTimeout(timer);
-    }, [searchQuery]);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-    // Safe navigation helper
-    const handleProductClick = (prod: any) => {
+  // Dynamic Route Navigation
+  const handleProductClick = (prod: any) => {
     setSearchFocus(false);
     setFocus(false);
-    setOpenSearch(false);
 
-    // Default color pehle variant se lenge, agar na ho toh "default"
     const defaultColor = prod.variants?.[0]?.color || "default";
-    
-    // Encoded URL formatting for color name (e.g. spaces handle karne ke liye)
     const encodedColor = encodeURIComponent(defaultColor);
 
-    // Aapke folder structure ke mutabiq route:
     router.push(`/card/${prod._id}/${encodedColor}`);
   };
 
   return (
     <div>
-      {/* ================= Desktop ================= */}
+      {/* ================= Desktop Navigation ================= */}
       <div className="w-full xl:flex hidden border-b border-[#E6E1D6] bg-white">
         <div className="w-[91%] h-[100px] mx-auto flex items-center justify-between">
-          {/* Wordmark */}
+          {/* Brand / Logo */}
           <Link href="/" className="cursor-pointer shrink-0">
             {logoUrl ? (
               <Image className="w-[80%] h-auto" src={logoUrl} alt="BeSpoke Wear" width={160} height={60} />
@@ -362,7 +314,7 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* Search Wrapper with Ref */}
+          {/* Search Bar & Suggestions */}
           <div className="flex flex-col w-[34%] mr-10 relative" ref={searchContainerRef}>
             <div
               className={`flex items-center h-[46px] rounded-full bg-[#FAF8F3] border transition-all duration-300 pl-4 pr-1 ${
@@ -415,13 +367,13 @@ export default function Navbar() {
                       return (
                         <div
                           key={prod._id}
-                          onClick={() => handleProductClick(prod)} // Pure prod object ko pass kiya
+                          onClick={() => handleProductClick(prod)}
                           className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#FAF8F3] transition-colors group cursor-pointer"
                         >
                           <div className="w-[45px] h-[45px] relative rounded overflow-hidden border border-[#E6E1D6] shrink-0 bg-gray-50">
                             <Image
                               src={displayImage}
-                              alt={prod.name}
+                              alt={prod.name || "Product"}
                               fill
                               className="object-cover"
                             />
@@ -450,12 +402,20 @@ export default function Navbar() {
                     No products found for "{searchQuery}"
                   </p>
                 ) : (
-                  <SearchSuggestions variant="desktop" onSelectTag={(tag) => setSearchQuery(tag)} onProductClick={(prod) => handleProductClick(prod)} />
+                  <SearchSuggestions 
+                    tags={trendingTags}
+                    loadingTags={loadingTags}
+                    popularProducts={popularProducts}
+                    loadingPopular={loadingPopular}
+                    onSelectTag={(tag) => setSearchQuery(tag)} 
+                    onProductClick={(prod) => handleProductClick(prod)} 
+                  />
                 )}
               </div>
             )}
           </div>
 
+          {/* Cart & User Action Buttons */}
           <div className="flex gap-4 items-center">
             <Link href="/cart" className="flex items-center gap-2.5 group cursor-pointer pr-4 border-r border-[#E6E1D6]">
               <div className="relative w-[42px] h-[42px] rounded-full border border-[#E6E1D6] group-hover:border-[#A9762F] flex items-center justify-center transition-colors duration-200">
@@ -522,210 +482,18 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ================= Mobile ================= */}
-      <div className="fixed top-0 left-0 right-0 z-[999] shadow-sm shadow-gray-200 transition-all duration-200 w-full h-[54px] bg-white xl:hidden flex">
-        {(openSearch || toggle) && (
-          <div
-            className="fixed inset-0 bg-[#0B1E3D]/40 z-40"
-            onClick={() => {
-              setOpenSearch(false);
-              setToggle(false);
-            }}
-          />
-        )}
-        <div className="w-[97%] flex items-center justify-between mx-auto">
-          <div className="flex items-center gap-5">
-            <div className="relative">
-              <HiMiniBars3 className="text-3xl text-[#0B1E3D]" onClick={() => setToggle(!toggle)} />
-              <div
-                className={`fixed overflow-scroll top-0 left-0 bg-white md:w-[370px] max-[320px]:w-[300px] w-[340px] h-full z-50 transition-all duration-300 ${
-                  toggle ? "translate-x-0" : "-translate-x-full"
-                }`}
-                ref={menuSideBar}
-              >
-                <div className="p-4 flex justify-between items-center border-b border-[#E6E1D6]">
-                  <div className="flex gap-5">
-                    <h1
-                      className={`text-[15px] tracking-wide font-semibold uppercase transition-all duration-300 ${
-                        openMenu ? "text-[#0B1E3D]" : "text-[#0B1E3D]/35"
-                      }`}
-                      onClick={handleMenu}
-                    >
-                      Menu
-                    </h1>
-                    <h1
-                      className={`text-[15px] tracking-wide font-semibold uppercase transition-all duration-300 ${
-                        openCategory ? "text-[#0B1E3D]" : "text-[#0B1E3D]/35"
-                      }`}
-                      onClick={handleCategory}
-                    >
-                      Category
-                    </h1>
-                  </div>
-                  <IoMdClose className="text-[24px] text-[#0B1E3D]" onClick={() => setToggle(false)} />
-                </div>
-
-                <div>
-                  <div className={openMenu ? "block" : "hidden"}>
-                    <Link href="/" className="flex text-[16px] items-center justify-between border-b border-[#E6E1D6] p-4">
-                      <h2 className="font-medium text-[#0B1E3D]">Home</h2>
-                    </Link>
-                    {categoriesMenu.map((cate) => (
-                      <div key={cate.id} className="relative">
-                        <div
-                          className="flex text-[16px] items-center justify-between border-b border-[#E6E1D6] p-4"
-                          onClick={() => setActiveMenu(cate.id)}
-                        >
-                          <h2 className="font-medium text-[#0B1E3D]">{cate.name}</h2>
-                          <MdOutlineArrowForwardIos className="text-[#A9762F] text-[13px]" />
-                        </div>
-                        <div
-                          className={`fixed overflow-scroll top-0 left-0 h-full w-[370px] bg-white z-50 transition-all duration-200 ${
-                            activeMenu === cate.id ? "translate-x-0" : "-translate-x-full"
-                          }`}
-                        >
-                          <div className="bg-[#FAF8F3] border-b border-[#E6E1D6]">
-                            <div className="flex font-medium justify-between p-4 items-center w-[225px]">
-                              <BsArrowLeft className="text-[22px] text-[#0B1E3D]" onClick={() => setActiveMenu(null)} />
-                              <h2 className="text-[#0B1E3D]">{cate.name}</h2>
-                            </div>
-                          </div>
-                          <div>
-                            {cate.items.map((item, index) => (
-                              <div className="text-[14.5px] text-[#0B1E3D]/80 border-b border-[#E6E1D6] p-4" key={index}>
-                                {item}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className={openCategory ? "block" : "hidden"}>
-                    {categoriesCategory.map((cateCate) => (
-                      <div key={cateCate.id} className="relative">
-                        <Link
-                          href={`/category/${encodeURIComponent(cateCate.name)}`}
-                          className="flex text-[16px] items-center justify-between border-b border-[#E6E1D6] p-4"
-                          onClick={() => setActiveCategory(cateCate.id)}
-                        >
-                          <h2 className="font-medium text-[#0B1E3D]">{cateCate.name}</h2>
-                          <MdOutlineArrowForwardIos className="text-[#A9762F] text-[13px]" />
-                        </Link>
-                        <div
-                          className={`fixed overflow-scroll top-0 left-0 h-full w-[370px] bg-white z-50 transition-all duration-200 ${
-                            activeCategory === cateCate.id ? "translate-x-0" : "-translate-x-full"
-                          }`}
-                        >
-                          <div className="bg-[#FAF8F3] border-b border-[#E6E1D6]">
-                            <div className="flex font-medium justify-between p-4 items-center w-[225px]">
-                              <BsArrowLeft className="text-[22px] text-[#0B1E3D]" onClick={() => setActiveCategory(null)} />
-                              <h2 className="text-[#0B1E3D]">{cateCate.name}</h2>
-                            </div>
-                          </div>
-                          <div>
-                            {cateCate.items.map((item, index) => (
-                              <div key={index} className="text-[14.5px] text-[#0B1E3D]/80 border-b border-[#E6E1D6] p-4">
-                                {item}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div>
-                    {status === "authenticated" ? (
-                      <>
-                        <div className="flex gap-2 items-center p-4 border-b border-[#E6E1D6]">
-                          <HiOutlineUserCircle className="text-[22px] text-[#A9762F]" />
-                          <span className="text-[15px] text-[#0B1E3D]">Hi, {session.user?.name?.split(" ")[0]}</span>
-                        </div>
-                        <button
-                          type="button"
-                          className="w-full flex gap-2 items-center p-4 border-b border-[#E6E1D6] text-left"
-                          onClick={() => signOut({ callbackUrl: "/" })}
-                        >
-                          <RiUserAddLine className="text-[22px] text-[#A9762F]" />
-                          <span className="text-[15px] text-[#0B1E3D]">Sign Out</span>
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <Link href="/sign-in" className="flex gap-2 items-center p-4 border-b border-[#E6E1D6]">
-                          <HiOutlineUserCircle className="text-[22px] text-[#A9762F]" />
-                          <span className="text-[15px] text-[#0B1E3D]">Sign In</span>
-                        </Link>
-                        <Link href="/sign-in" className="flex gap-2 items-center p-4 border-b border-[#E6E1D6]">
-                          <RiUserAddLine className="text-[22px] text-[#A9762F]" />
-                          <span className="text-[15px] text-[#0B1E3D]">Create an account</span>
-                        </Link>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <IoIosSearch className="text-[26px] text-[#0B1E3D]" onClick={() => setOpenSearch(true)} />
-
-            <div className="relative">
-              <div
-                className={`bg-white fixed top-0 left-0 md:w-[370px] max-[320px]:w-[300px] w-[340px] h-full z-50 transition-all duration-300 ${
-                  openSearch ? "translate-x-0" : "-translate-x-full"
-                }`}
-                ref={searchSideBar}
-              >
-                <div className="px-4 py-4 flex justify-between items-center border-b border-[#E6E1D6]">
-                  <h2 className="font-medium text-[16px] text-[#0B1E3D]">Search</h2>
-                  <IoMdClose className="text-[24px] text-[#0B1E3D]" onClick={() => setOpenSearch(false)} />
-                </div>
-                <div className="px-4 py-4">
-                  <div className="flex items-center gap-2 border-b-[1.5px] border-[#0B1E3D]/15 focus-within:border-[#A9762F] transition-colors duration-300 pb-2">
-                    <IoSearch className="text-[17px] text-[#0B1E3D]/50" />
-                    <input
-                      className="w-full h-full outline-none text-[14.5px] bg-transparent placeholder-[#0B1E3D]/40 text-[#0B1E3D]"
-                      type="text"
-                      placeholder="Search the store..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onFocus={() => {
-                        setFocus(true);
-                        setSearchFocus(true);
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="px-4 py-2 overflow-y-scroll h-[280px] mt-1">
-                  <SearchSuggestions variant="mobile" onSelectTag={(tag) => setSearchQuery(tag)} onProductClick={(prod) => handleProductClick(prod)} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Link href="/" className="cursor-pointer">
-            <div className="md:w-[16%] w-[34%]">
-              {logoUrl ? (
-                <Image className="w-[80%] h-auto" src={logoUrl} alt="BeSpoke Wear" width={160} height={60} />
-              ) : (
-                <span className="font-serif text-lg text-[#0B1E3D]">BeSpoke Wear</span>
-              )}
-            </div>
-          </Link>
-
-          <div className="flex items-center gap-5 mr-2">
-            <PiUserLight className="text-[24px] text-[#0B1E3D]" />
-            <Link href="/cart" className="relative">
-              <span className="absolute -top-[8px] -right-[9px] text-[11px] bg-[#A9762F] text-white w-5 h-5 flex justify-center items-center rounded-full">
-                {cart.length}
-              </span>
-              <CgShoppingBag className="text-[24px] text-[#0B1E3D]" />
-            </Link>
-          </div>
-        </div>
-      </div>
+      {/* ================= Mobile Navigation Component ================= */}
+      <MobileNavbar 
+        categoriesCategory={categoriesCategory} 
+        categoriesMenu={categoriesMenu}
+        popularProducts={popularProducts}
+        trendingTags={trendingTags}
+        logoUrl={logoUrl}
+        cart={cart}
+        status={status}
+        session={session}
+        signOut={signOut}
+      />
     </div>
   );
 }

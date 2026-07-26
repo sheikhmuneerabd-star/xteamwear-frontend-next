@@ -10,7 +10,7 @@ interface CateShirtCardProps {
 
 export default function CateShirtCard({ shirt, grid }: CateShirtCardProps) {
   return (
-    <div className="shirt2">
+    <div className="shirt2 w-full">
       <HomePageProductCard product={shirt} layout={grid === 1 ? "list" : "grid"} />
     </div>
   );

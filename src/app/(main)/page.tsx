@@ -52,14 +52,14 @@ export default function HomePage() {
 
       {/* 2. ADVANTAGES GRID (Factory / Features) */}
       <section className="w-full bg-slate-50/80 py-12 sm:py-16 border-y border-slate-100">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <FactoryCard />
         </div>
       </section>
 
       {/* 3. LATEST HOT PRODUCTS */}
       <section className="w-full bg-white py-16 sm:py-24">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2560px] mx-auto sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-slate-200">
             <div>
               <span className="text-[11px] font-black uppercase tracking-widest text-amber-600 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
@@ -100,42 +100,42 @@ export default function HomePage() {
 
       {/* 4. ELITE COLLECTION BANNER (Now Light Boxed Layout) */}
       <section className="w-full bg-slate-50 py-16 sm:py-20 border-y border-slate-100">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <EliteCollectionBanner />
         </div>
       </section>
 
       {/* 5. PRO TEAM SPOTLIGHT (LIGHT BACKGROUND) */}
       <section className="w-full bg-white py-16 sm:py-24">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <OfficialPartnersSection />
         </div>
       </section>
 
       {/* 6. CURATED CATEGORIES (LIGHT BACKGROUND) */}
       <section className="w-full bg-slate-50/80 py-16 sm:py-24 border-y border-slate-100">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <CategoryShowcase />
         </div>
       </section>
 
       {/* 7. JOIN THE GLOBAL SQUAD (LIGHT BACKGROUND) */}
       <section className="w-full bg-white py-16 sm:py-24">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <ImagesSection />
         </div>
       </section>
 
       {/* 8. TESTIMONIALS & REVIEWS (LIGHT BACKGROUND) */}
       <section className="w-full bg-slate-50/80 py-16 sm:py-24 border-y border-slate-100">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <TestimonialSlider />
         </div>
       </section>
 
       {/* 9. BRAND PROMISE & GUARANTEE */}
       <section className="w-full bg-white py-16 sm:py-20">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <PromiseSection />
         </div>
       </section>

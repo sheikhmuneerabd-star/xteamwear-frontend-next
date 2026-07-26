@@ -12,12 +12,14 @@ interface AdminProduct {
   newPrice: number;
   category: string;
   available: boolean;
+  isPopular?: boolean; // <-- Popular property added
   variants: { color: string; icon: string; images: string[]; sku: string; stock: number }[];
 }
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -30,6 +32,40 @@ export default function AdminProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Popular Status Toggle karne ka Handler
+  const handleTogglePopular = async (id: string, currentStatus: boolean) => {
+    setUpdatingId(id);
+    const newStatus = !currentStatus;
+
+    // Optimistic UI Update (Turant screen par change ho jayega)
+    setProducts((prev) =>
+      prev.map((p) => (p._id === id ? { ...p, isPopular: newStatus } : p))
+    );
+
+    try {
+      const res = await fetch(`/api/products/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPopular: newStatus }),
+      });
+
+      if (!res.ok) {
+        // Revert back if API failed
+        setProducts((prev) =>
+          prev.map((p) => (p._id === id ? { ...p, isPopular: currentStatus } : p))
+        );
+        alert("Failed to update popular status");
+      }
+    } catch (err) {
+      console.error(err);
+      setProducts((prev) =>
+        prev.map((p) => (p._id === id ? { ...p, isPopular: currentStatus } : p))
+      );
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
@@ -57,7 +93,10 @@ export default function AdminProductsPage() {
       {loading ? (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 animate-pulse">
+            <div
+              key={i}
+              className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 animate-pulse"
+            >
               <div className="w-12 h-12 bg-gray-200 rounded" />
               <div className="flex-1 space-y-2">
                 <div className="h-3 bg-gray-200 rounded w-1/3" />
@@ -77,6 +116,7 @@ export default function AdminProductsPage() {
                 <th className="p-3">Name</th>
                 <th className="p-3">Category</th>
                 <th className="p-3">Price</th>
+                <th className="p-3">Popular</th>
                 <th className="p-3">Available</th>
                 <th className="p-3">Actions</th>
               </tr>
@@ -98,15 +138,42 @@ export default function AdminProductsPage() {
                   <td className="p-3 max-w-[250px] truncate">{product.name}</td>
                   <td className="p-3">{product.category}</td>
                   <td className="p-3">{formatPrice(product.newPrice)}</td>
+
+                  {/* POPULAR TOGGLE COLUMN */}
+                  <td className="p-3">
+                    <button
+                      type="button"
+                      disabled={updatingId === product._id}
+                      onClick={() =>
+                        handleTogglePopular(product._id, !!product.isPopular)
+                      }
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                        product.isPopular
+                          ? "bg-amber-100 text-amber-800 border border-amber-300"
+                          : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          product.isPopular ? "bg-amber-500" : "bg-gray-400"
+                        }`}
+                      />
+                      {product.isPopular ? "Popular" : "Normal"}
+                    </button>
+                  </td>
+
                   <td className="p-3">
                     <span
                       className={`px-2 py-1 rounded text-xs ${
-                        product.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        product.available
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
                       }`}
                     >
                       {product.available ? "In Stock" : "Out of Stock"}
                     </span>
                   </td>
+
                   <td className="p-3 flex gap-2">
                     <Link
                       href={`/admin/products/${product._id}/edit`}
@@ -117,7 +184,7 @@ export default function AdminProductsPage() {
                     <button
                       type="button"
                       onClick={() => handleDelete(product._id)}
-                      className="text-sm bg-red-50 text-red-700 hover:bg-red-100 px-3 py-1.5 rounded-md font-medium transition-colors duration-150"
+                      className="text-sm cursor-pointer bg-red-50 text-red-700 hover:bg-red-100 px-3 py-1.5 rounded-md font-medium transition-colors duration-150"
                     >
                       Delete
                     </button>

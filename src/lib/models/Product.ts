@@ -15,7 +15,8 @@ export interface IProduct extends Document {
   category: string;
   subCategory?: string;
   item?: string;
-  tags?: string[]; // <--- Yeh TypeScript Interface mein add hona zaroori tha
+  tags?: string[];
+  isPopular?: boolean;
   available: boolean;
   variants: IProductVariant[];
   createdAt: Date;
@@ -41,6 +42,7 @@ const ProductSchema = new Schema<IProduct>(
     subCategory: { type: String, trim: true },
     item: { type: String, trim: true },
     tags: { type: [String], default: [] },
+    isPopular: { type: Boolean, default: false },
     available: { type: Boolean, default: true },
     variants: { type: [ProductVariantSchema], required: true },
   },

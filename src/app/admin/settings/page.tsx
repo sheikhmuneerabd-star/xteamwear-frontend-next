@@ -46,6 +46,15 @@ interface CategoryShowcaseItem {
   tag?: string;
 }
 
+interface ProductItem {
+  _id: string;
+  title?: string;
+  name?: string;
+  images?: string[];
+  image?: string;
+  price?: number;
+}
+
 const emptySlide: HeroSlide = { imageDesktop: "", imageMobile: "" };
 const emptyAdvantage: Advantage = { image: "", title: "" };
 const emptyPost: SocialPost = { image: "", caption: "", link: "" };
@@ -85,15 +94,27 @@ export default function SiteSettingsPage() {
   const [trendingTags, setTrendingTags] = useState<string[]>([]);
   const [newTagInput, setNewTagInput] = useState("");
 
+  // Popular Products States
+  const [allProducts, setAllProducts] = useState<ProductItem[]>([]);
+  const [selectedPopularProductIds, setSelectedPopularProductIds] = useState<string[]>([]);
+
   const [bespokeBanner, setBespokeBanner] = useState<BespokeBanner>(defaultBespokeBanner);
   const [categoriesShowcase, setCategoriesShowcase] = useState<CategoryShowcaseItem[]>(initialCategories);
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" });
-        const data = await res.json();
-        
+        // Fetch site settings and available products concurrently
+        const [settingsRes, prodRes] = await Promise.all([
+          fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" }),
+          fetch(`/api/products/search?q=`),
+        ]);
+
+        const data = await settingsRes.json();
+        const prodData = await prodRes.json();
+
+        setAllProducts(prodData.products || []);
+
         const settings = data.settings || data;
 
         setLogo(settings?.logo || "");
@@ -102,6 +123,12 @@ export default function SiteSettingsPage() {
         setAdvantages(settings?.advantages?.length ? settings.advantages : [emptyAdvantage]);
         setSocialPosts(settings?.socialPosts?.length ? settings.socialPosts : [emptyPost]);
         setTrendingTags(settings?.trendingTags || []);
+
+        // Load pre-selected Popular Products IDs
+        if (settings?.popularProducts && Array.isArray(settings.popularProducts)) {
+          const ids = settings.popularProducts.map((p: any) => (typeof p === "object" ? p._id : p));
+          setSelectedPopularProductIds(ids);
+        }
 
         if (settings?.bespokeBanner) {
           setBespokeBanner(settings.bespokeBanner);
@@ -179,6 +206,15 @@ export default function SiteSettingsPage() {
     });
   };
 
+  // Toggle selection for popular products
+  const togglePopularProduct = (productId: string) => {
+    setSelectedPopularProductIds((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setMessage("");
@@ -196,6 +232,7 @@ export default function SiteSettingsPage() {
           bespokeBanner,
           trendingTags,
           categoriesShowcase,
+          popularProducts: selectedPopularProductIds,
         }),
       });
 
