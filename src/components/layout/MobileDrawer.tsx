@@ -19,7 +19,7 @@ export interface DbCategory {
   name: string;
   order?: number;
   subcategories?: DbSubcategory[];
-  subCategories?: DbSubcategory[]; // Fallback for naming variations
+  subCategories?: DbSubcategory[];
   items?: string[];
 }
 
@@ -57,10 +57,12 @@ export default function MobileDrawer({
     onClose();
   };
 
-  // Safe helper to handle both 'subcategories' and 'subCategories'
   const getSubcategories = (cat: DbCategory): DbSubcategory[] => {
     return cat.subcategories || cat.subCategories || [];
   };
+
+  // Dedicated data fallback - if categoriesMenu is not supplied, use main categories list for Menu
+  const effectiveMenuList = categoriesMenu.length > 0 ? categoriesMenu : categoriesCategory;
 
   return (
     <>
@@ -125,10 +127,11 @@ export default function MobileDrawer({
         {/* Dynamic Multi-level Navigation Body */}
         <div className="relative flex-1 overflow-hidden">
           
-          {/* LEVEL 1: Main View (Category / Menu) */}
+          {/* LEVEL 1: Main View */}
           <div className="h-full overflow-y-auto divide-y divide-gray-100 pb-24">
             {activeTab === "menu" ? (
               <>
+                {/* Standard Main Links for MENU Tab */}
                 <Link
                   href="/"
                   onClick={resetAndClose}
@@ -137,13 +140,12 @@ export default function MobileDrawer({
                   Home
                 </Link>
 
-                {/* Display Navbar Menu Links */}
-                {(categoriesMenu.length > 0 ? categoriesMenu : categoriesCategory).map((cat, i) => {
+                {effectiveMenuList.map((cat, i) => {
                   const subs = getSubcategories(cat);
                   const hasSub = subs.length > 0;
 
                   return (
-                    <div key={cat._id || i}>
+                    <div key={cat._id || cat.id || i}>
                       {hasSub ? (
                         <div
                           onClick={() => setActiveCategory(cat)}
@@ -182,12 +184,13 @@ export default function MobileDrawer({
                 </Link>
               </>
             ) : (
+              /* CATEGORIES Tab Render */
               categoriesCategory.map((cat, idx) => {
                 const subs = getSubcategories(cat);
                 const hasSub = subs.length > 0;
 
                 return (
-                  <div key={cat._id || idx}>
+                  <div key={cat._id || cat.id || idx}>
                     {hasSub ? (
                       <div
                         onClick={() => setActiveCategory(cat)}

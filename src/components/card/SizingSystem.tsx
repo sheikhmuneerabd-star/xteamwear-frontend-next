@@ -12,6 +12,8 @@ import {
 import { TbTruckDelivery, TbShirtFilled } from "react-icons/tb";
 import { HiPlus, HiTrash, HiOutlineSparkles, HiXMark } from "react-icons/hi2";
 
+import { useRouter } from "next/navigation";
+
 import sponserPosition from "@/assets/sponserPosition/sponserPosition.webp";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types/product";
@@ -51,6 +53,7 @@ const emptyForm: SizingFormData = {
 
 export default function SizingSystem({ product, selectedColor, setSelectedColor }: SizingSystemProps) {
   const { addToCart } = useCart();
+  const router = useRouter();
 
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
@@ -127,6 +130,8 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
     showToast("Product added to your roster cart successfully!", "success");
     setFormData(emptyForm);
     setPreview(null);
+
+    router.push("/cart");
   };
 
   return (
