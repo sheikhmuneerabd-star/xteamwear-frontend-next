@@ -14,9 +14,12 @@ interface ProductsDetailsDemoProps {
 }
 
 export default function ProductsDetailsDemo({ item, onIncrease, onDecrease, onRemove }: ProductsDetailsDemoProps) {
-  const variant = item.variants.find((v) => v.color === item.color) ?? item.variants[0];
+  const variant = item.variants?.find((v) => v.color === item.color) ?? item.variants?.[0];
   const lineTotal = item.newPrice * item.qty;
   const sizing = item.sizingDetailData;
+
+  // Safe Logo Extraction
+  const logoUrl = sizing?.logo || (sizing as any)?.sponsorLogo || (sizing as any)?.logoUrl || "";
 
   return (
     <div className="border-b border-gray-200 flex flex-col lg:flex-row items-start lg:items-center py-5 gap-4">
@@ -35,11 +38,21 @@ export default function ProductsDetailsDemo({ item, onIncrease, onDecrease, onRe
 
           {/* Sizing & Custom Details */}
           {sizing && (
-            <div className="pt-1 text-[13px] text-gray-600 space-y-0.5">
+            <div className="pt-1 text-[13px] text-gray-600 space-y-1">
               {sizing.teamName && <p><span className="font-medium text-gray-800">Team Name:</span> {sizing.teamName}</p>}
               {sizing.playerNumberOption && <p><span className="font-medium text-gray-800">Player Number Option:</span> {sizing.playerNumberOption}</p>}
               {sizing.sponsorOption && <p><span className="font-medium text-gray-800">Sponsor Option:</span> {sizing.sponsorOption}</p>}
               {sizing.sponsorLocation && <p><span className="font-medium text-gray-800">Sponsor Location:</span> {sizing.sponsorLocation}</p>}
+              
+              {/* UPLOADED LOGO PREVIEW IN CART ITEM */}
+              {logoUrl && (
+                <div className="flex items-center gap-2 my-1.5 p-1.5 bg-gray-50 border border-gray-200 rounded-lg w-fit">
+                  <span className="font-medium text-gray-800 text-xs">Uploaded Logo:</span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={logoUrl} alt="Team Logo" className="w-8 h-8 object-contain rounded bg-white p-0.5 border" />
+                </div>
+              )}
+
               {sizing.note && <p><span className="font-medium text-gray-800">Requirements:</span> {sizing.note}</p>}
               {sizing.players?.length > 0 && <p><span className="font-medium text-gray-800">Number Of Players:</span> {sizing.players.length}</p>}
               {sizing.players?.map((player, i) => (
@@ -65,7 +78,7 @@ export default function ProductsDetailsDemo({ item, onIncrease, onDecrease, onRe
         <div className="border border-gray-300 rounded flex justify-between items-center w-[100px] h-[38px] shrink-0 bg-white">
           <button
             type="button"
-            className="w-full h-full flex items-center justify-center text-lg hover:bg-gray-100 text-gray-600 transition-colors"
+            className="w-full h-full flex items-center cursor-pointer justify-center text-lg hover:bg-gray-100 text-gray-600 transition-colors"
             onClick={() => item.qty > 1 && onDecrease(item.id, item.color)}
           >
             -
@@ -73,7 +86,7 @@ export default function ProductsDetailsDemo({ item, onIncrease, onDecrease, onRe
           <div className="w-full h-full flex items-center justify-center text-sm font-semibold">{item.qty}</div>
           <button
             type="button"
-            className="w-full h-full flex items-center justify-center text-md hover:bg-gray-100 text-gray-600 transition-colors"
+            className="w-full h-full flex items-center cursor-pointer justify-center text-md hover:bg-gray-100 text-gray-600 transition-colors"
             onClick={() => onIncrease(item.id, item.color)}
           >
             +

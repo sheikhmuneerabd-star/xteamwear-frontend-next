@@ -100,7 +100,7 @@ export default function CardPage() {
   }
 
   return (
-    <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-[2560px] xl:mt-0 mt-[56px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Breadcrumb Header */}
       <LinkBar productName={product.name} />
 

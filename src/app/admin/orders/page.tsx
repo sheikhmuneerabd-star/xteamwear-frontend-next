@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatPrice } from "@/lib/formatPrice";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 
@@ -97,7 +98,7 @@ export default function AdminOrdersPage() {
                   <td className="p-3">
                     {order.items.length} item{order.items.length > 1 ? "s" : ""}
                   </td>
-                  <td className="p-3">Rs.{order.total.toLocaleString("en-PK")}</td>
+                  <td className="p-3">{formatPrice(order.total)}</td>
                   <td className="p-3">
                     <span className={`px-2 py-1 rounded text-xs capitalize ${statusColors[order.status]}`}>
                       {order.status}

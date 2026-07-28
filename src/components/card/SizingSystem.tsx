@@ -7,7 +7,6 @@ import {
   IoCloudUploadOutline, 
   IoShirtOutline, 
   IoCheckmarkCircle,
-  IoInformationCircleOutline,
   IoAlertCircle
 } from "react-icons/io5";
 import { TbTruckDelivery, TbShirtFilled } from "react-icons/tb";
@@ -53,14 +52,12 @@ const emptyForm: SizingFormData = {
 export default function SizingSystem({ product, selectedColor, setSelectedColor }: SizingSystemProps) {
   const { addToCart } = useCart();
 
-  // Custom Toast State (Alert Replacement)
   const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
   const showToast = (message: string, type: "error" | "success" = "error") => {
     setToast({ message, type });
   };
 
-  // Auto hide toast after 4 seconds
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 4000);
@@ -68,24 +65,19 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
     }
   }, [toast]);
 
-  // Mode Selection
   const [decorationMode, setDecorationMode] = useState<"standard" | "bespoke">("standard");
 
-  // Step 2 Customization Options Toggles
   const [teamNameOpen, setTeamNameOpen] = useState(false);
   const [playerNumberOpen, setPlayerNumberOpen] = useState(false);
   const [logoOpen, setLogoOpen] = useState(false);
   const [sponsorOpen, setSponsorOpen] = useState(false);
 
-  // Logo Upload State
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Form State
   const [formData, setFormData] = useState<SizingFormData>(emptyForm);
 
-  // Handle Player Row Updates
   const handlePlayerChange = (index: number, field: keyof PlayerRow, value: string) => {
     setFormData((prev) => {
       const updated = [...prev.players];
@@ -123,7 +115,6 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
       return;
     }
 
-    // Validate player entries
     for (let i = 0; i < formData.players.length; i++) {
       const p = formData.players[i];
       if (!p.size) {
@@ -328,13 +319,26 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
                   <label className="text-[11px] font-bold uppercase text-slate-600">Upload Vector / High-Res Crest</label>
                   <div
                     onClick={() => fileRef.current?.click()}
-                    className="h-20 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center bg-white cursor-pointer hover:border-amber-500 transition-colors relative overflow-hidden"
+                    className="h-24 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center bg-white cursor-pointer hover:border-amber-500 transition-colors relative overflow-hidden"
                   >
                     {uploadingLogo ? (
                       <span className="text-xs font-bold text-slate-400">Uploading Crest...</span>
-                    ) : preview ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={preview} alt="Logo preview" className="h-full w-full object-contain p-2" />
+                    ) : preview || formData.logo ? (
+                      <div className="relative w-full h-full p-2 flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={preview || formData.logo} alt="Logo preview" className="max-h-full max-w-full object-contain" />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreview(null);
+                            setFormData((prev) => ({ ...prev, logo: "" }));
+                          }}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                        >
+                          <HiXMark className="text-xs" />
+                        </button>
+                      </div>
                     ) : (
                       <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase">
                         <IoCloudUploadOutline className="text-xl text-amber-500" />
@@ -490,7 +494,6 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
 
           </div>
         ) : (
-          /* Bespoke Mode Request Box */
           <div className="p-5 bg-slate-950 text-white rounded-2xl space-y-4">
             <h3 className="text-base font-black uppercase text-amber-400 flex items-center gap-2">
               <HiOutlineSparkles /> Full Custom Bespoke Studio
@@ -510,7 +513,6 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
 
         <hr className="border-slate-100" />
 
-        {/* Contact Support */}
         <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
           <span>Need design assistance?</span>
           <a
@@ -523,7 +525,6 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
           </a>
         </div>
 
-        {/* Brand Guarantees Grid */}
         <div className="grid grid-cols-1 gap-3 pt-2">
           <div className="flex items-center gap-3 text-xs text-slate-700">
             <TbTruckDelivery className="text-2xl text-amber-600 shrink-0" />

@@ -6,7 +6,7 @@ import ProductCarts from "@/components/cart/ProductCarts";
 
 export default function CartPage() {
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <main className="max-w-7xl mx-auto xl:mt-0 mt-[56px] px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <TopLinks />
       <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight uppercase">
         Your Cart

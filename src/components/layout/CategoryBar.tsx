@@ -238,7 +238,7 @@ export default function CategoryBar() {
 
       {/* ================= 2. STICKY CATEGORY BAR (EXACT MATCH) ================= */}
       <div 
-        className={`w-full hidden xl:block bg-[#0B1426] text-slate-100 z-[100] border-b border-slate-800 shadow-2xl fixed top-0 left-0 z-50 transition-all duration-300 font-sans ${
+        className={`w-full hidden xl:block bg-[#0B1426] text-slate-100 z-[103] border-b border-slate-800 shadow-2xl fixed top-0 left-0 z-50 transition-all duration-300 font-sans ${
           isStickyVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
         }`}
       >

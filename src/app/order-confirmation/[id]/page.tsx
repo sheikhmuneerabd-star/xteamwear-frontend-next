@@ -8,6 +8,15 @@ interface ConfirmationPageProps {
   params: Promise<{ id: string }>;
 }
 
+interface OrderItem {
+  name: string;
+  color: string;
+  qty: number;
+  price: number;
+  image?: string;
+  sizingDetailData?: any;
+}
+
 export default async function OrderConfirmationPage({ params }: ConfirmationPageProps) {
   const { id } = await params;
   await connectDB();
@@ -47,7 +56,7 @@ export default async function OrderConfirmationPage({ params }: ConfirmationPage
           </div>
 
           <div className="space-y-3">
-            {order.items.map((item, i) => (
+            {order.items.map((item: OrderItem, i: number) => (
               <div key={i} className="flex justify-between items-center text-sm">
                 <div>
                   <p className="font-medium text-gray-800">{item.name}</p>
