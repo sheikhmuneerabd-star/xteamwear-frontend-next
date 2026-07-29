@@ -2,32 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { IoClose } from "react-icons/io5";
-import { MdOutlineArrowForwardIos, MdOutlineAdminPanelSettings } from "react-icons/md";
-import { BsArrowLeft } from "react-icons/bs";
-import { HiOutlineUserCircle } from "react-icons/hi2";
-import { RiLogoutBoxRLine } from "react-icons/ri";
-
-export interface DbSubcategory {
-  name: string;
-  items?: string[];
-}
-
-export interface DbCategory {
-  _id?: string;
-  id?: string | number;
-  name: string;
-  order?: number;
-  subcategories?: DbSubcategory[];
-  subCategories?: DbSubcategory[];
-  items?: string[];
-}
+import { HiChevronDown, HiX } from "react-icons/hi";
+import { HiOutlineUser } from "react-icons/hi2";
+import { RiAdminLine, RiLogoutBoxRLine } from "react-icons/ri";
 
 interface MobileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  categoriesCategory?: DbCategory[];
-  categoriesMenu?: DbCategory[];
+  categoriesCategory?: any[];
+  categoriesMenu?: any[];
   status?: string;
   session?: any;
   signOut?: (options?: any) => void;
@@ -43,334 +26,332 @@ export default function MobileDrawer({
   signOut,
 }: MobileDrawerProps) {
   const [activeTab, setActiveTab] = useState<"category" | "menu">("category");
-  const [activeCategory, setActiveCategory] = useState<DbCategory | null>(null);
-  const [activeSubCategory, setActiveSubCategory] = useState<DbSubcategory | null>(null);
+
+  // Track accordion states
+  const [openCatId, setOpenCatId] = useState<string | null>(null);
+  const [openSubId, setOpenSubId] = useState<string | null>(null);
+
+  if (!isOpen) return null;
 
   const isAdmin =
     session?.user?.role === "admin" ||
     session?.user?.isAdmin === true ||
     session?.user?.email?.includes("admin");
 
-  const resetAndClose = () => {
-    setActiveCategory(null);
-    setActiveSubCategory(null);
-    onClose();
+  const getCleanId = (obj: any, index: number) => {
+    if (!obj) return String(index);
+    if (typeof obj._id === "string") return obj._id;
+    if (obj._id && obj._id.$oid) return obj._id.$oid;
+    if (obj.id) return String(obj.id);
+    return String(index);
   };
 
-  const getSubcategories = (cat: DbCategory): DbSubcategory[] => {
-    return cat.subcategories || cat.subCategories || [];
+  const toggleCategory = (id: string) => {
+    setOpenCatId(openCatId === id ? null : id);
+    setOpenSubId(null);
   };
 
-  // Dedicated data fallback - if categoriesMenu is not supplied, use main categories list for Menu
-  const effectiveMenuList = categoriesMenu.length > 0 ? categoriesMenu : categoriesCategory;
+  const toggleSubcategory = (id: string) => {
+    setOpenSubId(openSubId === id ? null : id);
+  };
+
+  const getUserInitials = (name?: string, email?: string) => {
+    const text = name || email || "U";
+    return text.charAt(0).toUpperCase();
+  };
 
   return (
-    <>
-      {/* Backdrop */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm transition-opacity"
-          onClick={resetAndClose}
-        />
-      )}
-
-      {/* Drawer */}
+    <div className="fixed inset-0 z-[1000] flex animate-fadeIn">
+      {/* Backdrop Overlay with Fade Effect */}
       <div
-        className={`fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white z-50 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        {/* Header Tabs */}
-        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between gap-2">
-          <div className="flex-1 bg-gray-200/70 p-1 rounded-xl flex text-xs font-bold">
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+        onClick={onClose}
+      />
+
+      {/* Main Drawer Container with Slide-In */}
+      <div className="relative w-[320px] max-w-[85vw] bg-white h-full flex flex-col justify-between z-10 shadow-2xl overflow-hidden transform transition-transform duration-300 ease-out translate-x-0">
+        <div className="flex-1 flex flex-col min-h-0">
+          
+          {/* Header Tabs */}
+          <div className="flex items-center justify-between p-3.5 bg-slate-50 border-b border-slate-100/80 shrink-0">
+            <div className="flex bg-slate-200/70 p-1 rounded-xl w-full mr-3 shadow-inner">
+              <button
+                type="button"
+                onClick={() => setActiveTab("category")}
+                className={`flex-1 py-2 text-[11px] font-bold tracking-wider rounded-lg transition-all duration-200 ${
+                  activeTab === "category"
+                    ? "bg-white text-[#0B1E3D] shadow-sm scale-[1.02]"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                CATEGORIES
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("menu")}
+                className={`flex-1 py-2 text-[11px] font-bold tracking-wider rounded-lg transition-all duration-200 ${
+                  activeTab === "menu"
+                    ? "bg-white text-[#0B1E3D] shadow-sm scale-[1.02]"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                MENU
+              </button>
+            </div>
+
             <button
               type="button"
-              onClick={() => {
-                setActiveTab("category");
-                setActiveCategory(null);
-                setActiveSubCategory(null);
-              }}
-              className={`flex-1 py-2 rounded-lg text-center transition-all ${
-                activeTab === "category"
-                  ? "bg-white text-[#0B1E3D] shadow-sm font-extrabold"
-                  : "text-gray-500 hover:text-gray-800"
-              }`}
+              onClick={onClose}
+              className="p-1.5 rounded-full hover:bg-slate-200/80 text-slate-500 transition-colors"
+              aria-label="Close drawer"
             >
-              CATEGORIES
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("menu");
-                setActiveCategory(null);
-                setActiveSubCategory(null);
-              }}
-              className={`flex-1 py-2 rounded-lg text-center transition-all ${
-                activeTab === "menu"
-                  ? "bg-white text-[#0B1E3D] shadow-sm font-extrabold"
-                  : "text-gray-500 hover:text-gray-800"
-              }`}
-            >
-              MENU
+              <HiX className="text-xl" />
             </button>
           </div>
 
-          <button
-            type="button"
-            onClick={resetAndClose}
-            className="p-1.5 rounded-full hover:bg-gray-200 text-gray-500 transition-colors"
-          >
-            <IoClose className="text-xl" />
-          </button>
-        </div>
-
-        {/* Dynamic Multi-level Navigation Body */}
-        <div className="relative flex-1 overflow-hidden">
-          
-          {/* LEVEL 1: Main View */}
-          <div className="h-full overflow-y-auto divide-y divide-gray-100 pb-24">
-            {activeTab === "menu" ? (
-              <>
-                {/* Standard Main Links for MENU Tab */}
-                <Link
-                  href="/"
-                  onClick={resetAndClose}
-                  className="block px-5 py-3.5 text-sm font-semibold text-[#0B1E3D] hover:bg-slate-50"
-                >
-                  Home
-                </Link>
-
-                {effectiveMenuList.map((cat, i) => {
-                  const subs = getSubcategories(cat);
-                  const hasSub = subs.length > 0;
+          {/* ================= CATEGORIES TAB ================= */}
+          {activeTab === "category" && (
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 scrollbar-thin">
+              {categoriesCategory.length === 0 ? (
+                <div className="p-8 text-center">
+                  <p className="text-xs text-slate-400 font-medium">No categories available.</p>
+                </div>
+              ) : (
+                categoriesCategory.map((cat, idx) => {
+                  const catId = getCleanId(cat, idx);
+                  const isCatExpanded = openCatId === catId;
+                  const rawSubs = cat.subcategories || cat.subCategories || cat.items || [];
+                  const hasSubCategories = Array.isArray(rawSubs) && rawSubs.length > 0;
 
                   return (
-                    <div key={cat._id || cat.id || i}>
-                      {hasSub ? (
-                        <div
-                          onClick={() => setActiveCategory(cat)}
-                          className="flex items-center justify-between px-5 py-3.5 text-sm font-semibold text-[#0B1E3D] cursor-pointer hover:bg-slate-50 transition-colors"
-                        >
-                          <span>{cat.name}</span>
-                          <MdOutlineArrowForwardIos className="text-xs text-[#A9762F]" />
-                        </div>
-                      ) : (
+                    <div key={catId} className="w-full">
+                      {/* LEVEL 1: Category Header */}
+                      <div
+                        className={`group relative flex items-center justify-between px-4 py-3.5 transition-all duration-200 ${
+                          isCatExpanded
+                            ? "bg-slate-50/80 border-l-[4px] border-[#A9762F]"
+                            : "hover:bg-slate-50/60 border-l-[4px] border-transparent"
+                        }`}
+                      >
                         <Link
-                          href={`/category/${encodeURIComponent(cat.name)}`}
-                          onClick={resetAndClose}
-                          className="block px-5 py-3.5 text-sm font-semibold text-[#0B1E3D] hover:bg-slate-50"
+                          href={`/category/${encodeURIComponent(cat.name || "")}`}
+                          onClick={onClose}
+                          className={`font-semibold text-sm transition-colors flex-1 ${
+                            isCatExpanded ? "text-[#A9762F]" : "text-slate-800 hover:text-[#A9762F]"
+                          }`}
                         >
                           {cat.name}
                         </Link>
-                      )}
-                    </div>
-                  );
-                })}
 
-                <Link
-                  href="/bespoke"
-                  onClick={resetAndClose}
-                  className="block px-5 py-3.5 text-sm font-bold text-[#A9762F] hover:bg-amber-50"
-                >
-                  Tailored Bespoke
-                </Link>
-
-                <Link
-                  href="/reviews"
-                  onClick={resetAndClose}
-                  className="block px-5 py-3.5 text-sm font-semibold text-[#0B1E3D] hover:bg-slate-50"
-                >
-                  All Reviews
-                </Link>
-              </>
-            ) : (
-              /* CATEGORIES Tab Render */
-              categoriesCategory.map((cat, idx) => {
-                const subs = getSubcategories(cat);
-                const hasSub = subs.length > 0;
-
-                return (
-                  <div key={cat._id || cat.id || idx}>
-                    {hasSub ? (
-                      <div
-                        onClick={() => setActiveCategory(cat)}
-                        className="flex items-center justify-between px-5 py-3.5 text-sm font-semibold text-[#0B1E3D] cursor-pointer hover:bg-slate-50 transition-colors"
-                      >
-                        <span>{cat.name}</span>
-                        <MdOutlineArrowForwardIos className="text-xs text-[#A9762F]" />
+                        {hasSubCategories && (
+                          <button
+                            type="button"
+                            onClick={() => toggleCategory(catId)}
+                            className="p-1.5 text-slate-400 hover:text-[#A9762F] hover:bg-amber-50 rounded-lg transition-all"
+                          >
+                            <HiChevronDown
+                              className={`text-lg transition-transform duration-300 ${
+                                isCatExpanded ? "rotate-180 text-[#A9762F]" : ""
+                              }`}
+                            />
+                          </button>
+                        )}
                       </div>
-                    ) : (
-                      <Link
-                        href={`/category/${encodeURIComponent(cat.name)}`}
-                        onClick={resetAndClose}
-                        className="block px-5 py-3.5 text-sm font-semibold text-[#0B1E3D] hover:bg-slate-50"
-                      >
-                        {cat.name}
-                      </Link>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
 
-          {/* LEVEL 2: Subcategories Slide-Over */}
-          <div
-            className={`absolute inset-0 bg-white z-10 flex flex-col transition-transform duration-300 ease-in-out ${
-              activeCategory ? "translate-x-0" : "translate-x-full"
-            }`}
-          >
-            <div className="flex items-center gap-3 px-4 py-3 bg-slate-100 border-b border-gray-200">
-              <button
-                type="button"
-                onClick={() => setActiveCategory(null)}
-                className="p-1 text-[#0B1E3D] hover:bg-slate-200 rounded-full"
-              >
-                <BsArrowLeft className="text-lg" />
-              </button>
-              <span className="font-bold text-sm text-[#0B1E3D]">{activeCategory?.name}</span>
-            </div>
-
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-100 pb-20">
-              <Link
-                href={`/category/${encodeURIComponent(activeCategory?.name || "")}`}
-                onClick={resetAndClose}
-                className="block px-5 py-3 text-xs font-bold text-[#A9762F] hover:bg-amber-50"
-              >
-                View All {activeCategory?.name}
-              </Link>
-
-              {activeCategory &&
-                getSubcategories(activeCategory).map((sub, idx) => {
-                  const hasItems = sub.items && sub.items.length > 0;
-
-                  return (
-                    <div key={idx}>
-                      {hasItems ? (
+                      {/* LEVEL 2: Subcategories Collapsible */}
+                      {hasSubCategories && (
                         <div
-                          onClick={() => setActiveSubCategory(sub)}
-                          className="flex items-center justify-between px-5 py-3 text-xs text-gray-700 font-medium cursor-pointer hover:bg-slate-50"
+                          className={`grid transition-all duration-300 ease-in-out ${
+                            isCatExpanded
+                              ? "grid-rows-[1fr] opacity-100"
+                              : "grid-rows-[0fr] opacity-0"
+                          }`}
                         >
-                          <span>{sub.name}</span>
-                          <MdOutlineArrowForwardIos className="text-[10px] text-[#A9762F]" />
+                          <div className="overflow-hidden bg-slate-50/50 border-l-2 border-[#A9762F]/30 ml-4 my-1 space-y-1">
+                            {rawSubs.map((sub: any, sIdx: number) => {
+                              const isStringSub = typeof sub === "string";
+                              const subName = isStringSub ? sub : sub?.name || "";
+                              const subId = getCleanId(sub, sIdx) + `-${subName}`;
+                              const isSubExpanded = openSubId === subId;
+                              const items = !isStringSub && Array.isArray(sub?.items) ? sub.items : [];
+                              const hasItems = items.length > 0;
+
+                              return (
+                                <div key={subId} className="px-2">
+                                  <div
+                                    className={`flex items-center justify-between py-2 px-2.5 rounded-md transition-all ${
+                                      isSubExpanded
+                                        ? "bg-amber-50/60 text-[#A9762F]"
+                                        : "hover:bg-slate-100/70 text-slate-700"
+                                    }`}
+                                  >
+                                    <Link
+                                      href={`/category/${encodeURIComponent(cat.name)}?sub=${encodeURIComponent(subName)}`}
+                                      onClick={onClose}
+                                      className="text-xs font-medium flex-1 hover:text-[#A9762F] transition-colors"
+                                    >
+                                      {subName}
+                                    </Link>
+
+                                    {hasItems && (
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleSubcategory(subId)}
+                                        className="p-1 text-slate-400 hover:text-[#A9762F] transition-colors"
+                                      >
+                                        <HiChevronDown
+                                          className={`text-sm transition-transform duration-300 ${
+                                            isSubExpanded ? "rotate-180 text-[#A9762F]" : ""
+                                          }`}
+                                        />
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  {/* LEVEL 3: Items Accordion */}
+                                  {hasItems && (
+                                    <div
+                                      className={`grid transition-all duration-300 ease-in-out ${
+                                        isSubExpanded
+                                          ? "grid-rows-[1fr] opacity-100"
+                                          : "grid-rows-[0fr] opacity-0"
+                                      }`}
+                                    >
+                                      <div className="overflow-hidden pl-3 py-1 space-y-1 my-1 border-l-2 border-slate-200/80 ml-2 bg-white/70 rounded-r-lg">
+                                        {items.map((item: any, itemIdx: number) => {
+                                          const itemName = typeof item === "string" ? item : item?.name;
+                                          return (
+                                            <Link
+                                              key={itemIdx}
+                                              href={`/category/${encodeURIComponent(cat.name)}?sub=${encodeURIComponent(subName)}&item=${encodeURIComponent(itemName)}`}
+                                              onClick={onClose}
+                                              className="group flex items-center gap-2 py-1.5 px-2 text-[11px] text-slate-600 hover:text-[#A9762F] transition-colors font-medium"
+                                            >
+                                              <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-[#A9762F] transition-colors shrink-0" />
+                                              <span className="truncate">{itemName}</span>
+                                            </Link>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      ) : (
-                        <Link
-                          href={`/category/${encodeURIComponent(
-                            activeCategory.name
-                          )}?sub=${encodeURIComponent(sub.name)}`}
-                          onClick={resetAndClose}
-                          className="block px-5 py-3 text-xs text-gray-700 hover:bg-slate-50"
-                        >
-                          {sub.name}
-                        </Link>
                       )}
                     </div>
                   );
-                })}
+                })
+              )}
             </div>
-          </div>
+          )}
 
-          {/* LEVEL 3: Items Slide-Over */}
-          <div
-            className={`absolute inset-0 bg-white z-20 flex flex-col transition-transform duration-300 ease-in-out ${
-              activeSubCategory ? "translate-x-0" : "translate-x-full"
-            }`}
-          >
-            <div className="flex items-center gap-3 px-4 py-3 bg-slate-100 border-b border-gray-200">
-              <button
-                type="button"
-                onClick={() => setActiveSubCategory(null)}
-                className="p-1 text-[#0B1E3D] hover:bg-slate-200 rounded-full"
-              >
-                <BsArrowLeft className="text-lg" />
-              </button>
-              <span className="font-bold text-sm text-[#0B1E3D]">{activeSubCategory?.name}</span>
-            </div>
-
-            <div className="flex-1 overflow-y-auto divide-y divide-gray-100 pb-20">
+          {/* ================= MENU TAB ================= */}
+          {activeTab === "menu" && (
+            <div className="flex-1 overflow-y-auto p-3 space-y-1 font-medium text-slate-700 text-sm">
               <Link
-                href={`/category/${encodeURIComponent(
-                  activeCategory?.name || ""
-                )}?sub=${encodeURIComponent(activeSubCategory?.name || "")}`}
-                onClick={resetAndClose}
-                className="block px-5 py-3 text-xs font-bold text-[#A9762F] hover:bg-amber-50"
+                href="/"
+                onClick={onClose}
+                className="block p-3 rounded-xl hover:bg-slate-100/80 transition-all hover:translate-x-1"
               >
-                View All {activeSubCategory?.name}
+                Home
               </Link>
 
-              {activeSubCategory?.items?.map((item, idx) => (
+              {/* Dynamic Categories inside Menu */}
+              {categoriesMenu.map((menuCat, i) => (
                 <Link
-                  key={idx}
-                  href={`/category/${encodeURIComponent(
-                    activeCategory?.name || ""
-                  )}?sub=${encodeURIComponent(item)}`}
-                  onClick={resetAndClose}
-                  className="block px-5 py-3 text-xs text-gray-600 hover:bg-slate-50"
+                  key={getCleanId(menuCat, i)}
+                  href={`/category/${encodeURIComponent(menuCat.name || "")}`}
+                  onClick={onClose}
+                  className="block p-3 rounded-xl hover:bg-slate-100/80 transition-all hover:translate-x-1"
                 >
-                  {item}
+                  {menuCat.name}
                 </Link>
               ))}
-            </div>
-          </div>
 
-        </div>
+              {/* Tailored Bespoke placed right above All Reviews */}
+              <Link
+                href="/bespoke"
+                onClick={onClose}
+                className="block p-3 rounded-xl text-[#A9762F] bg-amber-50/60 hover:bg-amber-100/70 font-semibold transition-all hover:translate-x-1 border border-amber-200/50"
+              >
+                Tailored Bespoke
+              </Link>
 
-        {/* Bottom User Card */}
-        <div className="p-3 bg-slate-50 border-t border-gray-200">
-          {status === "authenticated" ? (
-            <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-[#0B1E3D] text-[#A9762F] font-bold flex items-center justify-center text-sm shadow">
-                  {session?.user?.name ? session.user.name[0].toUpperCase() : "U"}
-                </div>
-                <div className="flex-1 overflow-hidden">
-                  <p className="font-bold text-[#0B1E3D] text-xs truncate">
-                    {session?.user?.name || "User"}
-                  </p>
-                  <span className="inline-block px-1.5 py-0.5 text-[9px] font-bold bg-amber-100 text-amber-800 rounded uppercase">
-                    {isAdmin ? "Admin" : "Customer"}
-                  </span>
-                </div>
-              </div>
+              <Link
+                href="/reviews"
+                onClick={onClose}
+                className="block p-3 rounded-xl hover:bg-slate-100/80 transition-all hover:translate-x-1"
+              >
+                All Reviews
+              </Link>
 
-              <div className="pt-2 border-t border-gray-100 space-y-1">
-                {isAdmin && (
+              {/* Professional Luxury Styled Admin Dashboard Button */}
+              {isAdmin && (
+                <div className="pt-2">
                   <Link
                     href="/admin"
-                    onClick={resetAndClose}
-                    className="flex items-center gap-2 p-1.5 text-xs font-semibold text-[#A9762F] hover:bg-amber-50 rounded-md transition-colors"
+                    onClick={onClose}
+                    className="flex items-center justify-between p-3.5 bg-[#0B1E3D] text-white rounded-xl shadow-md hover:shadow-lg transition-all hover:bg-[#152e58] active:scale-[0.99] border border-slate-700/50 group"
                   >
-                    <MdOutlineAdminPanelSettings className="text-base" />
-                    <span>Admin Dashboard</span>
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 rounded-lg bg-[#A9762F]/20 text-[#A9762F] group-hover:bg-[#A9762F] group-hover:text-white transition-colors">
+                        <RiAdminLine className="text-lg" />
+                      </div>
+                      <span className="font-semibold text-xs tracking-wide">Admin Portal</span>
+                    </div>
+                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-[#A9762F] text-white">
+                      Control
+                    </span>
                   </Link>
-                )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetAndClose();
-                    if (signOut) signOut({ callbackUrl: "/" });
-                  }}
-                  className="w-full flex items-center gap-2 p-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-md transition-colors text-left"
-                >
-                  <RiLogoutBoxRLine className="text-base" />
-                  <span>Sign Out</span>
-                </button>
+        {/* ================= FOOTER SECTION ================= */}
+        <div className="p-4 border-t border-slate-100 bg-slate-50/90 shrink-0">
+          {status === "authenticated" || session?.user ? (
+            <div className="p-3 bg-white border border-slate-200/70 rounded-2xl shadow-sm space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#0B1E3D] text-[#A9762F] font-bold text-sm flex items-center justify-center shrink-0 shadow-inner">
+                  {getUserInitials(session?.user?.name, session?.user?.email)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Signed in as</p>
+                  <p className="text-xs font-bold text-[#0B1E3D] truncate">
+                    {session?.user?.name || session?.user?.email}
+                  </p>
+                </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (signOut) signOut();
+                  onClose();
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl font-semibold transition-all duration-200 text-xs group"
+              >
+                <RiLogoutBoxRLine className="text-base text-slate-400 group-hover:text-rose-600 transition-colors" />
+                <span>Log Out</span>
+              </button>
             </div>
           ) : (
             <Link
-              href="/sign-in"
-              onClick={resetAndClose}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#0B1E3D] text-white rounded-xl text-xs font-bold hover:bg-[#0B1E3D]/90 transition-colors shadow"
+              href="/login"
+              onClick={onClose}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-[#0B1E3D] text-white rounded-xl font-semibold hover:bg-[#162f5c] transition-all shadow-md active:scale-[0.98] text-xs uppercase tracking-wider"
             >
-              <HiOutlineUserCircle className="text-lg text-[#A9762F]" />
+              <HiOutlineUser className="text-[#A9762F] text-lg" />
               <span>Sign In / Register</span>
             </Link>
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

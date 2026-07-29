@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, FormEvent, useMemo } from "react";
+import { useState, FormEvent, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { HiMiniBars3, HiOutlineUserCircle } from "react-icons/hi2";
+import { HiMiniBars3 } from "react-icons/hi2";
 import { IoClose } from "react-icons/io5";
-import { MdOutlineArrowForwardIos, MdOutlineAdminPanelSettings } from "react-icons/md";
-import { BsArrowLeft } from "react-icons/bs";
-import { RiUserAddLine, RiLogoutBoxRLine } from "react-icons/ri";
 import { PiShoppingCartLight, PiUserLight } from "react-icons/pi";
 import { IoIosSearch } from "react-icons/io";
 import MobileDrawer from "./MobileDrawer";
@@ -18,7 +15,7 @@ export interface SubCategoryItem {
   id?: string | number;
   _id?: string;
   name: string;
-  items?: string[]; // E.g., ["Jerseys", "Shorts", "Socks"]
+  items?: string[];
 }
 
 export interface CategoryItem {
@@ -26,6 +23,7 @@ export interface CategoryItem {
   _id?: string;
   name: string;
   subCategories?: SubCategoryItem[];
+  subcategories?: any[];
   items?: string[];
 }
 
@@ -62,7 +60,7 @@ interface MobileNavbarProps {
       name?: string | null;
       email?: string | null;
       image?: string | null;
-      role?: string | null; // Admin role check
+      role?: string | null;
       isAdmin?: boolean;
     };
   } | null;
@@ -70,7 +68,7 @@ interface MobileNavbarProps {
 }
 
 export default function MobileNavbar({
-  categoriesCategory = [],
+  categoriesCategory: propsCategories = [],
   categoriesMenu = [],
   popularProducts = [],
   trendingTags = [],
@@ -85,40 +83,48 @@ export default function MobileNavbar({
   // Drawers State
   const [toggle, setToggle] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
-  const [activeTab, setActiveTab] = useState<"category" | "menu">("category");
 
-  // Multi-Level Navigation States
-  const [activeCategory, setActiveCategory] = useState<CategoryItem | null>(null);
-  const [activeSubMenu, setActiveSubMenu] = useState<SubCategoryItem | string | null>(null);
+  // Dynamic Categories State fetched from API
+  const [dbCategories, setDbCategories] = useState<CategoryItem[]>([]);
 
   // Search Query
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Admin Check
-  const isAdmin =
-    session?.user?.role === "admin" ||
-    session?.user?.isAdmin === true ||
-    session?.user?.email?.includes("admin");
+  // Fetch Categories directly from API like CategoryBar.tsx
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        setDbCategories(data.categories || data || []);
+      } catch (err) {
+        console.error("Failed to fetch categories in MobileNavbar", err);
+      }
+    }
+    fetchCategories();
+  }, []);
+
+  // Prefer fetched categories from DB, fallback to props
+  const finalCategories = dbCategories.length > 0 ? dbCategories : propsCategories;
 
   const closeAll = () => {
     setToggle(false);
     setOpenSearch(false);
-    setActiveCategory(null);
-    setActiveSubMenu(null);
   };
 
   const computedTags =
     trendingTags.length > 0
       ? trendingTags
-      : categoriesCategory
-          .flatMap((cat) =>
-            cat.subCategories
-              ? cat.subCategories.map((s) => s.name)
-              : cat.items || [cat.name]
-          )
+      : finalCategories
+          .flatMap((cat) => {
+            const subs = cat.subCategories || cat.subcategories;
+            return subs
+              ? subs.map((s) => (typeof s === "string" ? s : s.name))
+              : cat.items || [cat.name];
+          })
           .filter(Boolean);
 
-  // Advanced Search Matching with Fallback
+  // Advanced Search Matching with Fallback (Unchanged)
   const filteredProducts = useMemo(() => {
     const rawQuery = searchQuery.trim().toLowerCase();
     if (!rawQuery) return [];
@@ -396,11 +402,12 @@ export default function MobileNavbar({
           )}
         </div>
       </div>
+
       {/* STANDALONE SEPARATE MOBILE DRAWER COMPONENT */}
       <MobileDrawer
         isOpen={toggle}
         onClose={() => setToggle(false)}
-        categoriesCategory={categoriesCategory}
+        categoriesCategory={finalCategories}
         categoriesMenu={categoriesMenu}
         status={status}
         session={session}
