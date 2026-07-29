@@ -120,9 +120,6 @@ export default function OrderSummary() {
         if (res.ok) {
           if (clearCart) clearCart();
           alert(`Order placed successfully! Transaction ID: ${details.id}`);
-          if (resData.order?._id) {
-            router.push(`/admin/orders/${resData.order._id}`);
-          }
         } else {
           console.error("Order Creation Error Response:", resData);
           alert(`Order Save Error: ${resData.error || "Failed to process order"}`);

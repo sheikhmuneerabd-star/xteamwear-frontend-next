@@ -342,7 +342,7 @@ export default function MobileDrawer({
             </div>
           ) : (
             <Link
-              href="/login"
+              href="/sign-in"
               onClick={onClose}
               className="w-full flex items-center justify-center gap-2 py-3 bg-[#0B1E3D] text-white rounded-xl font-semibold hover:bg-[#162f5c] transition-all shadow-md active:scale-[0.98] text-xs uppercase tracking-wider"
             >

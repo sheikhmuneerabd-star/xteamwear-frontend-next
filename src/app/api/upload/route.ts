@@ -5,7 +5,7 @@ const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
-// Cloudinary "signed upload" ke liye zaroori signature banata hai
+// Cloudinary signed upload signature generator
 async function generateSignature(params: Record<string, string>): Promise<string> {
   const crypto = await import("crypto");
   const sortedKeys = Object.keys(params).sort();
@@ -16,10 +16,8 @@ async function generateSignature(params: Record<string, string>): Promise<string
 
 export async function POST(request: Request) {
   try {
+    // Check session optional keeping public/user upload enabled for product customizations
     const session = await auth();
-    if (session?.user?.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
 
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
       return NextResponse.json({ error: "Cloudinary is not configured" }, { status: 500 });
@@ -33,7 +31,10 @@ export async function POST(request: Request) {
     }
 
     const timestamp = Math.floor(Date.now() / 1000).toString();
-    const folder = "xteamwear/products";
+    
+    // Categorize folder: products for admin, custom-logos for user customization
+    const isAdmin = session?.user?.role === "admin";
+    const folder = isAdmin ? "xteamwear/products" : "xteamwear/custom-logos";
 
     const signature = await generateSignature({ folder, timestamp });
 

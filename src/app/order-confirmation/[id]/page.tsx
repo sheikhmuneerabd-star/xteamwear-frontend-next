@@ -93,7 +93,7 @@ export default async function OrderConfirmationPage({ params }: ConfirmationPage
         </div>
 
         {/* Call to Action */}
-        <div className="text-center">
+        <div className="text-center cursor-pointer">
           <Link
             href="/"
             className="inline-flex items-center justify-center bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600 text-gray-900 px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-md"
