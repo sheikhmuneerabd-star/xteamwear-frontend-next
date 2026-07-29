@@ -37,6 +37,11 @@ export interface ICategoryShowcaseItem {
   tag?: string;
 }
 
+export interface IShippingConfig {
+  freeShippingThreshold: number;
+  standardShippingFee: number;
+}
+
 export interface ISiteSettings extends Document {
   logo: string;
   heroSlides: IHeroSlide[];
@@ -45,6 +50,7 @@ export interface ISiteSettings extends Document {
   bespokeBanner?: IBespokeBanner;
   trendingTags?: string[];
   categoriesShowcase?: ICategoryShowcaseItem[];
+  shippingConfig?: IShippingConfig;
 }
 
 // Schemas
@@ -88,15 +94,22 @@ const BespokeBannerSchema = new Schema<IBespokeBanner>(
   { _id: false }
 );
 
-// FIX IS HERE: required: true hata kar default: "" kar diya hai taaki optional image fields save ho sakein
 const CategoryShowcaseItemSchema = new Schema<ICategoryShowcaseItem>(
   {
     id: { type: String, default: "" },
     title: { type: String, default: "" },
     itemCount: { type: String, default: "0+ Products" },
-    image: { type: String, default: "" }, // <-- REQUIRED REMOVED
+    image: { type: String, default: "" },
     link: { type: String, default: "/category/all" },
     tag: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
+const ShippingConfigSchema = new Schema<IShippingConfig>(
+  {
+    freeShippingThreshold: { type: Number, default: 150 },
+    standardShippingFee: { type: Number, default: 15 },
   },
   { _id: false }
 );
@@ -110,6 +123,10 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     bespokeBanner: { type: BespokeBannerSchema },
     trendingTags: { type: [String], default: [] },
     categoriesShowcase: { type: [CategoryShowcaseItemSchema], default: [] },
+    shippingConfig: {
+      type: ShippingConfigSchema,
+      default: { freeShippingThreshold: 150, standardShippingFee: 15 },
+    },
   },
   { timestamps: true }
 );

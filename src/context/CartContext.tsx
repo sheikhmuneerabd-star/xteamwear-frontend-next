@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { Product } from "@/types/product";
 import type { SizingFormData } from "@/types/sizing";
 
@@ -23,9 +23,34 @@ const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Har cart line ab id + color se unique hai — same product alag color mein
-  // do baar add ho to alag row banegi, taake har row apni sizing details rakh sake.
+  // 1. Page Initial Load par LocalStorage se Cart Recover karein
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem("xteamwear_cart");
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+    } catch (error) {
+      console.error("Failed to load cart from localStorage:", error);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  // 2. Jab bhi Cart Update ho, LocalStorage me Save karein
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem("xteamwear_cart", JSON.stringify(cart));
+      } catch (error) {
+        console.error("Failed to save cart to localStorage:", error);
+      }
+    }
+  }, [cart, isLoaded]);
+
+  // Har cart line ab id + color se unique hai
   const addToCart = (product: Product, color: string, sizingDetailData?: SizingFormData) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id && item.color === color);
@@ -58,7 +83,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart((prev) => prev.filter((item) => !(item.id === id && item.color === color)));
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    try {
+      localStorage.removeItem("xteamwear_cart");
+    } catch (error) {
+      console.error("Failed to clear cart from localStorage:", error);
+    }
+  };
 
   return (
     <CartContext.Provider value={{ cart, addToCart, increase, decrease, removeFromCart, clearCart }}>

@@ -94,7 +94,11 @@ export default function SiteSettingsPage() {
   const [trendingTags, setTrendingTags] = useState<string[]>([]);
   const [newTagInput, setNewTagInput] = useState("");
 
-  // Popular Products States
+  const [shippingConfig, setShippingConfig] = useState({
+    freeShippingThreshold: 150,
+    standardShippingFee: 15,
+  });
+
   const [allProducts, setAllProducts] = useState<ProductItem[]>([]);
   const [selectedPopularProductIds, setSelectedPopularProductIds] = useState<string[]>([]);
 
@@ -104,10 +108,9 @@ export default function SiteSettingsPage() {
   useEffect(() => {
     async function load() {
       try {
-        // Fetch site settings and available products concurrently
         const [settingsRes, prodRes] = await Promise.all([
-          fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" }),
-          fetch(`/api/products/search?q=`),
+          fetch("/api/settings", { cache: "no-store" }),
+          fetch("/api/products/search?q="),
         ]);
 
         const data = await settingsRes.json();
@@ -124,7 +127,6 @@ export default function SiteSettingsPage() {
         setSocialPosts(settings?.socialPosts?.length ? settings.socialPosts : [emptyPost]);
         setTrendingTags(settings?.trendingTags || []);
 
-        // Load pre-selected Popular Products IDs
         if (settings?.popularProducts && Array.isArray(settings.popularProducts)) {
           const ids = settings.popularProducts.map((p: any) => (typeof p === "object" ? p._id : p));
           setSelectedPopularProductIds(ids);
@@ -148,6 +150,10 @@ export default function SiteSettingsPage() {
             };
           });
           setCategoriesShowcase(merged);
+        }
+
+        if (settings?.shippingConfig) {
+          setShippingConfig(settings.shippingConfig);
         }
       } catch (err) {
         console.error("Failed to load settings", err);
@@ -178,14 +184,6 @@ export default function SiteSettingsPage() {
   const addSquadImage = () => setSquadImages((prev) => [...prev, ""]);
   const removeSquadImage = (index: number) => setSquadImages((prev) => prev.filter((_, i) => i !== index));
 
-  const updateAdvantage = (index: number, field: keyof Advantage, value: string) => {
-    setAdvantages((prev) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
-  };
-
   const updateBespokeField = (field: keyof BespokeBanner, value: any) => {
     setBespokeBanner((prev) => ({ ...prev, [field]: value }));
   };
@@ -206,13 +204,15 @@ export default function SiteSettingsPage() {
     });
   };
 
-  // Toggle selection for popular products
-  const togglePopularProduct = (productId: string) => {
-    setSelectedPopularProductIds((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
+  const handleAddTag = () => {
+    if (!newTagInput.trim()) return;
+    if (trendingTags.includes(newTagInput.trim())) return;
+    setTrendingTags([...trendingTags, newTagInput.trim()]);
+    setNewTagInput("");
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTrendingTags(trendingTags.filter((t) => t !== tagToRemove));
   };
 
   const handleSave = async () => {
@@ -233,11 +233,12 @@ export default function SiteSettingsPage() {
           trendingTags,
           categoriesShowcase,
           popularProducts: selectedPopularProductIds,
+          shippingConfig,
         }),
       });
 
       if (res.ok) {
-        setMessage("Saved successfully! Page will refresh data.");
+        setMessage("Settings updated & cache revalidated successfully!");
       } else {
         setMessage("Failed to save settings.");
       }
@@ -249,39 +250,73 @@ export default function SiteSettingsPage() {
     }
   };
 
-  const handleAddTag = () => {
-    if (!newTagInput.trim()) return;
-    if (trendingTags.includes(newTagInput.trim())) return;
-    setTrendingTags([...trendingTags, newTagInput.trim()]);
-    setNewTagInput("");
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTrendingTags(trendingTags.filter((t) => t !== tagToRemove));
-  };
-
   if (loading) return <p className="p-6">Loading settings...</p>;
 
   return (
-    <div className="p-6 max-w-4xl space-y-8 font-sans">
-      <h1 className="text-2xl font-semibold">Site Settings</h1>
+    <div className="p-6 max-w-4xl space-y-8 font-sans pb-16">
+      <h1 className="text-2xl font-semibold text-gray-900">Site Settings</h1>
 
       {/* Logo */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="font-medium mb-3">Navbar Logo</h2>
+      <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
+        <h2 className="font-medium mb-3 text-gray-800">Navbar Logo</h2>
         <ImageUploader label="Logo" value={logo} onChange={setLogo} />
       </div>
 
+      {/* Shipping Settings Section */}
+      <div className="bg-white rounded-lg shadow p-6 border border-gray-100 space-y-4">
+        <div className="border-b pb-3">
+          <h2 className="font-medium text-lg text-gray-900">Shipping Configuration</h2>
+          <p className="text-xs text-gray-500">
+            Set default shipping charges and free shipping threshold.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">
+              Free Shipping Minimum Amount ($)
+            </label>
+            <input
+              type="number"
+              min="0"
+              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:border-[#0B1E3D]"
+              value={shippingConfig.freeShippingThreshold}
+              onChange={(e) =>
+                setShippingConfig((prev) => ({
+                  ...prev,
+                  freeShippingThreshold: Number(e.target.value),
+                }))
+              }
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">
+              Standard Shipping Fee ($)
+            </label>
+            <input
+              type="number"
+              min="0"
+              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:border-[#0B1E3D]"
+              value={shippingConfig.standardShippingFee}
+              onChange={(e) =>
+                setShippingConfig((prev) => ({
+                  ...prev,
+                  standardShippingFee: Number(e.target.value),
+                }))
+              }
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Trending Search Tags Section */}
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-6">
-        <h3 className="text-lg font-bold text-[#0B1E3D] mb-1">
-          Navbar Trending / Search Tags
-        </h3>
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h3 className="text-lg font-bold text-[#0B1E3D] mb-1">Navbar Trending / Search Tags</h3>
         <p className="text-xs text-gray-500 mb-4">
           Add custom tags that appear in the navbar search dropdown.
         </p>
 
-        {/* Tag Input Box */}
         <div className="flex gap-2 mb-4">
           <input
             type="text"
@@ -305,7 +340,6 @@ export default function SiteSettingsPage() {
           </button>
         </div>
 
-        {/* Active Tags List */}
         <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
           {trendingTags.map((tag) => (
             <span
@@ -335,7 +369,7 @@ export default function SiteSettingsPage() {
             Curated Category Cards (Explore by Sport)
           </h2>
           <p className="text-xs text-gray-500">
-            Upload images and text for the 5 category banner cards.
+            Upload images and text for the category banner cards.
           </p>
         </div>
 
@@ -394,9 +428,7 @@ export default function SiteSettingsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-gray-600 block mb-1">
-              Top Badge Tag
-            </label>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Top Badge Tag</label>
             <input
               className="w-full border border-gray-300 rounded-md p-2 text-sm"
               value={bespokeBanner.badge}
@@ -404,9 +436,7 @@ export default function SiteSettingsPage() {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-600 block mb-1">
-              Heading Title
-            </label>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Heading Title</label>
             <input
               className="w-full border border-gray-300 rounded-md p-2 text-sm font-semibold"
               value={bespokeBanner.heading}
@@ -416,9 +446,7 @@ export default function SiteSettingsPage() {
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-gray-600 block mb-1">
-            Description Text
-          </label>
+          <label className="text-xs font-semibold text-gray-600 block mb-1">Description Text</label>
           <textarea
             rows={2}
             className="w-full border border-gray-300 rounded-md p-2 text-sm"
@@ -429,9 +457,7 @@ export default function SiteSettingsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-gray-600 block mb-1">
-              Button Text
-            </label>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Button Text</label>
             <input
               className="w-full border border-gray-300 rounded-md p-2 text-sm"
               value={bespokeBanner.buttonText}
@@ -439,9 +465,7 @@ export default function SiteSettingsPage() {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-600 block mb-1">
-              Button Link
-            </label>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Button Link</label>
             <input
               className="w-full border border-gray-300 rounded-md p-2 text-sm"
               value={bespokeBanner.buttonLink}
@@ -451,9 +475,7 @@ export default function SiteSettingsPage() {
         </div>
 
         <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
-          <p className="text-xs font-semibold text-gray-700 mb-2">
-            Main Featured Image
-          </p>
+          <p className="text-xs font-semibold text-gray-700 mb-2">Main Featured Image</p>
           <ImageUploader
             value={bespokeBanner.mainImage}
             onChange={(url) => updateBespokeField("mainImage", url)}
@@ -461,9 +483,7 @@ export default function SiteSettingsPage() {
         </div>
 
         <div className="space-y-4 pt-2">
-          <h3 className="text-sm font-semibold text-gray-800">
-            Bottom 3 Collection Cards
-          </h3>
+          <h3 className="text-sm font-semibold text-gray-800">Bottom Collection Cards</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {bespokeBanner.cards.map((card, idx) => (
               <div key={idx} className="border border-gray-200 rounded-md p-3 space-y-2 bg-gray-50">
@@ -560,9 +580,7 @@ export default function SiteSettingsPage() {
             <h2 className="font-medium text-lg text-gray-900">
               Squad / Gallery Images (Trusted by Athletes)
             </h2>
-            <p className="text-xs text-gray-500">
-              Upload images for the multi-grid gallery section.
-            </p>
+            <p className="text-xs text-gray-500">Upload images for the multi-grid gallery section.</p>
           </div>
           <button
             type="button"
@@ -588,25 +606,29 @@ export default function SiteSettingsPage() {
                   </button>
                 )}
               </div>
-              <ImageUploader
-                value={imgUrl}
-                onChange={(url) => updateSquadImage(i, url)}
-              />
+              <ImageUploader value={imgUrl} onChange={(url) => updateSquadImage(i, url)} />
             </div>
           ))}
         </div>
       </div>
 
-      {message && <p className="text-sm text-green-700 font-medium">{message}</p>}
+      {/* Action Footer */}
+      <div className="flex items-center gap-4 pt-4">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-[#0B1E3D] text-white px-6 py-2.5 rounded-md font-medium hover:opacity-90 disabled:opacity-60 cursor-pointer transition-all"
+        >
+          {saving ? "Saving..." : "Save Settings"}
+        </button>
 
-      <button
-        type="button"
-        onClick={handleSave}
-        disabled={saving}
-        className="bg-[#0B1E3D] text-white px-6 py-2.5 rounded-md font-medium disabled:opacity-60 cursor-pointer"
-      >
-        {saving ? "Saving..." : "Save Settings"}
-      </button>
+        {message && (
+          <p className={`text-sm font-medium ${message.includes("Failed") ? "text-red-600" : "text-green-700"}`}>
+            {message}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
