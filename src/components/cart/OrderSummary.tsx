@@ -5,7 +5,7 @@ import { useCart } from "@/context/CartContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { FaCheckCircle, FaTimes, FaTruck, FaLock, FaShieldAlt } from "react-icons/fa";
+import { FaCheckCircle, FaTimes, FaTruck, FaLock, FaShieldAlt, FaWhatsapp } from "react-icons/fa";
 
 export default function OrderSummary() {
   const { cart, clearCart } = useCart();
@@ -22,6 +22,7 @@ export default function OrderSummary() {
   // Success Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionId, setTransactionId] = useState("");
+  const [whatsappUrl, setWhatsappUrl] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -159,9 +160,33 @@ export default function OrderSummary() {
         const resData = await res.json();
 
         if (res.ok) {
+          // 📲 WHATSAPP MESSAGE FORMATTING
+          const whatsappNumber = "923069110314"; // 👈 Apne Business WhatsApp Number se replace karein (Country code ke sath)
+          
+          let itemsListText = cart
+            .map((item: any, i: number) => `${i + 1}. *${item.name || "Product"}* (x${item.qty}) - $${(item.newPrice * item.qty).toFixed(2)}`)
+            .join("%0A");
+
+          const message = `*NEW PAID ORDER RECEIVED (PAYPAL)*%0A%0A` +
+            `*Transaction ID:* ${details.id}%0A` +
+            `*Customer Name:* ${shippingAddressPayload.fullName}%0A` +
+            `*Email:* ${shippingAddressPayload.email}%0A` +
+            `*Address:* ${shippingAddressPayload.address}, ${shippingAddressPayload.city}, ${shippingAddressPayload.country}%0A%0A` +
+            `*ORDER ITEMS:*%0A${itemsListText}%0A%0A` +
+            `*Subtotal:* $${subtotal.toFixed(2)} USD%0A` +
+            `*Shipping:* $${shippingCost.toFixed(2)} USD%0A` +
+            `*Total Paid:* *$${grandTotal.toFixed(2)} USD*%0A%0A` +
+            `_Payment Status: PAID_`;
+
+          const waUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+          setWhatsappUrl(waUrl);
+
           if (clearCart) clearCart();
           setTransactionId(details.id);
           setIsModalOpen(true);
+
+          // Direct Redirect to WhatsApp (Optional: User popup modal se bhi click kar sakta hai)
+          window.open(waUrl, "_blank");
         } else {
           console.error("Order Creation Error Response:", resData);
           alert(`Order Save Error: ${resData.error || "Failed to process order"}`);
@@ -412,6 +437,16 @@ export default function OrderSummary() {
             </div>
 
             <div className="mt-6 space-y-2">
+              {whatsappUrl && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <FaWhatsapp className="text-lg" /> Open WhatsApp Chat
+                </a>
+              )}
               <button
                 type="button"
                 onClick={() => {
