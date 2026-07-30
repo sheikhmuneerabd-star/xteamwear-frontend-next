@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google"; // 👈 Add Google
 import { connectDB } from "@/lib/db";
 import User from "@/lib/models/User";
 import { comparePassword, hashPassword } from "@/lib/auth";
@@ -9,6 +10,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   session: { strategy: "jwt" },
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     Credentials({
       name: "credentials",
       credentials: {

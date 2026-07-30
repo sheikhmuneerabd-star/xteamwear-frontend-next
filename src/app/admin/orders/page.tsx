@@ -5,7 +5,6 @@ import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-type PaymentFilter = "all" | "paypal" | "cashapp" | "cod";
 
 interface AdminOrder {
   _id: string;
@@ -13,7 +12,6 @@ interface AdminOrder {
   shippingAddress: { fullName: string; city: string };
   total: number;
   status: OrderStatus;
-  paymentMethod?: string;
   createdAt: string;
 }
 
@@ -29,9 +27,7 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Filters State
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
-  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Pagination State
@@ -53,24 +49,9 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, []);
 
-  // Helper function to normalize payment method matching
-  const matchesPaymentMethod = (orderMethod: string = "", filterMethod: PaymentFilter) => {
-    if (filterMethod === "all") return true;
-    const method = orderMethod.toLowerCase().replace(/[\s_-]/g, "");
-    
-    if (filterMethod === "paypal") return method.includes("paypal");
-    if (filterMethod === "cashapp") return method.includes("cashapp") || method.includes("cash");
-    if (filterMethod === "cod") return method.includes("cod") || method.includes("delivery");
-    
-    return method === filterMethod;
-  };
-
-  // Combined Filter + Search Logic
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
       const matchesStatus = statusFilter === "all" || o.status === statusFilter;
-      const matchesPayment = matchesPaymentMethod(o.paymentMethod, paymentFilter);
-      
       const customerName = o.shippingAddress?.fullName?.toLowerCase() || "";
       const city = o.shippingAddress?.city?.toLowerCase() || "";
       const orderId = o._id.toLowerCase();
@@ -82,49 +63,23 @@ export default function AdminOrdersPage() {
         city.includes(query) ||
         orderId.includes(query);
 
-      return matchesStatus && matchesPayment && matchesSearch;
+      return matchesStatus && matchesSearch;
     });
-  }, [orders, statusFilter, paymentFilter, searchQuery]);
+  }, [orders, statusFilter, searchQuery]);
 
-  // Reset to Page 1 when filters change
+  // Reset to Page 1 when search or filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter, paymentFilter, searchQuery, itemsPerPage]);
+  }, [statusFilter, searchQuery, itemsPerPage]);
 
-  // Pagination Logic
   const totalItems = filteredOrders.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
   const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
 
-  // Render badge helper for Payment Methods
-  const renderPaymentBadge = (methodStr: string = "N/A") => {
-    const method = methodStr.toLowerCase();
-    if (method.includes("paypal")) {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200/80">
-          PayPal
-        </span>
-      );
-    }
-    if (method.includes("cash")) {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-          Cash App
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-        {methodStr.toUpperCase()}
-      </span>
-    );
-  };
-
   return (
     <div className="space-y-6">
-      {/* Top Title Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Orders Management</h1>
@@ -138,10 +93,7 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      {/* Filter Control Box */}
       <div className="flex flex-col gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        
-        {/* Search Bar & Items Per Page Row */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="relative w-full sm:w-80">
             <input
@@ -151,17 +103,12 @@ export default function AdminOrdersPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1E3D] focus:bg-white transition-all"
             />
-            <svg
-              className="w-4 h-4 text-slate-400 absolute left-3 top-2.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
             <span>Show per page:</span>
             <select
               value={itemsPerPage}
@@ -176,35 +123,8 @@ export default function AdminOrdersPage() {
           </div>
         </div>
 
-        {/* Payment Method Filter Row */}
-        <div className="flex items-center gap-2 flex-wrap pb-2 border-b border-slate-100">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-2">Payment:</span>
-          
-          {[
-            { id: "all", label: "All Payments" },
-            { id: "paypal", label: "PayPal Only" },
-            { id: "cashapp", label: "Cash App Only" },
-            { id: "cod", label: "COD / Other" },
-          ].map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setPaymentFilter(item.id as PaymentFilter)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                paymentFilter === item.id
-                  ? "bg-[#0B1E3D] text-white shadow-sm"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Status Filter Row */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-2">Status:</span>
-          
           {(["all", "pending", "processing", "shipped", "delivered", "cancelled"] as const).map((s) => (
             <button
               key={s}
@@ -220,25 +140,13 @@ export default function AdminOrdersPage() {
             </button>
           ))}
         </div>
-
       </div>
 
-      {/* Table & Loading Section */}
       {loading ? (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 border-b border-slate-100 last:border-b-0 animate-pulse">
-              <div className="w-12 h-12 bg-slate-200 rounded-lg" />
-              <div className="flex-1 space-y-2">
-                <div className="h-3 bg-slate-200 rounded w-1/3" />
-                <div className="h-3 bg-slate-200 rounded w-1/5" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-xs text-slate-400">Loading orders...</div>
       ) : paginatedOrders.length === 0 ? (
         <div className="bg-white p-12 text-center rounded-xl border border-slate-200">
-          <p className="text-slate-500 font-medium text-sm">No orders found matching your selected criteria.</p>
+          <p className="text-slate-500 font-medium text-sm">No orders found.</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -250,7 +158,6 @@ export default function AdminOrdersPage() {
                   <th className="p-4">Customer</th>
                   <th className="p-4">Items</th>
                   <th className="p-4">Total</th>
-                  <th className="p-4">Payment Method</th>
                   <th className="p-4">Status</th>
                   <th className="p-4">Date</th>
                   <th className="p-4 text-right">Actions</th>
@@ -271,9 +178,6 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="p-4 font-bold text-slate-900">{formatPrice(order.total)}</td>
                     <td className="p-4">
-                      {renderPaymentBadge(order.paymentMethod)}
-                    </td>
-                    <td className="p-4">
                       <span className={`px-2.5 py-1 rounded-md text-xs capitalize ${statusColors[order.status]}`}>
                         {order.status}
                       </span>
@@ -284,7 +188,7 @@ export default function AdminOrdersPage() {
                     <td className="p-4 text-right">
                       <Link
                         href={`/admin/orders/${order._id}`}
-                        className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-[#0B1E3D] hover:bg-slate-100 transition-colors"
+                        className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-[#0B1E3D] hover:bg-slate-100"
                       >
                         View
                       </Link>
@@ -308,16 +212,13 @@ export default function AdminOrdersPage() {
                 type="button"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-white transition-all"
+                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold hover:bg-slate-100 disabled:opacity-40 transition-all"
               >
                 Previous
               </button>
 
-              {/* Dynamic Page Buttons */}
               {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .filter((page) => {
-                  return page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1;
-                })
+                .filter((page) => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
                 .map((page, idx, array) => {
                   const prevPage = array[idx - 1];
                   const showEllipsis = prevPage && page - prevPage > 1;
@@ -344,7 +245,7 @@ export default function AdminOrdersPage() {
                 type="button"
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages || totalPages === 0}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-white transition-all"
+                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold hover:bg-slate-100 disabled:opacity-40 transition-all"
               >
                 Next
               </button>

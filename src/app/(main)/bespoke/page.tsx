@@ -13,7 +13,10 @@ import {
   Send, 
   CheckCircle2, 
   Clock, 
-  Award 
+  Award,
+  MessageCircle,
+  X,
+  Check
 } from "lucide-react";
 
 // Color Options List
@@ -32,19 +35,40 @@ const COLOR_OPTIONS = [
   { name: "Pink", hex: "#EC4899" },
 ];
 
+// Sports Preset Categories
+const SPORT_CATEGORIES = [
+  { id: "soccer", label: "Soccer / Football ⚽" },
+  { id: "cricket", label: "Cricket 🏏" },
+  { id: "basketball", label: "Basketball 🏀" },
+  { id: "hoodies", label: "Hoodies / Tracksuits 🧥" },
+  { id: "esports", label: "Esports & Gaming 🎮" },
+  { id: "other", label: "Other Custom Apparel 🎽" },
+];
+
+// Quick Customization Options
+const CUSTOMIZATION_FEATURES = [
+  "Full Sublimation Printing",
+  "Player Names & Numbers",
+  "Embroidered Logo/Badge",
+  "Custom Collar Styles",
+  "Sponsor Logos Included",
+];
+
 export default function ContactUsPage() {
   // Form State
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
+    category: "Soccer / Football ⚽",
     quantity: "10-25",
     color: "Navy",
-    size: "M",
+    customFeatures: [] as string[],
     details: "",
   });
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   // Anti-Copy & Anti-Right-Click Security Handlers
@@ -54,7 +78,6 @@ export default function ContactUsPage() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent Ctrl+C, Ctrl+U, Ctrl+S, F12
       if (
         (e.ctrlKey || e.metaKey) &&
         ["c", "u", "s", "p", "a"].includes(e.key.toLowerCase())
@@ -72,37 +95,90 @@ export default function ContactUsPage() {
     };
   }, []);
 
+  // Handle File Upload & Preview
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    if (file) {
+      setUploadedFile(file);
+      if (file.type.startsWith("image/")) {
+        setFilePreview(URL.createObjectURL(file));
+      } else {
+        setFilePreview(null);
+      }
+    }
+  };
+
+  const removeFile = () => {
+    setUploadedFile(null);
+    setFilePreview(null);
+  };
+
+  // Toggle Customization Feature
+  const toggleFeature = (feature: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      customFeatures: prev.customFeatures.includes(feature)
+        ? prev.customFeatures.filter((f) => f !== feature)
+        : [...prev.customFeatures, feature],
+    }));
+  };
+
+  // Handle Form Submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 5000);
   };
 
+  // Quick Direct WhatsApp Redirect
+  const handleDirectWhatsApp = () => {
+    const text = encodeURIComponent(
+      `Hi XTeamwear! I want a custom quote:\n- Category: ${formData.category}\n- Qty: ${formData.quantity}\n- Color: ${formData.color}\n- Name: ${formData.fullName || "N/A"}`
+    );
+    window.open(`https://wa.me/923000000000?text=${text}`, "_blank");
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans select-none relative">
       
       {/* Visual Header / Banner */}
-      <section className="relative bg-slate-950 text-white py-20 px-4 overflow-hidden">
+      <section className="relative bg-slate-950 text-white py-16 sm:py-20 px-4 overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]" />
         <div className="max-w-6xl mx-auto text-center relative z-10 space-y-4">
           <span className="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-extrabold text-xs tracking-widest uppercase px-4 py-1.5 rounded-full inline-block">
-            Pro Custom Apparel & Manufacturing
+            Pro Custom Apparel & Factory Manufacturing
           </span>
-          <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tight">
-            Contact Us & <span className="text-amber-500">Get A Quote</span>
+          <h1 className="text-3xl sm:text-6xl font-black uppercase tracking-tight">
+            Design Your <span className="text-amber-500">Custom Kit</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-slate-400 text-sm sm:text-base font-medium">
-            Factory-direct custom soccer jerseys & teamwear tailored to your exact specs. High sublimation quality, low MOQs, and express delivery.
+          <p className="max-w-2xl mx-auto text-slate-400 text-xs sm:text-base font-medium">
+            Factory-direct custom teamwear. Submit your details below for a free 3D mockup & instant factory quote.
           </p>
+
+          {/* 3-Step Process Indicator */}
+          <div className="pt-6 grid grid-cols-3 max-w-xl mx-auto text-center gap-2">
+            <div className="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl">
+              <span className="text-amber-400 font-black text-xs sm:text-sm block">1. Select Specs</span>
+              <span className="text-[10px] text-slate-400">Choose colors & qty</span>
+            </div>
+            <div className="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl">
+              <span className="text-amber-400 font-black text-xs sm:text-sm block">2. Free Mockup</span>
+              <span className="text-[10px] text-slate-400">Design approval</span>
+            </div>
+            <div className="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl">
+              <span className="text-amber-400 font-black text-xs sm:text-sm block">3. Fast Delivery</span>
+              <span className="text-[10px] text-slate-400">2-week turnaround</span>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Main Form & Info Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20 pb-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Column: Direct Contact & Perks */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-4 space-y-6">
             
             {/* Quick Contact Card */}
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xl space-y-6">
@@ -141,6 +217,17 @@ export default function ContactUsPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Instant WhatsApp Quick Order CTA */}
+              <div className="pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={handleDirectWhatsApp}
+                  className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <MessageCircle className="w-5 h-5 fill-current" /> Order Fast Via WhatsApp
+                </button>
+              </div>
             </div>
 
             {/* Why Choose Us Highlight Box */}
@@ -152,23 +239,23 @@ export default function ContactUsPage() {
               <ul className="space-y-3 text-xs sm:text-sm text-slate-300 font-medium">
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Zero Sublimation Fading:</strong> High-grade Italian inks guarantee crisp color forever.</span>
+                  <span><strong>Zero Sublimation Fading:</strong> Italian inks guarantee crisp colors forever.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Fast Turnaround:</strong> 2-week rush production & express shipping available.</span>
+                  <span><strong>Fast Turnaround:</strong> 2-week rush production & express shipping.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Full Customization:</strong> Names, numbers, badges, sponsor logos included.</span>
+                  <span><strong>Full Customization:</strong> Names, numbers & logos included.</span>
                 </li>
               </ul>
             </div>
 
           </div>
 
-          {/* Right Column: Interactive Order Form */}
-          <div className="lg:col-span-7">
+          {/* Right Column: Interactive Easy Order Form */}
+          <div className="lg:col-span-8">
             <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-2xl relative">
               
               {submitted && (
@@ -187,10 +274,33 @@ export default function ContactUsPage() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 
-                {/* Name & Email Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* 1. Category Chip Selection */}
+                <div>
+                  <label className="block text-xs font-extrabold uppercase text-slate-700 mb-2">
+                    1. Select Sport / Category *
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {SPORT_CATEGORIES.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, category: cat.label })}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                          formData.category === cat.label
+                            ? "bg-amber-500 border-amber-500 text-slate-950 shadow-md"
+                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Contact Details (Name, Email, Phone) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-extrabold uppercase text-slate-700 mb-1.5">
                       Full Name *
@@ -218,10 +328,7 @@ export default function ContactUsPage() {
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all"
                     />
                   </div>
-                </div>
 
-                {/* Phone & Quantity Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-extrabold uppercase text-slate-700 mb-1.5">
                       Phone / WhatsApp *
@@ -235,10 +342,13 @@ export default function ContactUsPage() {
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all"
                     />
                   </div>
+                </div>
 
+                {/* 3. Quantity & Color Selection */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
                   <div>
                     <label className="block text-xs font-extrabold uppercase text-slate-700 mb-1.5">
-                      Estimated Order Quantity
+                      Estimated Quantity
                     </label>
                     <select
                       value={formData.quantity}
@@ -251,59 +361,120 @@ export default function ContactUsPage() {
                       <option value="100+">Bulk Order (100+ Kits)</option>
                     </select>
                   </div>
+
+                  <div>
+                    <label className="block text-xs font-extrabold uppercase text-slate-700 mb-2">
+                      Primary Team Color: <span className="text-amber-600 font-black">{formData.color}</span>
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {COLOR_OPTIONS.map((c) => (
+                        <button
+                          key={c.name}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, color: c.name })}
+                          title={c.name}
+                          className={`w-7 h-7 rounded-full border-2 transition-transform cursor-pointer ${
+                            formData.color === c.name
+                              ? "border-amber-500 scale-110 ring-2 ring-amber-500/20"
+                              : "border-slate-300 hover:scale-105"
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Color Selection Palette */}
+                {/* 4. Quick Checkbox Specifications */}
                 <div>
                   <label className="block text-xs font-extrabold uppercase text-slate-700 mb-2">
-                    Primary Team Color: <span className="text-amber-600 font-black">{formData.color}</span>
+                    Included Customizations (Select all that apply)
                   </label>
-                  <div className="flex flex-wrap gap-2.5">
-                    {COLOR_OPTIONS.map((c) => (
-                      <button
-                        key={c.name}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, color: c.name })}
-                        title={c.name}
-                        className={`w-8 h-8 rounded-full border-2 transition-transform cursor-pointer ${
-                          formData.color === c.name
-                            ? "border-amber-500 scale-110 ring-2 ring-amber-500/20"
-                            : "border-slate-300 hover:scale-105"
-                        }`}
-                        style={{ backgroundColor: c.hex }}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {CUSTOMIZATION_FEATURES.map((feature) => {
+                      const isChecked = formData.customFeatures.includes(feature);
+                      return (
+                        <div
+                          key={feature}
+                          onClick={() => toggleFeature(feature)}
+                          className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                            isChecked
+                              ? "bg-amber-50/80 border-amber-400 text-slate-900"
+                              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                          }`}
+                        >
+                          <div className={`w-4 h-4 rounded flex items-center justify-center border ${
+                            isChecked ? "bg-amber-500 border-amber-500 text-slate-950" : "border-slate-300 bg-white"
+                          }`}>
+                            {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                          </div>
+                          <span>{feature}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 5. Artwork Upload Dropzone with Live Preview */}
+                <div>
+                  <label className="block text-xs font-extrabold uppercase text-slate-700 mb-1.5">
+                    Upload Logo / Rough Sketch (Optional)
+                  </label>
+
+                  {!uploadedFile ? (
+                    <div className="border-2 border-dashed border-slate-200 hover:border-amber-500 rounded-2xl p-5 bg-slate-50 transition-colors text-center cursor-pointer relative">
+                      <input
+                        type="file"
+                        accept="image/*,.pdf,.ai,.eps"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                       />
-                    ))}
-                  </div>
+                      <UploadCloud className="w-8 h-8 text-amber-500 mx-auto mb-1" />
+                      <p className="text-xs font-bold text-slate-700">
+                        Click or drag logo files / rough sketch here
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Supports PNG, JPG, PDF, Vector (AI/EPS)</p>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between p-3 bg-amber-50/50 border border-amber-200 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        {filePreview ? (
+                          <div className="w-12 h-12 relative rounded-lg overflow-hidden border border-slate-200 bg-white shrink-0">
+                            <Image src={filePreview} alt="Preview" fill className="object-cover" />
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 bg-amber-500/20 text-amber-700 rounded-lg flex items-center justify-center font-black text-xs">
+                            DOC
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-xs font-black text-slate-900 truncate max-w-[200px]">
+                            {uploadedFile.name}
+                          </p>
+                          <p className="text-[10px] text-slate-500 font-bold">
+                            {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeFile}
+                        className="p-1.5 bg-white hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full border border-slate-200 transition-colors cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Artwork Upload Dropzone */}
+                {/* 6. Additional Details */}
                 <div>
                   <label className="block text-xs font-extrabold uppercase text-slate-700 mb-1.5">
-                    Upload Logo / Design Vector (Optional)
-                  </label>
-                  <div className="border-2 border-dashed border-slate-200 hover:border-amber-500 rounded-2xl p-4 bg-slate-50 transition-colors text-center cursor-pointer relative">
-                    <input
-                      type="file"
-                      accept="image/*,.pdf,.ai,.eps"
-                      onChange={(e) => setUploadedFile(e.target.files?.[0] || null)}
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    />
-                    <UploadCloud className="w-8 h-8 text-amber-500 mx-auto mb-1" />
-                    <p className="text-xs font-bold text-slate-700">
-                      {uploadedFile ? uploadedFile.name : "Click or drag logo files here"}
-                    </p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Supports PNG, JPG, PDF, AI, EPS</p>
-                  </div>
-                </div>
-
-                {/* Additional Details */}
-                <div>
-                  <label className="block text-xs font-extrabold uppercase text-slate-700 mb-1.5">
-                    Project Notes & Specifications
+                    Special Instructions / Notes (Optional)
                   </label>
                   <textarea
-                    rows={3}
-                    placeholder="Specify sizing split, collar preference, sleeve style..."
+                    rows={2}
+                    placeholder="Any specific collar style, fabric preference, or delivery timeline needed..."
                     value={formData.details}
                     onChange={(e) => setFormData({ ...formData, details: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all"
