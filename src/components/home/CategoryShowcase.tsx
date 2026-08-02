@@ -71,7 +71,7 @@ export default function CategoryShowcase() {
   }
 
   return (
-    <section className="py-12 bg-slate-50 text-slate-900 font-sans overflow-hidden border-t border-slate-200">
+    <section className="py-7 bg-slate-50 text-slate-900 font-sans overflow-hidden border-t border-slate-200">
       <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-xl mx-auto space-y-2 mb-8">

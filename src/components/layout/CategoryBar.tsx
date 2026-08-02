@@ -66,7 +66,7 @@ export default function CategoryBar() {
     <>
       {/* ================= 1. PRIMARY CATEGORY BAR (NORMAL SCROLL) ================= */}
       <nav className="w-full bg-[#0B1426] text-slate-100 hidden xl:block border-t border-slate-800/80 font-sans">
-        <div className="max-w-[1440px] h-[56px] mx-auto px-6 flex justify-between items-center">
+        <div className="max-w-[2560px] h-[56px] mx-auto px-6 flex justify-between items-center">
           
           {/* All Categories Dropdown Trigger */}
           <div className="relative group/megamenu">

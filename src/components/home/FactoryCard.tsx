@@ -57,7 +57,7 @@ export default function FactoryCard() {
   // Premium Skeleton Loading State
   if (loading) {
     return (
-      <section className="max-w-[2560px] mx-auto px-6 py-12">
+      <section className="max-w-[2560px] mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="animate-pulse space-y-3">
@@ -73,7 +73,7 @@ export default function FactoryCard() {
   if (features.length === 0) return null;
 
   return (
-    <section className="max-w-[2560px] mx-auto px-6 py-12 font-sans">
+    <section className="max-w-[2560px] mx-auto py-5 font-sans">
       
       {/* Optional Section Header for Brand Presence */}
       <div className="text-center mb-10">
@@ -86,7 +86,7 @@ export default function FactoryCard() {
       </div>
 
       {/* Grid Cards Container */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 px-[15px]">
         {features.map((item, i) => (
           <div
             key={i}

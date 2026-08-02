@@ -52,7 +52,7 @@ export default function PromiseSection() {
   }, []);
 
   return (
-    <section className="bg-slate-50/70 py-20 border-t border-slate-100 font-sans">
+    <section className="bg-slate-50/70 py-7 border-t border-slate-100 font-sans">
       <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}

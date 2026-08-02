@@ -160,8 +160,7 @@ export default function OrderSummary() {
         const resData = await res.json();
 
         if (res.ok) {
-          // 📲 WHATSAPP MESSAGE FORMATTING
-          const whatsappNumber = "923069110314"; // 👈 Apne Business WhatsApp Number se replace karein (Country code ke sath)
+          const whatsappNumber = "923069110314";
           
           let itemsListText = cart
             .map((item: any, i: number) => `${i + 1}. *${item.name || "Product"}* (x${item.qty}) - $${(item.newPrice * item.qty).toFixed(2)}`)
