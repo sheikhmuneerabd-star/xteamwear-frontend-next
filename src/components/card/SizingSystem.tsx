@@ -19,6 +19,8 @@ import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types/product";
 import { formatPrice } from "@/lib/formatPrice";
 
+const WHATSAPP_NUMBER = "923069110314";
+
 interface PlayerRow {
   size: string;
   name: string;
@@ -80,6 +82,12 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<SizingFormData>(emptyForm);
+
+  // Dynamic WhatsApp Link with encoded product query details
+  const whatsappMsg = encodeURIComponent(
+    `Hi! I need design assistance regarding product: ${product.name} (Color: ${selectedColor})`
+  );
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMsg}`;
 
   const handlePlayerChange = (index: number, field: keyof PlayerRow, value: string) => {
     setFormData((prev) => {
@@ -518,13 +526,14 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
 
         <hr className="border-slate-100" />
 
+        {/* Updated WhatsApp Section linked to target number */}
         <div className="flex items-center gap-2 text-lg font-medium text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
           <span>Need design assistance?</span>
           <a
-            href="https://wa.me/"
+            href={whatsappUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 font-bold text-emerald-600 hover:underline"
+            className="inline-flex items-center gap-1 font-bold text-emerald-600 hover:underline cursor-pointer"
           >
             <IoLogoWhatsapp className="text-base text-emerald-500" /> WhatsApp Direct
           </a>

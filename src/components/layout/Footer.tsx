@@ -49,7 +49,7 @@ const footerNavigation: FooterColumn[] = [
     links: [
       { label: "Shipping & Delivery", href: "/shipping" },
       { label: "Returns & Exchanges", href: "/returns" },
-      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
       { label: "Terms & Conditions", href: "/terms" },
       { label: "Track Your Order", href: "/track-order" },
     ],

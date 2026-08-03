@@ -148,7 +148,7 @@ export async function POST(request: Request) {
 📦 *Ordered Items:*
 ${orderItemsText}
 
-💰 *Total Amount:* Rs. ${subtotal}
+💰 *Total Amount:* $${subtotal}
 ---
 ✅ *Order placed automatically from website!*
         `;

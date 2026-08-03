@@ -11,7 +11,6 @@ import {
   IoChevronUp,
   IoBagHandleOutline,
   IoLockClosed,
-  IoLogoWhatsapp,
 } from "react-icons/io5";
 import { ImSpinner2 } from "react-icons/im";
 
@@ -50,11 +49,7 @@ export default function CheckoutPage() {
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [whatsappLoading, setWhatsappLoading] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
-
-  // ✅ Fixed Phone Format (Country Code 92 ke sath, bina '+' ya '0' ke)
-  const WHATSAPP_NUMBER = "923069110314";
 
   const subtotal = cart.reduce((sum, item) => sum + item.newPrice * item.qty, 0);
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -99,7 +94,7 @@ export default function CheckoutPage() {
     return data;
   };
 
-  // 1. Standard Order Submit (COD / Regular)
+  // Standard Order Submit (COD / Regular)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -118,71 +113,6 @@ export default function CheckoutPage() {
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
       setLoading(false);
-    }
-  };
-
-  // 2. WhatsApp Direct Order Handler (FIXED LOGIC)
-  const handleWhatsAppOrder = async () => {
-    setError("");
-
-    // Form Validation Check
-    if (!form.fullName || !form.phone || !form.address || !form.city) {
-      setError("Please fill in all required shipping details before sending to WhatsApp.");
-      return;
-    }
-
-    if (cart.length === 0) {
-      setError("Your cart is empty");
-      return;
-    }
-
-    setWhatsappLoading(true);
-
-    try {
-      // Step A: Database me order save karein
-      const data = await createOrderInDb();
-
-      // Step B: Clean Text Message Format (Bina corrupt hone wale symbols ke)
-      const itemsListText = cart
-        .map(
-          (item, idx) =>
-            `${idx + 1}. ${item.name}\n   - Color: ${item.color}\n   - Qty: ${item.qty}\n   - Price: $${(item.newPrice * item.qty).toFixed(2)}`
-        )
-        .join("\n\n");
-
-      const whatsappMsg = `NEW ORDER PLACED!
-Order ID: #${data.order._id || "N/A"}
-
-Customer Details:
-• Name: ${form.fullName}
-• Phone: ${form.phone}
-• Email: ${form.email}
-• Address: ${form.address}${form.apartment ? ", " + form.apartment : ""}, ${form.city}, ${form.country}
-
-Order Items (${totalQty} items):
-${itemsListText}
-
------------------------------------
-Total Amount: $${subtotal.toFixed(2)} USD
------------------------------------
-Notes: ${notes || "None"}
-
-Please confirm my order. Thank you!`;
-
-      // Step C: Reliable URL Encoding for Mobile & Web
-      const cleanPhone = WHATSAPP_NUMBER.replace(/[^0-9]/g, "");
-      const encodedMsg = encodeURIComponent(whatsappMsg);
-      
-      // Desktop / Web compatible link
-      const whatsappUrl = `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMsg}`;
-      
-      clearCart();
-      window.open(whatsappUrl, "_blank");
-      router.push(`/order-confirmation/${data.order._id}`);
-    } catch (err: any) {
-      setError(err.message || "Failed to process WhatsApp order.");
-    } finally {
-      setWhatsappLoading(false);
     }
   };
 
@@ -373,7 +303,7 @@ Please confirm my order. Thank you!`;
               <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 flex items-center gap-3">
                 <input type="radio" checked readOnly className="accent-black" />
                 <span className="text-sm font-semibold text-gray-800">
-                  Cash on Delivery (COD) / Direct WhatsApp
+                  Cash on Delivery (COD)
                 </span>
               </div>
             </div>
@@ -384,32 +314,11 @@ Please confirm my order. Thank you!`;
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              {/* WhatsApp Direct Order Button */}
-              <button
-                type="button"
-                onClick={handleWhatsAppOrder}
-                disabled={whatsappLoading || loading}
-                className="w-full h-13 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
-              >
-                {whatsappLoading ? (
-                  <>
-                    <ImSpinner2 className="animate-spin text-lg" />
-                    <span>Opening WhatsApp...</span>
-                  </>
-                ) : (
-                  <>
-                    <IoLogoWhatsapp className="text-xl" />
-                    <span>Order via WhatsApp Direct</span>
-                  </>
-                )}
-              </button>
-
-              {/* Regular Complete Order Button */}
+            {/* Action Button */}
+            <div>
               <button
                 type="submit"
-                disabled={loading || whatsappLoading}
+                disabled={loading}
                 className="w-full h-13 bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600 text-gray-900 rounded-xl font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
               >
                 {loading ? (
@@ -418,7 +327,7 @@ Please confirm my order. Thank you!`;
                     <span>Processing Order...</span>
                   </>
                 ) : (
-                  "Complete Order (Standard Checkout)"
+                  "Complete Order"
                 )}
               </button>
             </div>

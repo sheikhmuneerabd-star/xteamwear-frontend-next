@@ -5,7 +5,7 @@ import { useCart } from "@/context/CartContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { FaCheckCircle, FaTimes, FaTruck, FaLock, FaShieldAlt, FaWhatsapp } from "react-icons/fa";
+import { FaCheckCircle, FaTimes, FaTruck, FaLock } from "react-icons/fa";
 
 export default function OrderSummary() {
   const { cart, clearCart } = useCart();
@@ -22,7 +22,6 @@ export default function OrderSummary() {
   // Success Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionId, setTransactionId] = useState("");
-  const [whatsappUrl, setWhatsappUrl] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -160,31 +159,9 @@ export default function OrderSummary() {
         const resData = await res.json();
 
         if (res.ok) {
-          const whatsappNumber = "923069110314";
-          
-          const itemsListText = cart
-            .map((item: any, i: number) => `${i + 1}. *${item.name || "Product"}* (x${item.qty}) - $${(item.newPrice * item.qty).toFixed(2)}`)
-            .join("\n");
-
-          const rawMessage = `*NEW PAID ORDER RECEIVED (PAYPAL)*\n\n` +
-            `*Transaction ID:* ${details.id}\n` +
-            `*Customer Name:* ${shippingAddressPayload.fullName}\n` +
-            `*Email:* ${shippingAddressPayload.email}\n` +
-            `*Address:* ${shippingAddressPayload.address}, ${shippingAddressPayload.city}, ${shippingAddressPayload.country}\n\n` +
-            `*ORDER ITEMS:*\n${itemsListText}\n\n` +
-            `*Subtotal:* $${subtotal.toFixed(2)} USD\n` +
-            `*Shipping:* $${shippingCost.toFixed(2)} USD\n` +
-            `*Total Paid:* *$${grandTotal.toFixed(2)} USD*\n\n` +
-            `_Payment Status: PAID_`;
-
-          const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(rawMessage)}`;
-          setWhatsappUrl(waUrl);
-
           if (clearCart) clearCart();
           setTransactionId(details.id);
           setIsModalOpen(true);
-
-          window.open(waUrl, "_blank");
         } else {
           console.error("Order Creation Error Response:", resData);
           alert(`Order Save Error: ${resData.error || "Failed to process order"}`);
@@ -434,17 +411,7 @@ export default function OrderSummary() {
               </p>
             </div>
 
-            <div className="mt-6 space-y-2">
-              {whatsappUrl && (
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2"
-                >
-                  <FaWhatsapp className="text-lg" /> Open WhatsApp Chat
-                </a>
-              )}
+            <div className="mt-6">
               <button
                 type="button"
                 onClick={() => {

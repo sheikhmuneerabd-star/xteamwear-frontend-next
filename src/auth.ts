@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google"; // 👈 Add Google
+import Google from "next-auth/providers/google";
 import { connectDB } from "@/lib/db";
 import User from "@/lib/models/User";
 import { comparePassword, hashPassword } from "@/lib/auth";
@@ -19,14 +19,42 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        isOtpLogin: { label: "isOtpLogin", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        if (!credentials?.email) return null;
 
         await connectDB();
-        const user = await User.findOne({ email: (credentials.email as string).toLowerCase() }).select("+password");
+        const email = (credentials.email as string).toLowerCase().trim();
 
-        if (!user) return null;
+        // 🟢 CASE 1: OTP Login Logic
+        if (credentials.isOtpLogin === "true") {
+          let user = await User.findOne({ email });
+
+          // Agar OTP se login karne wala naya user hai, toh DB me account create kar do
+          if (!user) {
+            const userCount = await User.countDocuments();
+            user = await User.create({
+              name: email.split("@")[0],
+              email: email,
+              password: await hashPassword(crypto.randomUUID()), // Random secure password
+              role: userCount === 0 ? "admin" : "user",
+            });
+          }
+
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+        }
+
+        // 🔵 CASE 2: Normal Password Login Logic
+        if (!credentials?.password) return null;
+
+        const user = await User.findOne({ email }).select("+password");
+        if (!user || !user.password) return null;
 
         const isValid = await comparePassword(credentials.password as string, user.password);
         if (!isValid) return null;
