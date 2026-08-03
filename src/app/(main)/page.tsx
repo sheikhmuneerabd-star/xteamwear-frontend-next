@@ -14,6 +14,7 @@ import CategoryShowcase from "@/components/home/CategoryShowcase";
 import TestimonialSlider from "@/components/home/TestimonialSlider";
 import CustomGearCTASection from "@/components/home/CustomGearCTASection";
 import PackagesSlider from "@/components/home/PackagesSlider";
+import PromoBanners from "@/components/home/PromoBanners";
 
 export default function HomePage() {
   const [showMore, setShowMore] = useState(4);
@@ -131,6 +132,8 @@ export default function HomePage() {
           <ImagesSection />
         </div>
       </section>
+
+      <PromoBanners />
 
       {/* 8. TESTIMONIALS & REVIEWS (LIGHT BACKGROUND) */}
       <section className="w-full bg-slate-50/80 border-y border-slate-100">

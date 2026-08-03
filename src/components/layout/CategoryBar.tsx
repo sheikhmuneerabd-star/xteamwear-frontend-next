@@ -242,7 +242,7 @@ export default function CategoryBar() {
           isStickyVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
         }`}
       >
-        <div className="max-w-[1440px] h-[56px] mx-auto px-6 flex justify-between items-center">
+        <div className="max-w-[2560px] h-[56px] mx-auto px-6 flex justify-between items-center">
           
           {/* Left: Brand Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-lg text-white tracking-wider">

@@ -23,7 +23,7 @@ export default function CustomGearCTASection() {
         <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-orange-500/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative max-w-5xl mx-auto text-center space-y-6 sm:space-y-8">
+      <div className="relative max-w-[2560px] mx-auto text-center space-y-6 sm:space-y-8">
         
         {/* Top Tag & Main Heading */}
         <div className="space-y-2 sm:space-y-3">
@@ -101,7 +101,7 @@ export default function CustomGearCTASection() {
               <div className="text-left">
                 <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider">Call Us Now</span>
                 <span className="text-sm font-black text-slate-950 group-hover:text-amber-600 transition-colors">
-                  (347) 850-2720
+                  (347) 580-4219
                 </span>
               </div>
             </a>

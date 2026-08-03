@@ -3,7 +3,7 @@ import Link from "next/link"; // Next.js Link import karein
 import whatsapp from "@/assets/whatsapp/WhatsApp.svg";
 
 export default function WhatsApp() {
-  const phoneNumber = "03069110314"; // Apna number daalein
+  const phoneNumber = "(347) 580-4219"; // Apna number daalein
   const message = encodeURIComponent("Hi! I have a question regarding bespoke sportswear.");
 
   return (

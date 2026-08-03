@@ -58,8 +58,8 @@ const footerNavigation: FooterColumn[] = [
 
 const socialIcons = [
   { Icon: FaYoutube, label: "YouTube", href: "#" },
-  { Icon: GrFacebookOption, label: "Facebook", href: "#" },
-  { Icon: RiInstagramFill, label: "Instagram", href: "#" },
+  { Icon: GrFacebookOption, label: "Facebook", href: "https://www.facebook.com/bespoketeamwear/" },
+  { Icon: RiInstagramFill, label: "Instagram", href: "https://www.instagram.com/bespoketeamwear/?hl=en" },
   { Icon: AiFillTikTok, label: "TikTok", href: "#" },
 ];
 
@@ -156,7 +156,7 @@ export default function Footer() {
             
             <div className="space-y-2 pt-1 text-sm">
               <a
-                href="https://wa.me/1234567890"
+                href="https://wa.me/(347) 580-4219"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2.5 text-slate-300 hover:text-amber-400 transition-colors"
@@ -166,7 +166,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="mailto:support@bespokewear.com"
+                href="info@bespoketeamwear.com"
                 className="flex items-center gap-2.5 text-slate-300 hover:text-amber-400 transition-colors"
               >
                 <MdEmail className="text-amber-400 text-lg" />

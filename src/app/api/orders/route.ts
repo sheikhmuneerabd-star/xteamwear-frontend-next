@@ -109,6 +109,69 @@ export async function POST(request: Request) {
         paymentId: paymentId || null,
       });
 
+      // -------------------------------------------------------------
+      // 2. AUTOMATED WHATSAPP MESSAGE LOGIC
+      // -------------------------------------------------------------
+      try {
+        const instanceId = process.env.ULTRAMSG_INSTANCE_ID;
+        const token = process.env.ULTRAMSG_TOKEN;
+        const toPhone = process.env.MY_WHATSAPP_NUMBER;
+
+        // Extract Customer Details safely from Body/Address/Session
+        const customerName =
+          shippingAddress?.fullName ||
+          shippingAddress?.name ||
+          session?.user?.name ||
+          "N/A";
+
+        const phone =
+          shippingAddress?.phone ||
+          shippingAddress?.phoneNumber ||
+          "N/A";
+
+        const fullAddress = typeof shippingAddress === "string"
+          ? shippingAddress
+          : `${shippingAddress?.address || shippingAddress?.street || ""}, ${shippingAddress?.city || ""}`.trim() || "N/A";
+
+        // Format Items List
+        const orderItemsText = sanitizedItems.map(
+          (item: any) => `- ${item.name || item.title || "Item"} (Color: ${item.color || "N/A"}, Qty: ${item.qty || item.quantity || 1})`
+        ).join("\n");
+
+        const messageContent = `
+🚨 *NEW WEBSITE ORDER RECEIVED!* 🛍️
+
+👤 *Customer Name:* ${customerName}
+📞 *Phone Number:* ${phone}
+📍 *Address:* ${fullAddress}
+
+📦 *Ordered Items:*
+${orderItemsText}
+
+💰 *Total Amount:* Rs. ${subtotal}
+---
+✅ *Order placed automatically from website!*
+        `;
+
+        if (instanceId && token && toPhone) {
+          await fetch(`https://api.ultramsg.com/${instanceId}/messages/chat`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+              token: token,
+              to: toPhone,
+              body: messageContent,
+            }),
+          });
+
+        }
+      } catch (wsError) {
+        // WhatsApp failure won't break the order creation process
+        console.error("❌ Failed to send WhatsApp notification:", wsError);
+      }
+
       return NextResponse.json({ order }, { status: 201 });
     } catch (orderError) {
       // Rollback on order creation error

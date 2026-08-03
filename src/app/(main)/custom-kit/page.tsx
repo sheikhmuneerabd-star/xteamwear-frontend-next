@@ -590,7 +590,7 @@ export default function CustomKitBuilderPage() {
                 type="button"
                 className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-8 py-3.5 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl cursor-pointer transition-all"
               >
-                <ShoppingCart className="w-4 h-4" /> Save Design & Order Now
+                <ShoppingCart className="w-4 h-4" /> GET ESTIMATE & CHECKOUT
               </button>
             </div>
 
