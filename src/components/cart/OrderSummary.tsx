@@ -162,29 +162,28 @@ export default function OrderSummary() {
         if (res.ok) {
           const whatsappNumber = "923069110314";
           
-          let itemsListText = cart
+          const itemsListText = cart
             .map((item: any, i: number) => `${i + 1}. *${item.name || "Product"}* (x${item.qty}) - $${(item.newPrice * item.qty).toFixed(2)}`)
-            .join("%0A");
+            .join("\n");
 
-          const message = `*NEW PAID ORDER RECEIVED (PAYPAL)*%0A%0A` +
-            `*Transaction ID:* ${details.id}%0A` +
-            `*Customer Name:* ${shippingAddressPayload.fullName}%0A` +
-            `*Email:* ${shippingAddressPayload.email}%0A` +
-            `*Address:* ${shippingAddressPayload.address}, ${shippingAddressPayload.city}, ${shippingAddressPayload.country}%0A%0A` +
-            `*ORDER ITEMS:*%0A${itemsListText}%0A%0A` +
-            `*Subtotal:* $${subtotal.toFixed(2)} USD%0A` +
-            `*Shipping:* $${shippingCost.toFixed(2)} USD%0A` +
-            `*Total Paid:* *$${grandTotal.toFixed(2)} USD*%0A%0A` +
+          const rawMessage = `*NEW PAID ORDER RECEIVED (PAYPAL)*\n\n` +
+            `*Transaction ID:* ${details.id}\n` +
+            `*Customer Name:* ${shippingAddressPayload.fullName}\n` +
+            `*Email:* ${shippingAddressPayload.email}\n` +
+            `*Address:* ${shippingAddressPayload.address}, ${shippingAddressPayload.city}, ${shippingAddressPayload.country}\n\n` +
+            `*ORDER ITEMS:*\n${itemsListText}\n\n` +
+            `*Subtotal:* $${subtotal.toFixed(2)} USD\n` +
+            `*Shipping:* $${shippingCost.toFixed(2)} USD\n` +
+            `*Total Paid:* *$${grandTotal.toFixed(2)} USD*\n\n` +
             `_Payment Status: PAID_`;
 
-          const waUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+          const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(rawMessage)}`;
           setWhatsappUrl(waUrl);
 
           if (clearCart) clearCart();
           setTransactionId(details.id);
           setIsModalOpen(true);
 
-          // Direct Redirect to WhatsApp (Optional: User popup modal se bhi click kar sakta hai)
           window.open(waUrl, "_blank");
         } else {
           console.error("Order Creation Error Response:", resData);
@@ -406,7 +405,7 @@ export default function OrderSummary() {
 
       {/* 🚀 ORDER SUCCESS CONFIRMATION MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all p-6 text-center border border-gray-100">
             <button
               onClick={() => setIsModalOpen(false)}

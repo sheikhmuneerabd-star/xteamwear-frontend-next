@@ -262,17 +262,16 @@ export default function Footer() {
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-slate-400">
           <div className="text-center md:text-left space-y-1">
             <p className="text-slate-300 font-medium">
-              © {new Date().getFullYear()} BESPOKE WEAR. All Rights Reserved.
+              © {new Date().getFullYear()} <Link href="/">BESPOKE WEAR.</Link> All Rights Reserved.
             </p>
             <p>Designing Unity. Delivering Performance. Trusted by Teams Worldwide.</p>
           </div>
 
           {/* Payment Gateways */}
-          <div className="flex items-center gap-4 text-3xl opacity-90">
+          <div className="flex items-center gap-4 text-4xl opacity-90">
             <LiaCcVisa className="text-blue-400 hover:opacity-100" />
             <FaCcPaypal className="text-cyan-400 hover:opacity-100" />
             <FaCcMastercard className="text-orange-400 hover:opacity-100" />
-            <FaCcAmazonPay className="text-amber-400 hover:opacity-100" />
           </div>
         </div>
 

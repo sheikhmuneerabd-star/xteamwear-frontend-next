@@ -518,7 +518,7 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
 
         <hr className="border-slate-100" />
 
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <div className="flex items-center gap-2 text-lg font-medium text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
           <span>Need design assistance?</span>
           <a
             href="https://wa.me/"
@@ -531,7 +531,7 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
         </div>
 
         <div className="grid grid-cols-1 gap-3 pt-2">
-          <div className="flex items-center gap-3 text-xs text-slate-700">
+          <div className="flex items-center gap-3 text-[13px] text-slate-700">
             <TbTruckDelivery className="text-2xl text-amber-600 shrink-0" />
             <div>
               <p className="font-bold text-slate-900 uppercase">Express Dispatch Available</p>
@@ -539,7 +539,7 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-slate-700">
+          <div className="flex items-center gap-3 text-[13px] text-slate-700">
             <IoShirtOutline className="text-2xl text-amber-600 shrink-0" />
             <div>
               <p className="font-bold text-slate-900 uppercase">Low Minimum MOQ (1 Piece)</p>
@@ -547,7 +547,7 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-slate-700">
+          <div className="flex items-center gap-3 text-[13px] text-slate-700">
             <TbShirtFilled className="text-2xl text-amber-600 shrink-0" />
             <div>
               <p className="font-bold text-slate-900 uppercase">Sublimation Guarantee</p>

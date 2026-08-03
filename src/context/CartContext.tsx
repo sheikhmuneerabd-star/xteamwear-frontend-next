@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { Product } from "@/types/product";
-import type { SizingFormData } from "@/types/sizing";
+import type { SizingFormData, PlayerRow } from "@/types/sizing";
 
 export interface CartItem extends Product {
   qty: number;
@@ -13,8 +13,8 @@ export interface CartItem extends Product {
 interface CartContextValue {
   cart: CartItem[];
   addToCart: (product: Product, color: string, sizingDetailData?: SizingFormData) => void;
-  increase: (id: number | string, color: string) => void;
-  decrease: (id: number | string, color: string) => void;
+  increase: (id: number | string, color: string, newPlayer?: PlayerRow) => void;
+  decrease: (id: number | string, color: string, playerIndexToRemove?: number) => void;
   removeFromCart: (id: number | string, color: string) => void;
   clearCart: () => void;
 }
@@ -52,29 +52,90 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Har cart line ab id + color se unique hai
   const addToCart = (product: Product, color: string, sizingDetailData?: SizingFormData) => {
+    const addedQty = sizingDetailData?.players?.length && sizingDetailData.players.length > 0 
+      ? sizingDetailData.players.length 
+      : 1;
+
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id && item.color === color);
+      
       if (existing) {
         return prev.map((item) =>
           item.id === product.id && item.color === color
-            ? { ...item, qty: item.qty + 1, sizingDetailData: sizingDetailData ?? item.sizingDetailData }
+            ? { 
+                ...item, 
+                qty: item.qty + addedQty, 
+                sizingDetailData: sizingDetailData ?? item.sizingDetailData 
+              }
             : item
         );
       }
-      return [...prev, { ...product, qty: 1, color, sizingDetailData }];
+      
+      return [...prev, { ...product, qty: addedQty, color, sizingDetailData }];
     });
   };
 
-  const increase = (id: number | string, color: string) => {
+  // INCREASE LOGIC
+  const increase = (id: number | string, color: string, newPlayer?: PlayerRow) => {
     setCart((prev) =>
-      prev.map((item) => (item.id === id && item.color === color ? { ...item, qty: item.qty + 1 } : item))
+      prev.map((item): CartItem => {
+        if (item.id === id && item.color === color) {
+          if (item.sizingDetailData) {
+            const currentPlayers = item.sizingDetailData.players || [];
+            const updatedPlayers = newPlayer 
+              ? [...currentPlayers, newPlayer] 
+              : currentPlayers;
+
+            return {
+              ...item,
+              qty: item.qty + 1,
+              sizingDetailData: {
+                ...item.sizingDetailData,
+                players: updatedPlayers,
+              },
+            };
+          }
+
+          return {
+            ...item,
+            qty: item.qty + 1,
+          };
+        }
+        return item;
+      })
     );
   };
 
-  const decrease = (id: number | string, color: string) => {
+  // DECREASE LOGIC
+  const decrease = (id: number | string, color: string, playerIndexToRemove?: number) => {
     setCart((prev) =>
       prev
-        .map((item) => (item.id === id && item.color === color ? { ...item, qty: item.qty - 1 } : item))
+        .map((item): CartItem => {
+          if (item.id === id && item.color === color) {
+            if (item.sizingDetailData) {
+              let updatedPlayers = item.sizingDetailData.players || [];
+
+              if (typeof playerIndexToRemove === "number") {
+                updatedPlayers = updatedPlayers.filter((_, idx) => idx !== playerIndexToRemove);
+              }
+
+              return {
+                ...item,
+                qty: item.qty - 1,
+                sizingDetailData: {
+                  ...item.sizingDetailData,
+                  players: updatedPlayers,
+                },
+              };
+            }
+
+            return {
+              ...item,
+              qty: item.qty - 1,
+            };
+          }
+          return item;
+        })
         .filter((item) => item.qty > 0)
     );
   };
