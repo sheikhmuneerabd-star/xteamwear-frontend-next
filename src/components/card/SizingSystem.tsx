@@ -72,9 +72,9 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
 
   const [decorationMode, setDecorationMode] = useState<"standard" | "bespoke">("standard");
 
-  const [teamNameOpen, setTeamNameOpen] = useState(false);
-  const [playerNumberOpen, setPlayerNumberOpen] = useState(false);
-  const [logoOpen, setLogoOpen] = useState(false);
+  const [teamNameOpen, setTeamNameOpen] = useState(true);
+  const [playerNumberOpen, setPlayerNumberOpen] = useState(true);
+  const [logoOpen, setLogoOpen] = useState(true);
   const [sponsorOpen, setSponsorOpen] = useState(false);
 
   const [uploadingLogo, setUploadingLogo] = useState(false);
