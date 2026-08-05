@@ -8,13 +8,14 @@ import { authConfig } from "@/auth.config";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
-  trustHost: true,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET, // 👈 Secret explicitly set
+  trustHost: true, // 👈 Explicitly trust host for Vercel
   session: { strategy: "jwt" },
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true, // 👈 Link Google email with existing accounts
     }),
     Credentials({
       name: "credentials",
@@ -29,17 +30,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         await connectDB();
         const email = (credentials.email as string).toLowerCase().trim();
 
-        // 🟢 CASE 1: OTP Login Logic
         if (credentials.isOtpLogin === "true") {
           let user = await User.findOne({ email });
 
-          // Agar OTP se login karne wala naya user hai, toh DB me account create kar do
           if (!user) {
             const userCount = await User.countDocuments();
             user = await User.create({
               name: email.split("@")[0],
               email: email,
-              password: await hashPassword(crypto.randomUUID()), // Random secure password
+              password: await hashPassword(crypto.randomUUID()),
               role: userCount === 0 ? "admin" : "user",
             });
           }
@@ -52,7 +51,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
         }
 
-        // 🔵 CASE 2: Normal Password Login Logic
         if (!credentials?.password) return null;
 
         const user = await User.findOne({ email }).select("+password");
