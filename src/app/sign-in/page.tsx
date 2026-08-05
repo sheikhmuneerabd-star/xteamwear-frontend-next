@@ -544,6 +544,9 @@ export default function SignInUpPage() {
                   <button
                     type="button"
                     className="font-bold text-amber-600 hover:text-amber-700 underline underline-offset-2 ml-1 cursor-pointer"
+                    onClick={() => {
+                      setMode("signin");
+                    }}
                   >
                     Sign in
                   </button>
