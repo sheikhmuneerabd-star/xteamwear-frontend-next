@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import xteamwear from "@/assets/logo.svg";
+import bespoketeamwear from "@/assets/BSW-BLACK-LOGO.webp";
 import google from "@/assets/google.png";
 import { ImSpinner2 } from "react-icons/im";
 import { IoMailOutline, IoArrowBack, IoLockClosedOutline, IoPersonOutline, IoShieldCheckmarkSharp } from "react-icons/io5";
@@ -226,8 +226,8 @@ export default function SignInUpPage() {
         <div className="relative z-10 flex items-center space-x-3">
           <Link href="/">
             <Image
-              className="w-[180px] sm:w-[220px] h-auto object-contain brightness-0 invert"
-              src={xteamwear}
+              className="w-[180px] sm:w-[205px] h-auto object-contain brightness-0 invert"
+              src={bespoketeamwear}
               alt="XTeamWear"
               priority
             />
