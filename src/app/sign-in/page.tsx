@@ -228,7 +228,7 @@ export default function SignInUpPage() {
             <Image
               className="w-[180px] sm:w-[205px] h-auto object-contain brightness-0 invert"
               src={bespoketeamwear}
-              alt="XTeamWear"
+              alt="Bespoketeamwear"
               priority
             />
           </Link>
@@ -270,7 +270,7 @@ export default function SignInUpPage() {
         {/* Testimonial Quote */}
         <div className="relative z-10 p-4.5 rounded-2xl bg-slate-800/60 border border-slate-700/50 backdrop-blur-sm">
           <p className="text-xs text-slate-300 italic mb-2.5 leading-relaxed">
-            "XTeamwear made ordering our squad's football kits effortless. The 3D preview and print quality were top-notch!"
+            "Bespoketeamwear made ordering our squad's football kits effortless. The 3D preview and print quality were top-notch!"
           </p>
           <div className="flex items-center space-x-2.5">
             <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center font-bold text-xs text-amber-400 border border-amber-400/30">
@@ -320,7 +320,7 @@ export default function SignInUpPage() {
             <p className="text-sm text-slate-500 mt-1">
               {authType === "otp"
                 ? (otpStep === "request" ? "Enter email to receive a 6-digit login code" : `Code sent to ${email}`)
-                : (mode === "signin" ? "Sign in to access your orders and saved designs" : "Join XTeamwear to customize and track your sportswear")}
+                : (mode === "signin" ? "Sign in to access your orders and saved designs" : "Join Bespoketeamwear to customize and track your sportswear")}
             </p>
           </div>
 
