@@ -7,8 +7,9 @@ import { comparePassword, hashPassword } from "@/lib/auth";
 import { authConfig } from "@/auth.config";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   ...authConfig,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  trustHost: true,
   session: { strategy: "jwt" },
   providers: [
     Google({
