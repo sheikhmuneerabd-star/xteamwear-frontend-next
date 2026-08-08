@@ -54,7 +54,7 @@ export default function HeroSlider() {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[calc(100vh-70px)] xl:mt-0 mt-[56px] max-h-[750px] min-h-[440px] bg-slate-950 font-sans group overflow-hidden">
+    <section className="relative w-full h-[calc(100vh-70px)] xl:mt-0 mt-[56px] max-h-[750px] min-h-[714px] bg-slate-950 font-sans group overflow-hidden">
       <Swiper
         modules={[Navigation, Autoplay, EffectFade, Pagination]}
         loop

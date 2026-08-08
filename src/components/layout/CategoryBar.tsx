@@ -9,6 +9,8 @@ import {
 } from "react-icons/hi2";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface DbSubcategory {
   name: string;
@@ -30,6 +32,27 @@ export default function CategoryBar() {
 
   const lastScrollY = useRef(0);
   const { cart } = useCart();
+  const router = useRouter();
+
+  const handleCartClick = () => {
+    if(!cart || cart.length === 0) {
+      toast.error("Your cart is empty! Add items first.", {
+        style: {
+          borderRadius: '12px',
+          background: '#0f172a', // Slate 900
+          color: '#fff',
+          fontSize: '13px',
+          fontWeight: '600',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#fff',
+        },
+      });
+      return;
+    }
+    router.push("/cart");
+  }
 
   useEffect(() => {
     async function fetchCategories() {
@@ -226,12 +249,6 @@ export default function CategoryBar() {
             >
               Tailored Bespoke
             </Link>
-            <Link
-              href="/reviews"
-              className="text-[14px] font-medium text-slate-200 hover:text-amber-400 transition-colors"
-            >
-              All Reviews
-            </Link>
           </div>
         </div>
       </nav>
@@ -341,14 +358,14 @@ export default function CategoryBar() {
               Tailored Bespoke
             </Link>
 
-            <Link href="/cart" className="text-slate-200 hover:text-amber-400 transition-colors relative p-1.5">
+            <div onClick={handleCartClick} className="text-slate-200 hover:text-amber-400 transition-colors relative p-1.5">
               <PiShoppingCartLight className="text-2xl" />
               {cart.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-amber-500 text-slate-950 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-md">
                   {cart.length}
                 </span>
               )}
-            </Link>
+            </div>
           </div>
 
         </div>

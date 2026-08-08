@@ -184,6 +184,17 @@ export default function SiteSettingsPage() {
   const addSquadImage = () => setSquadImages((prev) => [...prev, ""]);
   const removeSquadImage = (index: number) => setSquadImages((prev) => prev.filter((_, i) => i !== index));
 
+  /* --- Advantages (Factory Cards) Handlers --- */
+  const addAdvantage = () => setAdvantages((prev) => [...prev, { ...emptyAdvantage }]);
+  const removeAdvantage = (index: number) => setAdvantages((prev) => prev.filter((_, i) => i !== index));
+  const updateAdvantage = (index: number, field: keyof Advantage, value: string) => {
+    setAdvantages((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
   const updateBespokeField = (field: keyof BespokeBanner, value: any) => {
     setBespokeBanner((prev) => ({ ...prev, [field]: value }));
   };
@@ -571,6 +582,59 @@ export default function SiteSettingsPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Factory Precision & Craftsmanship (Why Choose Us) */}
+      <div className="bg-white rounded-lg shadow p-6 space-y-4 border border-gray-100">
+        <div className="flex justify-between items-center border-b pb-3">
+          <div>
+            <h2 className="font-medium text-lg text-gray-900">
+              Factory Precision & Craftsmanship (Why Choose Us)
+            </h2>
+            <p className="text-xs text-gray-500">
+              Manage factory cards displayed on the homepage.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addAdvantage}
+            className="text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium"
+          >
+            + Add Advantage Card
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {advantages.map((adv, i) => (
+            <div key={i} className="border border-gray-200 rounded-md p-3 space-y-2 bg-gray-50">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-bold text-gray-600">Card #{i + 1}</span>
+                {advantages.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeAdvantage(i)}
+                    className="text-xs text-red-600 hover:underline"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+
+              <ImageUploader
+                label="Card Image"
+                value={adv.image}
+                onChange={(url) => updateAdvantage(i, "image", url)}
+              />
+
+              <input
+                className="w-full border border-gray-300 rounded-md p-1.5 text-xs font-semibold"
+                placeholder="Card Title"
+                value={adv.title}
+                onChange={(e) => updateAdvantage(i, "title", e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Squad / Gallery Images Section */}

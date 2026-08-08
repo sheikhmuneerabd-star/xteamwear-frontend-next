@@ -245,7 +245,7 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
             >
               Standard Custom
             </button>
-            <button
+            {/* <button
               type="button"
               onClick={() => setDecorationMode("bespoke")}
               className={`py-3 px-4 rounded-xl cursor-pointer font-bold text-xs uppercase tracking-wider border flex items-center justify-center gap-1.5 transition-all duration-200 ${
@@ -255,7 +255,7 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
               }`}
             >
               <HiOutlineSparkles className="text-amber-400 text-sm" /> Bespoke Design
-            </button>
+            </button> */}
           </div>
         </div>
 

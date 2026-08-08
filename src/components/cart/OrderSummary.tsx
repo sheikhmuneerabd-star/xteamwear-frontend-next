@@ -289,7 +289,7 @@ export default function OrderSummary() {
               </div>
             </div>
 
-            {/* COUPON CODE */}
+            {/* COUPON CODE
             <div className="mt-3 border-b border-gray-300 pb-4">
               <div
                 className="flex justify-between items-center cursor-pointer py-1"
@@ -326,7 +326,7 @@ export default function OrderSummary() {
                   </p>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* TOTAL */}
             <div className="flex justify-between items-center border-b border-gray-300 pb-4 pt-2">

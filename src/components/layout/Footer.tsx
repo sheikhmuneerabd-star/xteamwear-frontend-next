@@ -88,38 +88,6 @@ export default function Footer() {
   return (
     <footer className="bg-[#0B1426] text-slate-300 font-sans border-t border-slate-800 pt-16 pb-8">
       <div className="max-w-[1440px] mx-auto px-6 lg:px-10">
-        
-        {/* ================= 1. NEWSLETTER SECTION ================= */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 lg:p-12 mb-16 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="max-w-xl text-center lg:text-left">
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-              Stay Connected
-            </span>
-            <h3 className="text-2xl lg:text-3xl font-extrabold text-white mt-3 tracking-tight">
-              SIGN UP FOR OUR NEWSLETTER
-            </h3>
-            <p className="text-slate-400 text-sm mt-1.5 leading-relaxed">
-              Receive exclusive team apparel discounts, new drops, and custom design updates straight to your inbox.
-            </p>
-          </div>
-
-          <form onSubmit={handleNewsletterSubmit} className="w-full sm:w-auto flex flex-col sm:flex-row gap-3">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address..."
-              className="w-full sm:w-[320px] lg:w-[360px] px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-amber-500 transition-colors"
-            />
-            <button
-              type="submit"
-              className="px-8 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm rounded-xl transition-all duration-200 cursor-pointer shadow-lg shadow-amber-500/10 shrink-0"
-            >
-              SUBSCRIBE
-            </button>
-          </form>
-        </div>
 
         {/* ================= 2. MAIN FOOTER CONTENT ================= */}
         

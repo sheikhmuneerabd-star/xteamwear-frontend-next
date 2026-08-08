@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { CartProvider } from "@/context/CartContext";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Xteamwear | Custom Team Uniforms & Sublimated Jerseys",
@@ -18,6 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider>
+          <Toaster position="top-center" reverseOrder={false} />
           <CartProvider>{children}</CartProvider>
         </SessionProvider>
       </body>

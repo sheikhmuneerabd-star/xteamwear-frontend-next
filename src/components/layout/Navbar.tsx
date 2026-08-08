@@ -9,6 +9,7 @@ import { PiShoppingCartLight, PiUserLight } from "react-icons/pi";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import MobileNavbar from "./MobileNavbar";
+import toast from "react-hot-toast";
 
 interface CategoryMenuEntry {
   id: number;
@@ -238,6 +239,26 @@ export default function Navbar() {
   const { data: session, status } = useSession();
   const isAdmin = session?.user?.role === "admin";
 
+  const handleCartClick = () => {
+    if(!cart || cart.length === 0) {
+      toast.error("Your cart is empty! Add items first.", {
+        style: {
+          borderRadius: '12px',
+          background: '#0f172a', // Slate 900
+          color: '#fff',
+          fontSize: '13px',
+          fontWeight: '600',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#fff',
+        },
+      });
+      return;
+    }
+    router.push("/cart");
+  }
+
   // Handle Outside Click for Search Box
   useEffect(() => {
     function handleClickOutsideSearch(event: MouseEvent) {
@@ -417,7 +438,7 @@ export default function Navbar() {
 
           {/* Cart & User Action Buttons */}
           <div className="flex gap-4 items-center">
-            <Link href="/cart" className="flex items-center gap-2.5 group cursor-pointer pr-4 border-r border-[#E6E1D6]">
+            <div onClick={handleCartClick} className="flex items-center gap-2.5 group cursor-pointer pr-4 border-r border-[#E6E1D6]">
               <div className="relative w-[42px] h-[42px] rounded-full border border-[#E6E1D6] group-hover:border-[#A9762F] flex items-center justify-center transition-colors duration-200">
                 <PiShoppingCartLight className="text-[21px] text-[#0B1E3D] group-hover:text-[#A9762F] transition-colors duration-200" />
                 <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-[#A9762F] rounded-full font-semibold text-white text-[10.5px] w-[17px] h-[17px] ring-2 ring-white">
@@ -425,7 +446,7 @@ export default function Navbar() {
                 </span>
               </div>
               <span className="text-[13px] text-[#0B1E3D] font-medium hidden 2xl:inline">Cart</span>
-            </Link>
+            </div>
 
             {status === "authenticated" ? (
               <div className="flex items-center gap-2 group cursor-pointer relative" ref={accountBoxRef}>
