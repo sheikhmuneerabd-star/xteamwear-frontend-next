@@ -106,18 +106,18 @@ export default function HomePage() {
       <CustomGearCTASection />
 
       {/* 4. ELITE COLLECTION BANNER (Now Light Boxed Layout) */}
-      <section className="w-full bg-slate-50 border-y border-slate-100">
+      {/* <section className="w-full bg-slate-50 border-y border-slate-100">
         <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <EliteCollectionBanner />
         </div>
-      </section>
+      </section> */}
 
       {/* 5. PRO TEAM SPOTLIGHT (LIGHT BACKGROUND) */}
-      <section className="w-full bg-white">
+      {/* <section className="w-full bg-white">
         <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8">
           <OfficialPartnersSection />
         </div>
-      </section>
+      </section> */}
 
       {/* 6. CURATED CATEGORIES (LIGHT BACKGROUND) */}
       <section className="w-full bg-slate-50/80 border-y border-slate-100">

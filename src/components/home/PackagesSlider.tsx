@@ -4,26 +4,21 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
-// Images
-import pakageSlide1 from "@/assets/pakageSlide1.webp";
-import pakageSlide2 from "@/assets/pakageSlide2.webp";
-import pakageSlide3 from "@/assets/pakageSlide3.webp";
-
 const packageBanners = [
   {
     id: 1,
     title: "Soccer Packages",
-    image: pakageSlide1,
+    image: "/home images/first package.jpeg",
   },
   {
     id: 2,
     title: "Volleyball Packages",
-    image: pakageSlide2,
+    image: "/home images/2nd package.jpeg",
   },
   {
     id: 3,
     title: "Football Packages",
-    image: pakageSlide3,
+    image: "/home images/3rd package.jpeg",
   },
 ];
 

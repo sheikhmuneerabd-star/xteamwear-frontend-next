@@ -5,12 +5,7 @@ import Link from "next/link";
 import { FiArrowRight, FiCheckCircle } from "react-icons/fi";
 
 // 1. TOP PAR IMAGES IMPORT KAREIN
-import orangeShirtImg from "@/assets/orangeShirt.jpg";
 import whiteBlackFrontImg from "@/assets/baseball/whiteBlackFront1.avif";
-import comandoFrontImg from "@/assets/basketball/comandoFront3.avif";
-import purpleFrontImg from "@/assets/basketball/purpleFront1.avif";
-import blueFrontImg from "@/assets/basketball/blueFront2.avif";
-import purpleBackImg from "@/assets/basketball/purpleBack1.avif";
 
 export default function PromoBanners() {
   const features = [
@@ -29,7 +24,7 @@ export default function PromoBanners() {
         <div className="relative rounded-2xl overflow-hidden min-h-[260px] sm:min-h-[280px] flex items-center shadow-lg group">
           {/* Imported Image Object use karein */}
           <Image
-            src={orangeShirtImg}
+            src="/home images/easy online ordering.jpeg"
             alt="Order Online"
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -81,42 +76,10 @@ export default function PromoBanners() {
 
         {/* BOTTOM 2x2 GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Card 1 */}
-          <div className="relative rounded-2xl overflow-hidden min-h-[200px] sm:min-h-[220px] flex items-end p-6 group shadow-md border border-gray-100">
-            <Image
-              src={comandoFrontImg}
-              alt="Custom Fan Store"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/20" />
-
-            <div className="relative z-10 space-y-2 text-white w-full">
-              <span className="text-[11px] font-black uppercase tracking-widest text-amber-400">
-                Monetize
-              </span>
-              <h3 className="text-xl sm:text-2xl font-black uppercase leading-tight">
-                Open Your Own{" "}
-                <span className="text-amber-400">Custom Fan Store</span>
-              </h3>
-              <p className="text-xs text-gray-300 max-w-md">
-                Free to setup. Earn money on every single sale automatically.
-              </p>
-              <div className="pt-2">
-                <Link
-                  href="/fan-store"
-                  className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2 rounded-lg text-xs uppercase tracking-wider transition-all"
-                >
-                  Open Shop Now <FiArrowRight />
-                </Link>
-              </div>
-            </div>
-          </div>
-
           {/* Card 2 */}
           <div className="relative rounded-2xl overflow-hidden min-h-[200px] sm:min-h-[220px] flex items-end p-6 group shadow-md border border-gray-100">
             <Image
-              src={purpleFrontImg}
+              src="/home images/school discount.jpeg"
               alt="Schools & Non-Profits"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
