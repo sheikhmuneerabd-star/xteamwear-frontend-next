@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { IoSearch } from "react-icons/io5";
 import { PiShoppingCartLight, PiUserLight } from "react-icons/pi";
+import { FiPackage, FiShield, FiLogOut, FiUser } from "react-icons/fi";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import MobileNavbar from "./MobileNavbar";
@@ -449,56 +450,96 @@ export default function Navbar() {
             </div>
 
             {status === "authenticated" ? (
-              <div className="flex items-center gap-2 group cursor-pointer relative" ref={accountBoxRef}>
-                <button
-                  type="button"
-                  onClick={() => setAccountOpen(!accountOpen)}
-                  className="flex items-center gap-2.5 cursor-pointer"
-                >
-                  <div className="w-[42px] h-[42px] rounded-full border border-[#E6E1D6] group-hover:border-[#A9762F] flex items-center justify-center transition-colors duration-200">
-                    <PiUserLight className="text-[21px] text-[#0B1E3D] group-hover:text-[#A9762F] transition-colors duration-200" />
+            <div className="flex items-center gap-2 relative" ref={accountBoxRef}>
+              {/* Trigger Button - Colors fixed (no gold hover effect) */}
+              <button
+                type="button"
+                onClick={() => setAccountOpen(!accountOpen)}
+                className="flex items-center gap-2.5 cursor-pointer outline-none focus:outline-none"
+              >
+                <div className="w-[42px] h-[42px] rounded-full border border-[#E6E1D6] flex items-center justify-center bg-white shadow-xs">
+                  <PiUserLight className="text-[21px] text-[#0B1E3D]" />
+                </div>
+                <div className="flex flex-col text-[13px] items-start leading-tight">
+                  <span className="text-[#0B1E3D]/60 text-[11.5px] font-medium">
+                    Hi, {session.user?.name?.split(" ")[0]}
+                  </span>
+                  <span className="font-medium text-[#0B1E3D]">
+                    My Account
+                  </span>
+                </div>
+              </button>
+
+              {/* Dropdown Menu */}
+              <div
+                className="bg-white z-50 w-[230px] rounded-xl absolute top-[52px] right-0 border border-[#E6E1D6] shadow-[0_16px_36px_-10px_rgba(11,30,61,0.22)] transition-all duration-300 overflow-hidden"
+                style={{
+                  opacity: accountOpen ? 1 : 0,
+                  pointerEvents: accountOpen ? "auto" : "none",
+                  transform: accountOpen ? "translateY(0)" : "translateY(-8px)",
+                }}
+              >
+                {/* Header Info Banner */}
+                <div className="px-4 py-3 bg-[#0B1E3D]/5 border-b border-[#E6E1D6] flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#0B1E3D] text-white flex items-center justify-center shrink-0 font-bold text-xs uppercase">
+                    {session.user?.name ? session.user.name[0] : <FiUser />}
                   </div>
-                  <div className="flex flex-col text-[13px] items-start leading-tight">
-                    <span className="text-[#0B1E3D]/60 text-[11.5px]">Hi, {session.user?.name?.split(" ")[0]}</span>
-                    <span className="font-semibold text-[#0B1E3D]">My Account</span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-[#0B1E3D] truncate leading-tight">
+                      {session.user?.name || "User"}
+                    </p>
+                    <p className="text-[11px] text-[#0B1E3D]/60 truncate">
+                      {session.user?.email}
+                    </p>
                   </div>
-                </button>
-                <div
-                  className="bg-white z-50 w-[190px] py-2 flex flex-col rounded-md absolute top-[52px] right-0 border border-[#E6E1D6] shadow-[0_12px_28px_-8px_rgba(11,30,61,0.18)] transition-all duration-300"
-                  style={{
-                    opacity: accountOpen ? 1 : 0,
-                    pointerEvents: accountOpen ? "auto" : "none",
-                    transform: accountOpen ? "translateY(0)" : "translateY(-8px)",
-                  }}
-                >
-                  <p className="px-4 pb-2 mb-1 text-xs text-[#0B1E3D]/50 truncate border-b border-[#E6E1D6]">
-                    {session.user?.email}
-                  </p>
+                </div>
+
+                {/* Menu Links */}
+                <div className="p-1.5 space-y-0.5">
+                  <Link 
+                    href="/orders" 
+                    onClick={() => setAccountOpen(false)}
+                    className="px-3 py-2.5 rounded-lg text-xs font-semibold text-[#0B1E3D] hover:bg-[#A9762F]/10 hover:text-[#A9762F] flex items-center gap-2.5 transition-colors duration-150"
+                  >
+                    <FiPackage className="text-base text-[#0B1E3D]/70" />
+                    <span>My Orders</span>
+                  </Link>
+
                   {isAdmin && (
-                    <Link href="/admin" className="px-4 py-2 text-left text-sm text-[#0B1E3D] hover:bg-[#A9762F]/5">
-                      Admin
+                    <Link 
+                      href="/admin" 
+                      onClick={() => setAccountOpen(false)}
+                      className="px-3 py-2.5 rounded-lg text-xs font-semibold text-[#0B1E3D] hover:bg-[#A9762F]/10 hover:text-[#A9762F] flex items-center gap-2.5 transition-colors duration-150"
+                    >
+                      <FiShield className="text-base text-[#0B1E3D]/70" />
+                      <span>Admin Dashboard</span>
                     </Link>
                   )}
+
+                  <div className="h-[1px] bg-[#E6E1D6] my-1" />
+
                   <button
                     type="button"
-                    className="px-4 py-2 text-left text-sm text-[#0B1E3D] hover:bg-[#A9762F]/5 cursor-pointer"
+                    className="w-full px-3 py-2.5 rounded-lg text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors duration-150 cursor-pointer"
                     onClick={() => signOut({ callbackUrl: "/" })}
                   >
-                    Sign Out
+                    <FiLogOut className="text-base" />
+                    <span>Sign Out</span>
                   </button>
                 </div>
               </div>
-            ) : (
-              <Link href="/sign-in" className="flex items-center gap-2.5 group cursor-pointer">
-                <div className="w-[42px] h-[42px] rounded-full border border-[#E6E1D6] group-hover:border-[#A9762F] flex items-center justify-center transition-colors duration-200">
-                  <PiUserLight className="text-[21px] text-[#0B1E3D] group-hover:text-[#A9762F] transition-colors duration-200" />
-                </div>
-                <div className="flex flex-col text-[13px] leading-tight">
-                  <span className="text-[#0B1E3D]/60 text-[11.5px]">Sign In or Register</span>
-                  <span className="font-semibold text-[#0B1E3D]">My Account</span>
-                </div>
-              </Link>
-            )}
+            </div>
+          ) : (
+            <Link href="/sign-in" className="flex items-center gap-2.5 cursor-pointer">
+              <div className="w-[42px] h-[42px] rounded-full border border-[#E6E1D6] flex items-center justify-center bg-white">
+                <PiUserLight className="text-[21px] text-[#0B1E3D]" />
+              </div>
+              <div className="flex flex-col text-[13px] leading-tight">
+                <span className="text-[#0B1E3D]/60 text-[11.5px]">Sign In or Register</span>
+                <span className="font-semibold text-[#0B1E3D]">My Account</span>
+              </div>
+            </Link>
+          )}
           </div>
         </div>
       </div>
