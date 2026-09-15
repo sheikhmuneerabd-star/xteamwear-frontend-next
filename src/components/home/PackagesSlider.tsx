@@ -1,94 +1,140 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
-const packageBanners = [
-  {
-    id: 1,
-    title: "Soccer Packages",
-    image: "/home images/first package.jpeg",
-  },
-  {
-    id: 2,
-    title: "Volleyball Packages",
-    image: "/home images/2nd package.jpeg",
-  },
-  {
-    id: 3,
-    title: "Football Packages",
-    image: "/home images/3rd package.jpeg",
-  },
-];
+interface PackageBanner {
+  title: string;
+  imageDesktop: string;
+  imageTablet: string;
+  imageMobile: string;
+}
 
 export default function PackagesSlider() {
+  const [banners, setBanners] = useState<PackageBanner[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev === packageBanners.length - 1 ? 0 : prev + 1));
-  }, []);
-
-  const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev === 0 ? packageBanners.length - 1 : prev - 1));
-  }, []);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/settings");
+        const data = await res.json();
+
+        setBanners(
+          data?.settings?.packageBanners?.filter(
+            (b: PackageBanner) => b.imageDesktop
+          ) || []
+        );
+      } catch (err) {
+        console.error("Failed to load package banners", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchSettings();
+  }, []);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) =>
+      banners.length
+        ? prev === banners.length - 1
+          ? 0
+          : prev + 1
+        : 0
+    );
+  }, [banners.length]);
+
+  const handlePrev = useCallback(() => {
+    setCurrentIndex((prev) =>
+      banners.length
+        ? prev === 0
+          ? banners.length - 1
+          : prev - 1
+        : 0
+    );
+  }, [banners.length]);
+
+  useEffect(() => {
+    if (banners.length < 2) return;
+
     const timer = setInterval(() => {
       handleNext();
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [handleNext]);
+  }, [handleNext, banners.length]);
+
+  if (loading || banners.length === 0) return null;
 
   return (
     <section className="relative w-full bg-slate-50 py-8 overflow-hidden select-none">
       <div className="max-w-[2560px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        
-        {/* Improved Heading & Header Container */}
+
+        {/* Heading */}
         <div className="text-center max-w-3xl mx-auto space-y-2.5">
-          
-          {/* Badge */}
           <div className="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-600 text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full">
             <span>Exclusive Deals</span>
           </div>
 
-          {/* Heading */}
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold uppercase tracking-tight text-slate-900 leading-snug">
-            Save Big On <span className="text-amber-500">Team Package Bundles</span>
+            Save Big On{" "}
+            <span className="text-amber-500">
+              Team Package Bundles
+            </span>
           </h2>
 
-          {/* Subtitle */}
           <p className="text-xs sm:text-sm font-medium text-slate-500 leading-relaxed">
-            All-inclusive customized uniform packages crafted at factory-direct rates.
+            All-inclusive customized uniform packages crafted at
+            factory-direct rates.
           </p>
         </div>
 
-        {/* Banner Container */}
-        <div className="relative w-full h-[220px] sm:h-[320px] md:h-[420px] lg:h-[320px] rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 bg-white">
-          
-          {/* Images Slider Track */}
+        {/* Slider */}
+        <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 bg-white">
+
           <div
             className="flex w-full h-full transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            style={{
+              transform: `translateX(-${currentIndex * 100}%)`,
+            }}
           >
-            {packageBanners.map((banner) => (
+            {banners.map((banner, idx) => (
               <div
-                key={banner.id}
-                className="relative w-full h-full shrink-0"
+                key={idx}
+                className="relative w-full h-full shrink-0 flex items-center justify-center"
               >
-                <Image
-                  src={banner.image}
-                  alt={banner.title}
-                  fill
-                  priority={banner.id === 1}
-                  className="object-contain md:object-cover w-full h-full"
-                />
+                <picture className="w-full h-full block">
+                  <source
+                    media="(min-width: 1024px)"
+                    srcSet={banner.imageDesktop}
+                  />
+
+                  <source
+                    media="(min-width: 640px)"
+                    srcSet={
+                      banner.imageTablet || banner.imageDesktop
+                    }
+                  />
+
+                  <img
+                    src={
+                      banner.imageMobile ||
+                      banner.imageDesktop
+                    }
+                    alt={
+                      banner.title ||
+                      `Package Banner ${idx + 1}`
+                    }
+                    className="w-full h-full object-contain"
+                  />
+                </picture>
               </div>
             ))}
           </div>
 
-          {/* Left Arrow Button */}
+          {/* Previous Button */}
           <button
             type="button"
             aria-label="Previous Slide"
@@ -98,7 +144,7 @@ export default function PackagesSlider() {
             <HiChevronLeft className="text-xl sm:text-2xl" />
           </button>
 
-          {/* Right Arrow Button */}
+          {/* Next Button */}
           <button
             type="button"
             aria-label="Next Slide"
@@ -108,9 +154,9 @@ export default function PackagesSlider() {
             <HiChevronRight className="text-xl sm:text-2xl" />
           </button>
 
-          {/* Bottom Dots Indicator */}
+          {/* Dots */}
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-slate-900/30 backdrop-blur-md px-3 py-1.5 rounded-full">
-            {packageBanners.map((_, index) => (
+            {banners.map((_, index) => (
               <button
                 key={index}
                 type="button"
@@ -126,7 +172,6 @@ export default function PackagesSlider() {
           </div>
 
         </div>
-
       </div>
     </section>
   );

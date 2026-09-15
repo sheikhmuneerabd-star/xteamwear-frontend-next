@@ -29,7 +29,7 @@ export default function AdminSidebar() {
     <aside className="w-[220px] bg-[#0b1329] text-white p-5 flex flex-col justify-between shrink-0 h-screen sticky top-0">
       <div className="space-y-6">
         <Link href="/" prefetch={true} className="text-xl font-bold block cursor-pointer text-white">
-          Xteamwear Admin
+          Bespoketeamwear Admin
         </Link>
         
         <nav className="flex flex-col gap-1.5">

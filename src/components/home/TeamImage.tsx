@@ -15,6 +15,7 @@ import "swiper/css/effect-fade";
 
 interface HeroSlide {
   imageDesktop: string;
+  imageTablet: string;
   imageMobile: string;
   badge?: string;
   title?: string;
@@ -79,7 +80,8 @@ export default function HeroSlider() {
             {/* Image Wrapper */}
             <div className="absolute inset-0 w-full h-full">
               <picture className="w-full h-full">
-                <source media="(min-width: 640px)" srcSet={slide.imageDesktop} />
+                <source media="(min-width: 1024px)" srcSet={slide.imageDesktop} />
+                <source media="(min-width: 640px)" srcSet={slide.imageTablet || slide.imageDesktop} />
                 <img
                   src={slide.imageMobile || slide.imageDesktop}
                   alt={slide.title || `Hero Slide ${i + 1}`}

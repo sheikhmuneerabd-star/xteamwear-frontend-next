@@ -5,6 +5,7 @@ import ImageUploader from "@/components/admin/ImageUploader";
 
 interface HeroSlide {
   imageDesktop: string;
+  imageTablet: string;
   imageMobile: string;
 }
 
@@ -17,24 +18,6 @@ interface SocialPost {
   image: string;
   caption: string;
   link: string;
-}
-
-interface CardItem {
-  badge?: string;
-  category: string;
-  title: string;
-  image: string;
-  link: string;
-}
-
-interface BespokeBanner {
-  badge: string;
-  heading: string;
-  description: string;
-  mainImage: string;
-  buttonText: string;
-  buttonLink: string;
-  cards: CardItem[];
 }
 
 interface CategoryShowcaseItem {
@@ -55,7 +38,61 @@ interface ProductItem {
   price?: number;
 }
 
-const emptySlide: HeroSlide = { imageDesktop: "", imageMobile: "" };
+interface PackageBanner {
+  title: string;
+  imageDesktop: string;
+  imageTablet: string;
+  imageMobile: string;
+}
+
+interface PromoMainBanner {
+  title: string;
+  highlight: string;
+  features: string[];
+  buttonText: string;
+  buttonLink: string;
+  imageMobile: string;
+}
+
+interface PromoBottomBanner {
+  badge: string;
+  title: string;
+  tags: string[];
+  imageMobile: string;
+}
+
+interface PromoBanners {
+  mainBanner: PromoMainBanner;
+  bottomBanner: PromoBottomBanner;
+}
+
+const defaultPromoBanners: PromoBanners = {
+  mainBanner: {
+    title: "ORDER ONLINE",
+    highlight: "EASILY.",
+    features: [
+      "Instant Quote Tool",
+      "Automated Ordering",
+      "Create Your Package",
+      "Free Custom Designs",
+      "Add Team Rosters",
+      "Run Your Fan Shop",
+    ],
+    buttonText: "START CUSTOM ORDER",
+    buttonLink: "/custom-order",
+    imageMobile: "",
+  },
+  bottomBanner: {
+    badge: "EXCLUSIVE FOR",
+    title: "Schools & Non-Profits Discount",
+    tags: ["Schools", "Colleges", "High Schools", "Non-Profit Organizations"],
+    imageMobile: "",
+  },
+};
+
+const emptyPackageBanner: PackageBanner = { title: "", imageDesktop: "", imageTablet: "", imageMobile: "" };
+
+const emptySlide: HeroSlide = { imageDesktop: "", imageTablet: "", imageMobile: "" };
 const emptyAdvantage: Advantage = { image: "", title: "" };
 const emptyPost: SocialPost = { image: "", caption: "", link: "" };
 
@@ -66,21 +103,6 @@ const initialCategories: CategoryShowcaseItem[] = [
   { id: "winterwear", title: "Outerwear & Vests", itemCount: "18+ Products", image: "", link: "/category/Winter Wear", tag: "" },
   { id: "training", title: "Athletic Training", itemCount: "50+ Products", image: "", link: "/category/training", tag: "New" },
 ];
-
-const defaultBespokeBanner: BespokeBanner = {
-  badge: "BESPOKE WEAR • 2026 RELEASE",
-  heading: "2026 ELITE PERFORMANCE COLLECTION",
-  description:
-    "Engineered with advanced moisture-wicking technology and ergonomic fit. Designed exclusively for professional athletes and modern teams.",
-  mainImage: "",
-  buttonText: "EXPLORE FULL COLLECTION",
-  buttonLink: "/category/all",
-  cards: [
-    { badge: "BEST SELLER", category: "PRO FOOTBALL", title: "Sublimated Pro Match Jersey", image: "", link: "/category/Football" },
-    { badge: "NEW", category: "TRAINING WEAR", title: "Ergonomic Training Zip Top", image: "", link: "/category/Training" },
-    { badge: "", category: "ATHLETIC WEAR", title: "Elite Performance Track Suit", image: "", link: "/category/Winter Wear" },
-  ],
-};
 
 export default function SiteSettingsPage() {
   const [logo, setLogo] = useState("");
@@ -93,6 +115,8 @@ export default function SiteSettingsPage() {
   const [socialPosts, setSocialPosts] = useState<SocialPost[]>([]);
   const [trendingTags, setTrendingTags] = useState<string[]>([]);
   const [newTagInput, setNewTagInput] = useState("");
+  const [packageBanners, setPackageBanners] = useState<PackageBanner[]>([]);
+  const [promoBanners, setPromoBanners] = useState<PromoBanners>(defaultPromoBanners);
 
   const [shippingConfig, setShippingConfig] = useState({
     freeShippingThreshold: 150,
@@ -102,7 +126,6 @@ export default function SiteSettingsPage() {
   const [allProducts, setAllProducts] = useState<ProductItem[]>([]);
   const [selectedPopularProductIds, setSelectedPopularProductIds] = useState<string[]>([]);
 
-  const [bespokeBanner, setBespokeBanner] = useState<BespokeBanner>(defaultBespokeBanner);
   const [categoriesShowcase, setCategoriesShowcase] = useState<CategoryShowcaseItem[]>(initialCategories);
 
   useEffect(() => {
@@ -126,14 +149,11 @@ export default function SiteSettingsPage() {
         setAdvantages(settings?.advantages?.length ? settings.advantages : [emptyAdvantage]);
         setSocialPosts(settings?.socialPosts?.length ? settings.socialPosts : [emptyPost]);
         setTrendingTags(settings?.trendingTags || []);
+        setPackageBanners(settings?.packageBanners?.length ? settings.packageBanners : [emptyPackageBanner]);
 
         if (settings?.popularProducts && Array.isArray(settings.popularProducts)) {
           const ids = settings.popularProducts.map((p: any) => (typeof p === "object" ? p._id : p));
           setSelectedPopularProductIds(ids);
-        }
-
-        if (settings?.bespokeBanner) {
-          setBespokeBanner(settings.bespokeBanner);
         }
 
         if (settings?.categoriesShowcase && Array.isArray(settings.categoriesShowcase) && settings.categoriesShowcase.length > 0) {
@@ -150,6 +170,13 @@ export default function SiteSettingsPage() {
             };
           });
           setCategoriesShowcase(merged);
+        }
+
+        if (settings?.promoBanners) {
+          setPromoBanners({
+            mainBanner: { ...defaultPromoBanners.mainBanner, ...settings.promoBanners.mainBanner },
+            bottomBanner: { ...defaultPromoBanners.bottomBanner, ...settings.promoBanners.bottomBanner },
+          });
         }
 
         if (settings?.shippingConfig) {
@@ -195,15 +222,45 @@ export default function SiteSettingsPage() {
     });
   };
 
-  const updateBespokeField = (field: keyof BespokeBanner, value: any) => {
-    setBespokeBanner((prev) => ({ ...prev, [field]: value }));
+  /* --- Package Banners Handlers --- */
+  const updatePackageBanner = (index: number, field: keyof PackageBanner, value: string) => {
+    setPackageBanners((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+  const addPackageBanner = () => setPackageBanners((prev) => [...prev, { ...emptyPackageBanner }]);
+  const removePackageBanner = (index: number) => setPackageBanners((prev) => prev.filter((_, i) => i !== index));
+
+  /* --- Promo Banners Handlers --- */
+  const updateMainBannerField = (field: keyof Omit<PromoMainBanner, "features">, value: string) => {
+    setPromoBanners((prev) => ({
+      ...prev,
+      mainBanner: { ...prev.mainBanner, [field]: value },
+    }));
   };
 
-  const updateBespokeCard = (index: number, field: keyof CardItem, value: string) => {
-    setBespokeBanner((prev) => {
-      const updatedCards = [...prev.cards];
-      updatedCards[index] = { ...updatedCards[index], [field]: value };
-      return { ...prev, cards: updatedCards };
+  const updateMainBannerFeature = (index: number, value: string) => {
+    setPromoBanners((prev) => {
+      const updated = [...prev.mainBanner.features];
+      updated[index] = value;
+      return { ...prev, mainBanner: { ...prev.mainBanner, features: updated } };
+    });
+  };
+
+  const updateBottomBannerField = (field: keyof Omit<PromoBottomBanner, "tags">, value: string) => {
+    setPromoBanners((prev) => ({
+      ...prev,
+      bottomBanner: { ...prev.bottomBanner, [field]: value },
+    }));
+  };
+
+  const updateBottomBannerTag = (index: number, value: string) => {
+    setPromoBanners((prev) => {
+      const updated = [...prev.bottomBanner.tags];
+      updated[index] = value;
+      return { ...prev, bottomBanner: { ...prev.bottomBanner, tags: updated } };
     });
   };
 
@@ -240,11 +297,12 @@ export default function SiteSettingsPage() {
           squadImages: squadImages.filter(Boolean),
           advantages,
           socialPosts,
-          bespokeBanner,
           trendingTags,
           categoriesShowcase,
           popularProducts: selectedPopularProductIds,
           shippingConfig,
+          packageBanners,
+          promoBanners,
         }),
       });
 
@@ -429,118 +487,6 @@ export default function SiteSettingsPage() {
         </div>
       </div>
 
-      {/* Featured Collection Banner */}
-      <div className="bg-white rounded-lg shadow p-6 space-y-6">
-        <div className="border-b pb-3">
-          <h2 className="font-medium text-lg text-gray-900">
-            Featured Collection Banner (Bespoke Wear)
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-semibold text-gray-600 block mb-1">Top Badge Tag</label>
-            <input
-              className="w-full border border-gray-300 rounded-md p-2 text-sm"
-              value={bespokeBanner.badge}
-              onChange={(e) => updateBespokeField("badge", e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-600 block mb-1">Heading Title</label>
-            <input
-              className="w-full border border-gray-300 rounded-md p-2 text-sm font-semibold"
-              value={bespokeBanner.heading}
-              onChange={(e) => updateBespokeField("heading", e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="text-xs font-semibold text-gray-600 block mb-1">Description Text</label>
-          <textarea
-            rows={2}
-            className="w-full border border-gray-300 rounded-md p-2 text-sm"
-            value={bespokeBanner.description}
-            onChange={(e) => updateBespokeField("description", e.target.value)}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-semibold text-gray-600 block mb-1">Button Text</label>
-            <input
-              className="w-full border border-gray-300 rounded-md p-2 text-sm"
-              value={bespokeBanner.buttonText}
-              onChange={(e) => updateBespokeField("buttonText", e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-600 block mb-1">Button Link</label>
-            <input
-              className="w-full border border-gray-300 rounded-md p-2 text-sm"
-              value={bespokeBanner.buttonLink}
-              onChange={(e) => updateBespokeField("buttonLink", e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
-          <p className="text-xs font-semibold text-gray-700 mb-2">Main Featured Image</p>
-          <ImageUploader
-            value={bespokeBanner.mainImage}
-            onChange={(url) => updateBespokeField("mainImage", url)}
-          />
-        </div>
-
-        <div className="space-y-4 pt-2">
-          <h3 className="text-sm font-semibold text-gray-800">Bottom Collection Cards</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {bespokeBanner.cards.map((card, idx) => (
-              <div key={idx} className="border border-gray-200 rounded-md p-3 space-y-2 bg-gray-50">
-                <span className="text-[10px] font-bold text-amber-600 uppercase bg-amber-100 px-2 py-0.5 rounded">
-                  Card #{idx + 1}
-                </span>
-
-                <ImageUploader
-                  label="Card Image"
-                  value={card.image}
-                  onChange={(url) => updateBespokeCard(idx, "image", url)}
-                />
-
-                <input
-                  className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
-                  placeholder="Badge"
-                  value={card.badge || ""}
-                  onChange={(e) => updateBespokeCard(idx, "badge", e.target.value)}
-                />
-
-                <input
-                  className="w-full border border-gray-300 rounded-md p-1.5 text-xs font-semibold"
-                  placeholder="Category"
-                  value={card.category}
-                  onChange={(e) => updateBespokeCard(idx, "category", e.target.value)}
-                />
-
-                <input
-                  className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
-                  placeholder="Title"
-                  value={card.title}
-                  onChange={(e) => updateBespokeCard(idx, "title", e.target.value)}
-                />
-
-                <input
-                  className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
-                  placeholder="Link"
-                  value={card.link}
-                  onChange={(e) => updateBespokeCard(idx, "link", e.target.value)}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Hero Slider */}
       <div className="bg-white rounded-lg shadow p-6 space-y-4">
         <div className="flex justify-between items-center">
@@ -575,9 +521,70 @@ export default function SiteSettingsPage() {
                 onChange={(url) => updateSlide(i, "imageDesktop", url)}
               />
               <ImageUploader
+                label="Tablet Image"
+                value={slide.imageTablet}
+                onChange={(url) => updateSlide(i, "imageTablet", url)}
+              />
+              <ImageUploader
                 label="Mobile Image"
                 value={slide.imageMobile}
                 onChange={(url) => updateSlide(i, "imageMobile", url)}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Package Bundle Banners */}
+      <div className="bg-white rounded-lg shadow p-6 space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="font-medium">Package Bundle Banners ({packageBanners.length})</h2>
+          <button
+            type="button"
+            onClick={addPackageBanner}
+            className="text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium"
+          >
+            + Add Banner
+          </button>
+        </div>
+
+        {packageBanners.map((banner, i) => (
+          <div key={i} className="border border-gray-200 rounded-md p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-gray-600">Banner {i + 1}</span>
+              {packageBanners.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removePackageBanner(i)}
+                  className="text-sm bg-red-50 text-red-700 hover:bg-red-100 px-3 py-1.5 rounded-md font-medium"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+
+            <input
+              className="w-full border border-gray-300 rounded-md p-2 text-sm"
+              placeholder="Title (e.g. Soccer Packages)"
+              value={banner.title}
+              onChange={(e) => updatePackageBanner(i, "title", e.target.value)}
+            />
+
+            <div className="flex gap-4">
+              <ImageUploader
+                label="Desktop Image"
+                value={banner.imageDesktop}
+                onChange={(url) => updatePackageBanner(i, "imageDesktop", url)}
+              />
+              <ImageUploader
+                label="Tablet Image"
+                value={banner.imageTablet}
+                onChange={(url) => updatePackageBanner(i, "imageTablet", url)}
+              />
+              <ImageUploader
+                label="Mobile Image"
+                value={banner.imageMobile}
+                onChange={(url) => updatePackageBanner(i, "imageMobile", url)}
               />
             </div>
           </div>
@@ -673,6 +680,134 @@ export default function SiteSettingsPage() {
               <ImageUploader value={imgUrl} onChange={(url) => updateSquadImage(i, url)} />
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Promo Banners Section */}
+      <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div className="border-b pb-3">
+          <h2 className="font-medium text-lg text-gray-900">Promo Banners</h2>
+          <p className="text-xs text-gray-500">
+            Desktop/Tablet par ye design code se banta hai (sirf text edit karein). Mobile ke liye image upload karein.
+          </p>
+        </div>
+
+        {/* Main Banner */}
+        <div className="border border-gray-200 rounded-md p-4 space-y-3 bg-gray-50">
+          <span className="text-xs font-bold text-gray-700 uppercase">Top Main Banner</span>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Title (white)</label>
+              <input
+                className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                value={promoBanners.mainBanner.title}
+                onChange={(e) => updateMainBannerField("title", e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Highlight Text (amber)</label>
+              <input
+                className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                value={promoBanners.mainBanner.highlight}
+                onChange={(e) => updateMainBannerField("highlight", e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Button Text</label>
+              <input
+                className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                value={promoBanners.mainBanner.buttonText}
+                onChange={(e) => updateMainBannerField("buttonText", e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Button Link</label>
+              <input
+                className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                value={promoBanners.mainBanner.buttonLink}
+                onChange={(e) => updateMainBannerField("buttonLink", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Checklist Items (6)</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {promoBanners.mainBanner.features.map((f, i) => (
+                <input
+                  key={i}
+                  className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+                  value={f}
+                  onChange={(e) => updateMainBannerFeature(i, e.target.value)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-2 border-t">
+            <ImageUploader
+              label="Mobile Image (sirf mobile screen ke liye)"
+              value={promoBanners.mainBanner.imageMobile}
+              onChange={(url) =>
+                setPromoBanners((prev) => ({
+                  ...prev,
+                  mainBanner: { ...prev.mainBanner, imageMobile: url },
+                }))
+              }
+            />
+          </div>
+        </div>
+
+        {/* Bottom Banner */}
+        <div className="border border-gray-200 rounded-md p-4 space-y-3 bg-gray-50">
+          <span className="text-xs font-bold text-gray-700 uppercase">Bottom Banner</span>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Badge Text</label>
+              <input
+                className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                value={promoBanners.bottomBanner.badge}
+                onChange={(e) => updateBottomBannerField("badge", e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Title</label>
+              <input
+                className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                value={promoBanners.bottomBanner.title}
+                onChange={(e) => updateBottomBannerField("title", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Tags (4)</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {promoBanners.bottomBanner.tags.map((t, i) => (
+                <input
+                  key={i}
+                  className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+                  value={t}
+                  onChange={(e) => updateBottomBannerTag(i, e.target.value)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-2 border-t">
+            <ImageUploader
+              label="Mobile Image (sirf mobile screen ke liye)"
+              value={promoBanners.bottomBanner.imageMobile}
+              onChange={(url) =>
+                setPromoBanners((prev) => ({
+                  ...prev,
+                  bottomBanner: { ...prev.bottomBanner, imageMobile: url },
+                }))
+              }
+            />
+          </div>
         </div>
       </div>
 

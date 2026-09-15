@@ -17,7 +17,6 @@ export async function GET() {
         heroSlides: [],
         squadImages: [],
         advantages: [],
-        bespokeBanner: {},
         categoriesShowcase: [],
         trendingTags: [],
         shippingConfig: {
