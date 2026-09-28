@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import SiteSettings from "@/lib/models/SiteSettings";
 import { auth } from "@/auth";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
+
+// Hamesha fresh data (kabhi static cache na ho)
+export const dynamic = "force-dynamic";
 
 // GET: Fetch Settings
 export async function GET() {
@@ -31,8 +34,10 @@ export async function GET() {
       { success: true, settings },
       {
         headers: {
-          "Cache-Control":
-            "public, max-age=31536000, s-maxage=31536000, stale-while-revalidate",
+          // Browser + Vercel CDN dono cache nahi karenge
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+          "CDN-Cache-Control": "no-store",
+          "Vercel-CDN-Cache-Control": "no-store",
         },
       }
     );
@@ -57,6 +62,7 @@ async function saveSettings(body: any) {
 
   try {
     revalidateTag("site-settings", "max");
+    revalidatePath("/", "layout");
   } catch (err) {
     console.log("Tag revalidation bypassed");
   }
