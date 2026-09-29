@@ -20,6 +20,24 @@ export interface ICategoryShowcaseItem {
   tag?: string;
 }
 
+export interface ITestimonialReview {
+  name: string;
+  role: string;
+  team: string;
+  rating: number;
+  comment: string;
+}
+
+export interface ITestimonialGalleryItem {
+  image: string;
+  caption: string;
+}
+
+export interface ITestimonials {
+  reviews: ITestimonialReview[];
+  gallery: ITestimonialGalleryItem[];
+}
+
 export interface IShippingConfig {
   freeShippingThreshold: number;
   standardShippingFee: number;
@@ -35,6 +53,7 @@ export interface ISiteSettings extends Document {
   shippingConfig?: IShippingConfig;
   packageBanners?: IPackageBanner[];
   promoBanners?: IPromoBanners;
+  testimonials?: ITestimonials;
 }
 
 export interface IPackageBanner {
@@ -110,6 +129,33 @@ const PromoBottomBannerSchema = new Schema<IPromoBottomBanner>(
   { _id: false }
 );
 
+const TestimonialReviewSchema = new Schema<ITestimonialReview>(
+  {
+    name: { type: String, default: "" },
+    role: { type: String, default: "" },
+    team: { type: String, default: "" },
+    rating: { type: Number, default: 5, min: 1, max: 5 },
+    comment: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
+const TestimonialGalleryItemSchema = new Schema<ITestimonialGalleryItem>(
+  {
+    image: { type: String, default: "" },
+    caption: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
+const TestimonialsSchema = new Schema<ITestimonials>(
+  {
+    reviews: { type: [TestimonialReviewSchema], default: [] },
+    gallery: { type: [TestimonialGalleryItemSchema], default: [] },
+  },
+  { _id: false }
+);
+
 const PromoBannersSchema = new Schema<IPromoBanners>(
   {
     mainBanner: { type: PromoMainBannerSchema, default: () => ({}) },
@@ -170,6 +216,7 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     },
     packageBanners: { type: [PackageBannerSchema], default: [] },
     promoBanners: { type: PromoBannersSchema, default: () => ({}) },
+    testimonials: { type: TestimonialsSchema, default: () => ({ reviews: [], gallery: [] }) },
   },
   { timestamps: true }
 );

@@ -58,12 +58,34 @@ interface PromoBottomBanner {
   badge: string;
   title: string;
   tags: string[];
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  imageDesktop: string;
   imageMobile: string;
 }
 
 interface PromoBanners {
   mainBanner: PromoMainBanner;
   bottomBanner: PromoBottomBanner;
+}
+
+interface TestimonialReview {
+  name: string;
+  role: string;
+  team: string;
+  rating: number;
+  comment: string;
+}
+
+interface TestimonialGalleryItem {
+  image: string;
+  caption: string;
+}
+
+interface Testimonials {
+  reviews: TestimonialReview[];
+  gallery: TestimonialGalleryItem[];
 }
 
 const defaultPromoBanners: PromoBanners = {
@@ -84,13 +106,20 @@ const defaultPromoBanners: PromoBanners = {
   },
   bottomBanner: {
     badge: "EXCLUSIVE FOR",
-    title: "Schools & Non-Profits Discount",
+    title: "10% EXTRA DISCOUNT",
     tags: ["Schools", "Colleges", "High Schools", "Non-Profit Organizations"],
+    description: "Special 10% extra discount for Schools, Colleges, High Schools & Non-Profit Organizations.",
+    buttonText: "GET YOUR DISCOUNT",
+    buttonLink: "/discount",
+    imageDesktop: "",
     imageMobile: "",
   },
 };
 
 const emptyPackageBanner: PackageBanner = { title: "", imageDesktop: "", imageTablet: "", imageMobile: "" };
+
+const emptyReview: TestimonialReview = { name: "", role: "", team: "", rating: 5, comment: "" };
+const emptyGalleryItem: TestimonialGalleryItem = { image: "", caption: "" };
 
 const emptySlide: HeroSlide = { imageDesktop: "", imageTablet: "", imageMobile: "" };
 const emptyAdvantage: Advantage = { image: "", title: "" };
@@ -117,6 +146,7 @@ export default function SiteSettingsPage() {
   const [newTagInput, setNewTagInput] = useState("");
   const [packageBanners, setPackageBanners] = useState<PackageBanner[]>([]);
   const [promoBanners, setPromoBanners] = useState<PromoBanners>(defaultPromoBanners);
+  const [testimonials, setTestimonials] = useState<Testimonials>({ reviews: [], gallery: [] });
 
   const [shippingConfig, setShippingConfig] = useState({
     freeShippingThreshold: 150,
@@ -178,6 +208,11 @@ export default function SiteSettingsPage() {
             bottomBanner: { ...defaultPromoBanners.bottomBanner, ...settings.promoBanners.bottomBanner },
           });
         }
+
+        setTestimonials({
+          reviews: settings?.testimonials?.reviews?.length ? settings.testimonials.reviews : [emptyReview],
+          gallery: settings?.testimonials?.gallery?.length ? settings.testimonials.gallery : [emptyGalleryItem],
+        });
 
         if (settings?.shippingConfig) {
           setShippingConfig(settings.shippingConfig);
@@ -264,6 +299,31 @@ export default function SiteSettingsPage() {
     });
   };
 
+  /* --- Testimonials Handlers --- */
+  const updateReview = (index: number, field: keyof TestimonialReview, value: string | number) => {
+    setTestimonials((prev) => {
+      const updated = [...prev.reviews];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, reviews: updated };
+    });
+  };
+  const addReview = () =>
+    setTestimonials((prev) => ({ ...prev, reviews: [...prev.reviews, { ...emptyReview }] }));
+  const removeReview = (index: number) =>
+    setTestimonials((prev) => ({ ...prev, reviews: prev.reviews.filter((_, i) => i !== index) }));
+
+  const updateGalleryItem = (index: number, field: keyof TestimonialGalleryItem, value: string) => {
+    setTestimonials((prev) => {
+      const updated = [...prev.gallery];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, gallery: updated };
+    });
+  };
+  const addGalleryItem = () =>
+    setTestimonials((prev) => ({ ...prev, gallery: [...prev.gallery, { ...emptyGalleryItem }] }));
+  const removeGalleryItem = (index: number) =>
+    setTestimonials((prev) => ({ ...prev, gallery: prev.gallery.filter((_, i) => i !== index) }));
+
   const updateCategoryShowcase = (index: number, field: keyof CategoryShowcaseItem, value: string) => {
     setCategoriesShowcase((prev) => {
       const updated = [...prev];
@@ -303,6 +363,7 @@ export default function SiteSettingsPage() {
           shippingConfig,
           packageBanners,
           promoBanners,
+          testimonials,
         }),
       });
 
@@ -773,11 +834,40 @@ export default function SiteSettingsPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-gray-600 block mb-1">Title</label>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Discount Heading (e.g. 10% EXTRA DISCOUNT)</label>
               <input
                 className="w-full border border-gray-300 rounded-md p-2 text-sm"
                 value={promoBanners.bottomBanner.title}
                 onChange={(e) => updateBottomBannerField("title", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-1">Description</label>
+            <textarea
+              rows={2}
+              className="w-full border border-gray-300 rounded-md p-2 text-sm"
+              value={promoBanners.bottomBanner.description}
+              onChange={(e) => updateBottomBannerField("description", e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Button Text</label>
+              <input
+                className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                value={promoBanners.bottomBanner.buttonText}
+                onChange={(e) => updateBottomBannerField("buttonText", e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-1">Button Link</label>
+              <input
+                className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                value={promoBanners.bottomBanner.buttonLink}
+                onChange={(e) => updateBottomBannerField("buttonLink", e.target.value)}
               />
             </div>
           </div>
@@ -796,7 +886,17 @@ export default function SiteSettingsPage() {
             </div>
           </div>
 
-          <div className="pt-2 border-t">
+          <div className="pt-2 border-t space-y-3">
+            <ImageUploader
+              label="Right Side Image (Desktop/Tablet)"
+              value={promoBanners.bottomBanner.imageDesktop}
+              onChange={(url) =>
+                setPromoBanners((prev) => ({
+                  ...prev,
+                  bottomBanner: { ...prev.bottomBanner, imageDesktop: url },
+                }))
+              }
+            />
             <ImageUploader
               label="Mobile Image (sirf mobile screen ke liye)"
               value={promoBanners.bottomBanner.imageMobile}
@@ -807,6 +907,140 @@ export default function SiteSettingsPage() {
                 }))
               }
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials & Reviews Section */}
+      <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div className="flex justify-between items-center border-b pb-3">
+          <div>
+            <h2 className="font-medium text-lg text-gray-900">
+              Testimonials & Reviews (Trusted by Athletes)
+            </h2>
+            <p className="text-xs text-gray-500">
+              Manage customer reviews aur gallery images jo homepage par testimonial slider mein dikhti hain.
+            </p>
+          </div>
+        </div>
+
+        {/* Reviews */}
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-semibold text-gray-800">Reviews ({testimonials.reviews.length})</h3>
+            <button
+              type="button"
+              onClick={addReview}
+              className="text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium"
+            >
+              + Add Review
+            </button>
+          </div>
+
+          {testimonials.reviews.map((rev, i) => (
+            <div key={i} className="border border-gray-200 rounded-md p-4 space-y-3 bg-gray-50">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600">Review {i + 1}</span>
+                {testimonials.reviews.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeReview(i)}
+                    className="text-sm bg-red-50 text-red-700 hover:bg-red-100 px-3 py-1.5 rounded-md font-medium"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                  placeholder="Name (e.g. Karen G.)"
+                  value={rev.name}
+                  onChange={(e) => updateReview(i, "name", e.target.value)}
+                />
+                <input
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                  placeholder="Role (e.g. Team Manager)"
+                  value={rev.role}
+                  onChange={(e) => updateReview(i, "role", e.target.value)}
+                />
+                <input
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                  placeholder="Team (e.g. Metro Strikers FC)"
+                  value={rev.team}
+                  onChange={(e) => updateReview(i, "team", e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-600 block mb-1">Rating (1-5)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={5}
+                  className="w-24 border border-gray-300 rounded-md p-2 text-sm"
+                  value={rev.rating}
+                  onChange={(e) => updateReview(i, "rating", Number(e.target.value))}
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-600 block mb-1">Comment</label>
+                <textarea
+                  rows={2}
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                  placeholder="Customer ka review text..."
+                  value={rev.comment}
+                  onChange={(e) => updateReview(i, "comment", e.target.value)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Gallery */}
+        <div className="space-y-3 pt-2 border-t">
+          <div className="flex justify-between items-center pt-3">
+            <h3 className="text-sm font-semibold text-gray-800">Gallery Images ({testimonials.gallery.length})</h3>
+            <button
+              type="button"
+              onClick={addGalleryItem}
+              className="text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium"
+            >
+              + Add Image
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {testimonials.gallery.map((item, i) => (
+              <div key={i} className="border border-gray-200 rounded-md p-3 space-y-2 bg-gray-50">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-gray-600">Image #{i + 1}</span>
+                  {testimonials.gallery.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeGalleryItem(i)}
+                      className="text-xs text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <ImageUploader
+                  value={item.image}
+                  onChange={(url) => updateGalleryItem(i, "image", url)}
+                />
+
+                <input
+                  className="w-full border border-gray-300 rounded-md p-1.5 text-xs"
+                  placeholder="Caption (e.g. Pro Sublimated Match Kit)"
+                  value={item.caption}
+                  onChange={(e) => updateGalleryItem(i, "caption", e.target.value)}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
