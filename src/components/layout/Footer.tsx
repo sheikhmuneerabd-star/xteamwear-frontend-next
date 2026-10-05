@@ -2,18 +2,20 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { 
-  RiMessage2Fill, 
-  RiInstagramFill 
-} from "react-icons/ri";
+import { RiMessage2Fill, RiInstagramFill } from "react-icons/ri";
 import { MdEmail } from "react-icons/md";
 import { GrFacebookOption } from "react-icons/gr";
 import { AiFillTikTok } from "react-icons/ai";
-import { FaYoutube } from "react-icons/fa";
-import { LiaCcVisa } from "react-icons/lia";
-import { FaCcPaypal, FaCcMastercard } from "react-icons/fa";
-import { FaCcAmazonPay } from "react-icons/fa6";
 import { HiChevronDown } from "react-icons/hi2";
+import {
+  FaYoutube,
+  FaCcVisa,
+  FaCcMastercard,
+  FaCcAmex,
+  FaCcPaypal,
+  FaApplePay,
+} from "react-icons/fa";
+import { SiShopify, SiRevolut, SiCashapp, SiZelle, SiMeta } from "react-icons/si";
 
 interface FooterColumn {
   id: number;
@@ -63,6 +65,59 @@ const socialIcons = [
   { Icon: AiFillTikTok, label: "TikTok", href: "#" },
 ];
 
+const MaestroIcon = () => (
+  <svg viewBox="0 0 32 20" className="h-5 w-8" aria-hidden="true">
+    <defs>
+      <clipPath id="maestro-clip">
+        <circle cx="11" cy="10" r="9" />
+      </clipPath>
+    </defs>
+    <circle cx="11" cy="10" r="9" fill="#eb001b" />
+    <circle cx="21" cy="10" r="9" fill="#00a2e5" />
+    <circle cx="21" cy="10" r="9" fill="#7375cf" clipPath="url(#maestro-clip)" />
+  </svg>
+);
+
+const ChimeIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+    <path
+      d="M17 8.5A6 6 0 1 0 17 15.5"
+      fill="none"
+      stroke="#1ec677"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const cardPayments = [
+  { name: "Visa", icon: <FaCcVisa className="text-[#1a1f71]" /> },
+  { name: "Mastercard", icon: <FaCcMastercard className="text-[#eb001b]" /> },
+  { name: "American Express", icon: <FaCcAmex className="text-[#006fcf]" /> },
+  { name: "Maestro", icon: <MaestroIcon /> },
+  { name: "Shopify", icon: <SiShopify className="text-[#95bf47]" /> },
+  { name: "PayPal", icon: <FaCcPaypal className="text-[#003087]" /> },
+];
+
+const walletPayments = [
+  { name: "Cash App", icon: <SiCashapp className="text-[#00d632]" /> },
+  { name: "Revolut", icon: <SiRevolut className="text-black" /> },
+  { name: "Chime", icon: <ChimeIcon /> },
+  { name: "Zelle", icon: <SiZelle className="text-[#6d1ed4]" /> },
+  { name: "Apple Pay", icon: <FaApplePay className="text-black" /> },
+  { name: "Meta Pay", icon: <SiMeta className="text-[#0866ff]" /> },
+];
+
+const PaymentBadge = ({ name, icon }: { name: string; icon: React.ReactNode }) => (
+  <div
+    title={name}
+    aria-label={name}
+    className="flex h-8 min-w-[48px] items-center justify-center rounded-sm bg-white px-2 text-2xl shadow-sm transition-transform duration-200 hover:scale-105"
+  >
+    {icon}
+  </div>
+);
+
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -90,7 +145,7 @@ export default function Footer() {
       <div className="max-w-[1440px] mx-auto px-6 lg:px-10">
 
         {/* ================= 2. MAIN FOOTER CONTENT ================= */}
-        
+
         {/* Desktop Layout */}
         <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
           {footerNavigation.map((col) => (
@@ -121,10 +176,10 @@ export default function Footer() {
             <p className="text-xs text-slate-400 leading-relaxed">
               Have questions or custom team requests? Our team is available 7 days a week.
             </p>
-            
+
             <div className="space-y-2 pt-1 text-sm">
               <a
-                href="https://wa.me/(347) 580-4219"
+                href="https://wa.me/13475804219"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2.5 text-slate-300 hover:text-amber-400 transition-colors"
@@ -134,7 +189,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="info@bespoketeamwear.com"
+                href="mailto:info@bespoketeamwear.com"
                 className="flex items-center gap-2.5 text-slate-300 hover:text-amber-400 transition-colors"
               >
                 <MdEmail className="text-amber-400 text-lg" />
@@ -203,10 +258,10 @@ export default function Footer() {
               Hours: 9:00 AM - 6:00 PM (EST), 7 Days a week.
             </p>
             <div className="flex gap-4 pt-1">
-              <a href="https://wa.me/1234567890" className="flex items-center gap-2 text-sm text-emerald-400">
+              <a href="https://wa.me/13475804219" className="flex items-center gap-2 text-sm text-emerald-400">
                 <RiMessage2Fill className="text-lg" /> WhatsApp
               </a>
-              <a href="mailto:support@bespokewear.com" className="flex items-center gap-2 text-sm text-amber-400">
+              <a href="mailto:info@bespoketeamwear.com" className="flex items-center gap-2 text-sm text-amber-400">
                 <MdEmail className="text-lg" /> Email
               </a>
             </div>
@@ -236,10 +291,17 @@ export default function Footer() {
           </div>
 
           {/* Payment Gateways */}
-          <div className="flex items-center gap-4 text-4xl opacity-90">
-            <LiaCcVisa className="text-blue-400 hover:opacity-100" />
-            <FaCcPaypal className="text-cyan-400 hover:opacity-100" />
-            <FaCcMastercard className="text-orange-400 hover:opacity-100" />
+          <div className="flex flex-col items-center md:items-end gap-3">
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+              {cardPayments.map((p) => (
+                <PaymentBadge key={p.name} {...p} />
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+              {walletPayments.map((p) => (
+                <PaymentBadge key={p.name} {...p} />
+              ))}
+            </div>
           </div>
         </div>
 
