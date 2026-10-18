@@ -198,9 +198,16 @@ export default function MobileNavbar({
       {/* LOGO */}
       <Link href="/" onClick={closeAll} className="flex items-center justify-center">
         {logoUrl ? (
-          <Image src={logoUrl} alt="Logo" width={120} height={35} className="h-7 w-auto object-contain" />
+          <Image
+            src={logoUrl}
+            alt="Logo"
+            width={240}
+            height={80}
+            priority
+            className="h-10 w-auto object-contain sm:h-12 md:h-14 lg:h-16"
+          />
         ) : (
-          <span className="font-serif text-lg font-bold tracking-tight text-[#0B1E3D]">
+          <span className="font-serif text-xl font-bold tracking-tight text-[#0B1E3D] md:text-2xl">
             BeSpoke Wear
           </span>
         )}

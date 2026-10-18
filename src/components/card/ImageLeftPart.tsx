@@ -56,7 +56,7 @@ export default function ImageLeftPart({ product, selectedColor }: ImageLeftPartP
   };
 
   return (
-    <div className="w-full lg:w-[48%] md:w-[45%] md:sticky md:top-6 self-start space-y-4">
+    <div className="w-full lg:w-[48%] md:w-full md:sticky md:top-6 self-start space-y-4">
       {/* Main Image Container */}
       <div className="relative aspect-[4/5] w-full bg-slate-100 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm">
         {images[activeImageIndex] && (

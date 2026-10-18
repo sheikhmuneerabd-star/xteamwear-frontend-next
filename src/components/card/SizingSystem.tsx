@@ -143,7 +143,7 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
   };
 
   return (
-    <div className="xl:w-[48%] md:w-[52%] w-full bg-white font-sans text-slate-900 leading-relaxed relative">
+    <div className="w-full lg:w-[52%] xl:w-[48%] bg-white font-sans text-slate-900 leading-relaxed relative">
       
       {/* Dynamic Custom Notification Toast UI */}
       {toast && (
@@ -527,7 +527,7 @@ export default function SizingSystem({ product, selectedColor, setSelectedColor 
         <hr className="border-slate-100" />
 
         {/* Updated WhatsApp Section linked to target number */}
-        <div className="flex items-center gap-2 text-lg font-medium text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base font-medium text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
           <span>Need design assistance?</span>
           <a
             href={whatsappUrl}

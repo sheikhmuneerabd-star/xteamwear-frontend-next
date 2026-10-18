@@ -5,7 +5,7 @@ import { CartProvider } from "@/context/CartContext";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "Xteamwear | Custom Team Uniforms & Sublimated Jerseys",
+  title: "BespokeTeamWear | Custom Team Uniforms & Sublimated Jerseys",
   description:
     "Trusted by more than 1 million teams worldwide. Custom sublimated soccer, basketball, and team jerseys.",
 };
