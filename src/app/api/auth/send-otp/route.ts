@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { connectDB } from "@/lib/db";
 import User from "@/lib/models/User";
+import { otpStore } from "@/lib/otpStore";
 
 // Global OTP store to prevent memory wiped during Hot Reloads
 const globalForOtp = global as unknown as { otpStore?: Map<string, { code: string; expires: number }> };
-export const otpStore = globalForOtp.otpStore || new Map<string, { code: string; expires: number }>();
 if (process.env.NODE_ENV !== "production") globalForOtp.otpStore = otpStore;
 
 export async function POST(req: Request) {
