@@ -21,7 +21,7 @@ const items = [
 export default function CustomizationGrid() {
   return (
     <div className="py-14 px-5 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold text-center mb-10">Cooperate with XTeamwear</h2>
+      <h2 className="text-2xl font-bold text-center mb-10">Cooperate with bespoketeamwear</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {items.map((item) => (
           <div

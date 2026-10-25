@@ -31,7 +31,7 @@ const leftCategoriesData: LeftCategoryItem[] = [
     title: "Kids",
     items: ["Kids Football", "Kids Basketball", "Kids Training", "Kids Socks & Accessories", "Down & Warm", "More Kids Teamwear"],
   },
-  { id: 8, title: "Xteamwear Basics", items: ["Yoga", "T-shirts", "Shorts & Pants", "Sweatshirts & Hoodies"] },
+  { id: 8, title: "bespoketeamwear Basics", items: ["Yoga", "T-shirts", "Shorts & Pants", "Sweatshirts & Hoodies"] },
 ];
 
 export default leftCategoriesData;

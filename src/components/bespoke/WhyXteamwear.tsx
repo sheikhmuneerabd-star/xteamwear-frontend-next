@@ -8,10 +8,10 @@ const reasons = [
   "Bespoke Custom ETA: 15–20 days",
 ];
 
-export default function WhyXteamwear() {
+export default function Whybespoketeamwear() {
   return (
     <div className="bg-gray-50 py-14 px-5">
-      <h2 className="text-2xl font-bold text-center mb-8">Why Xteamwear?</h2>
+      <h2 className="text-2xl font-bold text-center mb-8">Why bespoketeamwear?</h2>
       <div className="max-w-2xl mx-auto grid sm:grid-cols-2 gap-3">
         {reasons.map((r) => (
           <div key={r} className="flex items-start gap-2 text-sm text-gray-700 bg-white rounded-md p-3 border border-gray-100">

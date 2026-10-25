@@ -12,8 +12,8 @@ const faqData: FaqItem[] = [
   { question: "Is there a minimum order quantity?", answer: "There is no minimum order requirement – customization is available from just 1 piece." },
   { question: "Can I request design changes after ordering?", answer: "Yes—contact us within 24 hours of placing your order. If production hasn't started, we can apply your requested changes." },
   { question: "Can you produce any custom design?", answer: "Yes—we create fully bespoke designs tailored to your branding. Upload your artwork and receive a free digital proof before production." },
-  { question: "Who is XTeamwear?", answer: "XTeamwear is an in-house teamwear manufacturer serving nearly one million teams worldwide. We oversee design, production, and delivery to ensure speed and quality." },
-  { question: "How can I contact support?", answer: "Email us at support@xteamwear.com or message via WhatsApp. We respond within 12 hours (9 AM–6 PM EST, 7 days/week)." },
+  { question: "Who is bespoketeamwear?", answer: "bespoketeamwear is an in-house teamwear manufacturer serving nearly one million teams worldwide. We oversee design, production, and delivery to ensure speed and quality." },
+  { question: "How can I contact support?", answer: "Email us at support@bespoketeamwear.com or message via WhatsApp. We respond within 12 hours (9 AM–6 PM EST, 7 days/week)." },
 ];
 
 export default faqData;

@@ -197,7 +197,7 @@ export default function CheckoutPage() {
       <div className="xl:w-1/2 w-full px-5 sm:px-10 xl:px-16 py-8 xl:py-12">
         <div className="max-w-xl xl:ml-auto w-full space-y-8">
           <Link href="/" className="text-2xl font-black tracking-tight text-gray-900 inline-block">
-            XTEAMWEAR
+            bespoketeamwear
           </Link>
 
           <form onSubmit={handleSubmit} className="space-y-6">

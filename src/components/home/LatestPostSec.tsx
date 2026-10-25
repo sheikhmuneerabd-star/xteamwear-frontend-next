@@ -77,7 +77,7 @@ export default function LatestPostSec() {
             </div>
             <p className="text-gray-400 text-sm">AlexWear Feb 02, 2026</p>
             <p className="text-gray-800 text-sm line-clamp-2">
-              With the 2026 Spring Season already in motion, Xteamwear is officially opening our early-bird production Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, dolorum!
+              With the 2026 Spring Season already in motion, bespoketeamwear is officially opening our early-bird production Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, dolorum!
             </p>
             <p className="text-gray-800 text-sm hover:underline cursor-pointer">View details</p>
           </div>
@@ -101,7 +101,7 @@ export default function LatestPostSec() {
             </div>
             <p className="text-gray-400 text-sm">AlexWear Feb 02, 2026</p>
             <p className="text-gray-800 text-sm line-clamp-2">
-              With the 2026 Spring Season already in motion, Xteamwear is officially opening our early-bird production Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, dolorum!
+              With the 2026 Spring Season already in motion, bespoketeamwear is officially opening our early-bird production Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, dolorum!
             </p>
             <p className="text-gray-800 text-sm hover:underline cursor-pointer">View details</p>
           </div>

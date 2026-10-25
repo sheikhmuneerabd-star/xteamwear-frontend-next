@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     
     // Categorize folder: products for admin, custom-logos for user customization
     const isAdmin = session?.user?.role === "admin";
-    const folder = isAdmin ? "xteamwear/products" : "xteamwear/custom-logos";
+    const folder = isAdmin ? "bespoketeamwear/products" : "bespoketeamwear/custom-logos";
 
     const signature = await generateSignature({ folder, timestamp });
 

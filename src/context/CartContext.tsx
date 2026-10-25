@@ -28,7 +28,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // 1. Page Initial Load par LocalStorage se Cart Recover karein
   useEffect(() => {
     try {
-      const savedCart = localStorage.getItem("xteamwear_cart");
+      const savedCart = localStorage.getItem("bespoketeamwear_cart");
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
@@ -43,7 +43,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoaded) {
       try {
-        localStorage.setItem("xteamwear_cart", JSON.stringify(cart));
+        localStorage.setItem("bespoketeamwear_cart", JSON.stringify(cart));
       } catch (error) {
         console.error("Failed to save cart to localStorage:", error);
       }
@@ -147,7 +147,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clearCart = () => {
     setCart([]);
     try {
-      localStorage.removeItem("xteamwear_cart");
+      localStorage.removeItem("bespoketeamwear_cart");
     } catch (error) {
       console.error("Failed to clear cart from localStorage:", error);
     }

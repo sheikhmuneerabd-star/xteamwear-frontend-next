@@ -59,7 +59,7 @@ export default function GetInTouchInfo() {
           href="/track-order"
           className="inline-block text-xs font-semibold text-blue-600 hover:underline break-all"
         >
-          https://xteamwear.com/a/track-order
+          https://bespoketeamwear.com/a/track-order
         </Link>
       </div>
     </div>

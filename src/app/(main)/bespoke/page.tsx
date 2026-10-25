@@ -133,7 +133,7 @@ export default function ContactUsPage() {
   // Quick Direct WhatsApp Redirect
   const handleDirectWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hi XTeamwear! I want a custom quote:\n- Category: ${formData.category}\n- Qty: ${formData.quantity}\n- Color: ${formData.color}\n- Name: ${formData.fullName || "N/A"}`
+      `Hi bespoketeamwear! I want a custom quote:\n- Category: ${formData.category}\n- Qty: ${formData.quantity}\n- Color: ${formData.color}\n- Name: ${formData.fullName || "N/A"}`
     );
     window.open(`https://wa.me/923000000000?text=${text}`, "_blank");
   };

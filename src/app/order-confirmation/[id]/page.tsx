@@ -30,7 +30,7 @@ export default async function OrderConfirmationPage({ params }: ConfirmationPage
         {/* Brand Header */}
         <div className="text-center mb-8 border-b border-gray-100 pb-6">
           <Link href="/" className="text-2xl font-black tracking-tight text-gray-900">
-            XTEAMWEAR
+            bespoketeamwear
           </Link>
         </div>
 

@@ -7,9 +7,9 @@ const stats = [
 export default function StatsSection() {
   return (
     <div className="py-14 px-5">
-      <h2 className="text-2xl font-bold text-center mb-2">XTeamwear Team Service</h2>
+      <h2 className="text-2xl font-bold text-center mb-2">bespoketeamwear Team Service</h2>
       <p className="text-center text-sm text-gray-600 max-w-2xl mx-auto mb-10">
-        XTeamwear produce custom design sportswear for teams all over the world. We have a professional
+        bespoketeamwear produce custom design sportswear for teams all over the world. We have a professional
         design team, high-tech AI garment production process and are committed to improved research and
         development of sportswear equipment.
       </p>

@@ -46,13 +46,13 @@ export async function POST(req: Request) {
     });
 
     await transporter.sendMail({
-      from: `"XTeamWear Auth" <${process.env.SMTP_USER}>`,
+      from: `"bespoketeamwear Auth" <${process.env.SMTP_USER}>`,
       to: cleanEmail,
-      subject: `${otpCode} is your XTeamWear Registration Code`,
+      subject: `${otpCode} is your bespoketeamwear Registration Code`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #111;">
           <h2>Account Registration Verification</h2>
-          <p>Your verification code for creating your XTeamWear account is:</p>
+          <p>Your verification code for creating your bespoketeamwear account is:</p>
           <h1 style="font-size: 32px; letter-spacing: 5px; color: #f59e0b;">${otpCode}</h1>
           <p>This code will expire in 5 minutes.</p>
         </div>

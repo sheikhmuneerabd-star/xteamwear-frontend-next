@@ -37,7 +37,7 @@ const topCategoriesData34: TopCategory[] = [
           "More Kids Teamwear",
         ],
       },
-      { id: 19, name: "Xteamwear Basics", item: ["Yoga", "T-shirts", "Shorts & Pants", "Sweatshirts & Hoodies"] },
+      { id: 19, name: "bespoketeamwear Basics", item: ["Yoga", "T-shirts", "Shorts & Pants", "Sweatshirts & Hoodies"] },
     ],
   },
 ];

@@ -215,7 +215,7 @@ export default function MobileNavbar({
 
       {/* RIGHT SECTION (ACCOUNT & CART) */}
       <div className="flex items-center gap-2">
-        <Link href="/account" className="p-1 text-[#0B1E3D]" aria-label="Account">
+        <Link href="/sign-in" className="p-1 text-[#0B1E3D]" aria-label="Account">
           <PiUserLight className="text-2xl" />
         </Link>
         <Link href="/cart" className="relative p-1 text-[#0B1E3D]" aria-label="Cart">

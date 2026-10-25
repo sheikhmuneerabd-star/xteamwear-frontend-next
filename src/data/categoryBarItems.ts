@@ -25,7 +25,7 @@ const category: CategoryItem[] = [
   { id: 5, name: "Training", title: ["Sublimated Shirts", "Fluorescent Jersey", "Shirts", "Pants"] },
   { id: 6, name: "Accessories", title: ["Sublimated Shirts", "Fluorescent Jersey", "Shirts", "Pants"] },
   { id: 7, name: "Kids", title: ["Sublimated Shirts", "Fluorescent Jersey", "Shirts", "Pants"] },
-  { id: 8, name: "Xteamwear Basics", title: ["Sublimated Shirts", "Fluorescent Jersey", "Shirts", "Pants"] },
+  { id: 8, name: "bespoketeamwear Basics", title: ["Sublimated Shirts", "Fluorescent Jersey", "Shirts", "Pants"] },
 ];
 
 export default category;

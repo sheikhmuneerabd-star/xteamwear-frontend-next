@@ -46,7 +46,7 @@ export default function NavContact() {
           </div>
           <div className="flex justify-center items-center gap-1 text-gray-800 cursor-pointer">
             <GoMail className="text-[15px]" />
-            <span className="text-[13px]">support@xteamwear.com</span>
+            <span className="text-[13px]">support@bespoketeamwear.com</span>
           </div>
         </div>
 

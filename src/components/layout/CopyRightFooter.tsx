@@ -6,7 +6,7 @@ export default function CopyRightFooter() {
   return (
     <div className="flex xl:flex-row flex-col justify-between items-center px-6 py-3">
       <div className="md:text-[14px] text-[12.5px] xl:text-start text-center">
-        <p>© 2026 XTeamwear All Rights Reserved.</p>
+        <p>© 2026 bespoketeamwear All Rights Reserved.</p>
         <p>Designing Unity. Delivering Performance. Trusted by Thousands of Teams Worldwide.</p>
         <div className="flex gap-2 xl:justify-start justify-center">
           <p className="cursor-pointer hover:underline">About Us |</p>
