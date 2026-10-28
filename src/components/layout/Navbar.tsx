@@ -328,9 +328,16 @@ export default function Navbar() {
       <div className="w-full xl:flex hidden border-b border-[#E6E1D6] bg-white">
         <div className="w-[91%] h-[100px] mx-auto flex items-center justify-between">
           {/* Brand / Logo */}
-          <Link href="/" className="cursor-pointer shrink-0">
+          <Link href="/" className="flex h-full shrink-0 cursor-pointer items-center py-2">
             {logoUrl ? (
-              <Image className="w-[80%] h-auto" src={logoUrl} alt="BeSpoke Wear" width={160} height={60} />
+              <Image
+                className="h-full w-auto object-contain"
+                src={logoUrl}
+                alt="BeSpoke Wear"
+                width={240}
+                height={80}
+                priority
+              />
             ) : (
               <span className="font-serif text-2xl tracking-tight text-[#0B1E3D]">BeSpoke Wear</span>
             )}

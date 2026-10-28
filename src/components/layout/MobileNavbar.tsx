@@ -165,7 +165,7 @@ export default function MobileNavbar({
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[999] shadow-sm w-full h-[56px] bg-white xl:hidden flex items-center justify-between px-4 border-b border-gray-100">
+    <div className="fixed top-0 left-0 right-0 z-[999] shadow-sm w-full h-[72px] bg-white xl:hidden flex items-center justify-between px-4 border-b border-gray-100">
       {/* BACKDROP OVERLAY */}
       {(toggle || openSearch) && (
         <div
@@ -196,15 +196,19 @@ export default function MobileNavbar({
       </div>
 
       {/* LOGO */}
-      <Link href="/" onClick={closeAll} className="flex items-center justify-center">
+      <Link
+        href="/"
+        onClick={closeAll}
+        className="flex h-full items-center justify-center py-1.5"
+      >
         {logoUrl ? (
           <Image
             src={logoUrl}
-            alt="Logo"
+            alt="BeSpoke Wear"
             width={240}
             height={80}
             priority
-            className="h-10 w-auto object-contain sm:h-12 md:h-14 lg:h-16"
+            className="h-full w-auto object-contain"
           />
         ) : (
           <span className="font-serif text-xl font-bold tracking-tight text-[#0B1E3D] md:text-2xl">

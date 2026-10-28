@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   },
   description:
     "Trusted by more than 1 million teams worldwide. Custom sublimated soccer, basketball, and team jerseys.",
+  verification: {
+    google: "rHnY01SWUo5QDjJYpG3okgoaubEl1Xg-_9iPuG2SIUM",
+  },
   applicationName: "BespokeTeamWear",
   openGraph: {
     siteName: "BespokeTeamWear",
